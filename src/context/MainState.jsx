@@ -29,7 +29,7 @@ const MainState = (props) => {
     /* ------------ User Authentication ------------ */
     // Signin User (Admin will create new users)
     const signin = async (firstName, lastName, email, password, cpassword, dob, designationName, forced2FA, userGroup, ip) => {
-        let response = await fetch('/user/signin', {
+        let response = await fetch(`${baseUrl}/user/signin`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -56,7 +56,7 @@ const MainState = (props) => {
 
     // Logout User
     const logout = async (ip) => {
-        let resp = await fetch('/user/logout', {
+        let resp = await fetch(`${baseUrl}/user/logout`, {
             method: 'POST',
             headers: {
                 'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token,
@@ -71,7 +71,7 @@ const MainState = (props) => {
 
     // Verify New User / Old User (Refresh Token)
     const verifyReft = async (userIp) => {
-        const response = await fetch(`/user/verifyReft?userIp=${userIp}`, {
+        const response = await fetch(`${baseUrl}/user/verifyReft?userIp=${userIp}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -86,7 +86,7 @@ const MainState = (props) => {
     // Verify Jwt token
     const verifyJwt = async (userIp) => {
         if (getWithExpiry('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
-            let response = await fetch(`/user/verifyJwt?userIp=${userIp}`, {
+            let response = await fetch(`${baseUrl}/user/verifyJwt?userIp=${userIp}`, {
                 method: 'GET',
                 headers: {
                     'content-type': 'application/json',
@@ -103,7 +103,7 @@ const MainState = (props) => {
 
     // Verify The Session
     const verifySession = async (ip) => {
-        let response = await fetch('/user/verifySession', {
+        let response = await fetch(`${baseUrl}/user/verifySession`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -118,7 +118,7 @@ const MainState = (props) => {
 
     // Email OTP Verification
     const email2fa = async (email, ip) => {
-        let resp = await fetch('/user/email2fa', {
+        let resp = await fetch(`${baseUrl}/user/email2fa`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -132,7 +132,7 @@ const MainState = (props) => {
 
     // Verification of otp by entering it
     const verifyOtp = async (otp, ip, email) => {
-        let resp = await fetch('/user/verifyOtp', {
+        let resp = await fetch(`${baseUrl}/user/verifyOtp`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -146,7 +146,7 @@ const MainState = (props) => {
 
     // verification of otp by email link
     const verifyOtp1 = async (otp, ip, email) => {
-        let resp = await fetch(`/user/verifyOtp/${otp}`, {
+        let resp = await fetch(`${baseUrl}/user/verifyOtp/${otp}`, {
             method: 'POST',
             headers: {
                 'reft': JSON.parse(localStorage.getItem('923hufweh8934rbuf3489h348ryc34ry890xcr348efq3we90y')).token,
@@ -161,7 +161,7 @@ const MainState = (props) => {
     // Fetch the information of currently logged in user from backend and save user details to localstorage (stackNUser)
     const userDetail = async (ip) => {
         // props.setLoad1(false);
-        let resp = await fetch(`/user/userInfo`, {
+        let resp = await fetch(`${baseUrl}${baseUrl}/user/userInfo`, {
             method: 'POST',
             headers: {
                 'reft': JSON.parse(localStorage.getItem('923hufweh8934rbuf3489h348ryc34ry890xcr348efq3we90y')).token,
@@ -191,7 +191,7 @@ const MainState = (props) => {
     /* ------------ 2 factor authentication ------------ */
     // Generate QR Code for g auth verification
     const genQr = async (ip) => {
-        let resp = await fetch(`/user/generate2`, {
+        let resp = await fetch(`${baseUrl}/user/generate2`, {
             method: 'POST',
             headers: {
                 'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token,
@@ -206,7 +206,7 @@ const MainState = (props) => {
 
     // Verification of user by g auth (2fa verification)
     const verify2 = async (token, ip) => {
-        let resp = await fetch('/user/verify2', {
+        let resp = await fetch(`${baseUrl}/user/verify2`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -220,7 +220,7 @@ const MainState = (props) => {
 
     // Remove the 2fa authentication (g auth)
     const remove2fa = async (userIp) => {
-        let resp = await fetch(`/user/remove2fa?userIp=${userIp}`, {
+        let resp = await fetch(`${baseUrl}/user/remove2fa?userIp=${userIp}`, {
             headers: {
                 'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token
             }
@@ -233,7 +233,7 @@ const MainState = (props) => {
 
     // Fetch data by country (Analytics)
     const getCountryData = async () => {
-        let resp = await fetch('/analytics/countryData', {
+        let resp = await fetch(`${baseUrl}/analytics/countryData`, {
             headers: {
                 'jwt': JSON.parse(localStorage.getItem('jwt')).value
             }
@@ -246,7 +246,7 @@ const MainState = (props) => {
 
     // Temp (For some testing purpose)
     const ua = async () => {
-        let resp = await fetch('/ua');
+        let resp = await fetch(`${baseUrl}/ua`);
         let data = await resp.json();
         // console.log(data.source);
     };
@@ -255,7 +255,7 @@ const MainState = (props) => {
 
     // Get user current session
     const getUserSessions = async () => {
-        let resp = await fetch('/user/getUserSessions', {
+        let resp = await fetch(`${baseUrl}/user/getUserSessions`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -269,7 +269,7 @@ const MainState = (props) => {
 
     // Remove user session
     const removeSession = async (index, userIp) => {
-        let resp = await fetch(`/user/removeSession/${index}`, {
+        let resp = await fetch(`${baseUrl}/user/removeSession/${index}`, {
             method: 'DELETE',
             headers: {
                 'content-type': 'application/json',
@@ -284,7 +284,7 @@ const MainState = (props) => {
 
     // Remove user's all sessions
     const removeAllSessionByUser = async (userIp) => {
-        let resp = await fetch('/user/removeAllSessionByUser', {
+        let resp = await fetch(`${baseUrl}/user/removeAllSessionByUser`, {
             method: 'DELETE',
             headers: {
                 'content-type': 'application/json',
@@ -299,7 +299,7 @@ const MainState = (props) => {
 
     // Get user current session
     const getCurrentSession = async (ip) => {
-        let resp = await fetch('/user/getCurrentSession', {
+        let resp = await fetch(`${baseUrl}/user/getCurrentSession`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -316,7 +316,7 @@ const MainState = (props) => {
     // Save heartbeat
     const heartBeat = async (pageUrl, userState, currentTab, numberTabs) => {
         try {
-            let resp = await fetch('/user/heartBeat', {
+            let resp = await fetch(`${baseUrl}/user/heartBeat`, {
                 method: 'POST',
                 headers: {
                     'content-type': 'application/json',
@@ -333,7 +333,7 @@ const MainState = (props) => {
 
     // Get last heartbeat by user id
     const lastHeartBeat = async (userId) => {
-        let resp = await fetch(`/user/lastHeartBeatByUser/${userId}`, {
+        let resp = await fetch(`${baseUrl}/user/lastHeartBeatByUser/${userId}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -348,7 +348,7 @@ const MainState = (props) => {
     // Fetch article corresponding to perticular user
     const fetchUserArticles = async (page, perPage, key, order, query, catId, date, mode, userGroup, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/userAllArticles?page=${page}&perPage=${perPage}&key=${key}&order=${order}&query=${query}&catId=${catId}&date=${date}&mode=${mode}&userGroup=${userGroup}&delay=1&userIp=${userIp}`, {
+        let resp = await fetch(`${baseUrl}/article/userAllArticles?page=${page}&perPage=${perPage}&key=${key}&order=${order}&query=${query}&catId=${catId}&date=${date}&mode=${mode}&userGroup=${userGroup}&delay=1&userIp=${userIp}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -363,7 +363,7 @@ const MainState = (props) => {
 
     // New Article
     const newArticle = async (userIp) => {
-        let resp = await fetch(`/article/newArticle`, {
+        let resp = await fetch(`${baseUrl}/article/newArticle`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -378,7 +378,7 @@ const MainState = (props) => {
 
     // Get Version History
     const getVersionHistory = async (articleId, userIp) => {
-        let resp = await fetch(`/article/getVersionHistory/${articleId}?userIp=${userIp}`, {
+        let resp = await fetch(`${baseUrl}/article/getVersionHistory/${articleId}?userIp=${userIp}`, {
             headers: {
                 'content-type': 'application/json',
                 'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token
@@ -390,7 +390,7 @@ const MainState = (props) => {
 
     // Update Article
     const putArticle = async (articleId, articleData, userIp) => {
-        let resp = await fetch(`/article/putArticle/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/putArticle/${articleId}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
@@ -406,7 +406,7 @@ const MainState = (props) => {
     // Get current article detail
     const getArticle = async (articleId, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/userArticle/${articleId}/${JSON.parse(localStorage.getItem('stackNUser')).designationName}?userIp=${userIp}`, {
+        let resp = await fetch(`${baseUrl}/article/userArticle/${articleId}/${JSON.parse(localStorage.getItem('stackNUser')).designationName}?userIp=${userIp}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -422,7 +422,7 @@ const MainState = (props) => {
     // Get current article detail (By Slug) (not in use)
     const getArticleBySlug = async (slug) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/userArticleBySlug/${slug}`, {
+        let resp = await fetch(`${baseUrl}/article/userArticleBySlug/${slug}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -438,7 +438,7 @@ const MainState = (props) => {
     // Update article slug by article id
     const updateArticleBySlug = async (articleId, slug, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/updateArticleSlug/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/updateArticleSlug/${articleId}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
@@ -453,7 +453,7 @@ const MainState = (props) => {
 
     // Update current article Heading
     const updateArticleHead = async (articleId, editorHead, userIp) => {
-        let resp = await fetch(`/article/editorHead/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/editorHead/${articleId}`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -468,7 +468,7 @@ const MainState = (props) => {
 
     // Getting article wise goals details
     const getArticleGoals = async (articleId, userIp) => {
-        let resp = await fetch(`/article/getArticleGoals/${articleId}?userIp=${userIp}`, {
+        let resp = await fetch(`${baseUrl}/article/getArticleGoals/${articleId}?userIp=${userIp}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -481,7 +481,7 @@ const MainState = (props) => {
 
     // Delele the article by id
     const deleteArticle = async (articleId, userIp) => {
-        let resp = await fetch(`/article/deleteArticle/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/deleteArticle/${articleId}`, {
             method: 'DELETE',
             headers: {
                 'content-type': 'application/json',
@@ -499,7 +499,7 @@ const MainState = (props) => {
     // Fetch all article categories
     const getArticleCategories = async () => {
         props.setLoad1(false);
-        let resp = await fetch(`/articleCategory/getCategories`, {
+        let resp = await fetch(`${baseUrl}/articleCategory/getCategories`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -513,7 +513,7 @@ const MainState = (props) => {
 
     // Fetch all article categories
     const postArticleCategory = async (catName, catSlug, catParent, userIp) => {
-        let resp = await fetch(`/articleCategory/postCategory`, {
+        let resp = await fetch(`${baseUrl}/articleCategory/postCategory`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -527,7 +527,7 @@ const MainState = (props) => {
 
     // Fetch all article categories
     const putArticleCategory = async (catId, catName, catSlug, catParent, userIp) => {
-        let resp = await fetch(`/articleCategory/putCategory/${catId}`, {
+        let resp = await fetch(`${baseUrl}/articleCategory/putCategory/${catId}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
@@ -541,7 +541,7 @@ const MainState = (props) => {
 
     // Fetch all article categories
     const deleteArticleCategory = async (catId, userIp) => {
-        let resp = await fetch(`/articleCategory/deleteCategory/${catId}`, {
+        let resp = await fetch(`${baseUrl}/articleCategory/deleteCategory/${catId}`, {
             method: 'DELETE',
             headers: {
                 'content-type': 'application/json',
@@ -556,7 +556,7 @@ const MainState = (props) => {
     // Update article category
     const updateArticleCat = async (articleId, catDetails, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/updateCategory/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/updateCategory/${articleId}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
@@ -572,7 +572,7 @@ const MainState = (props) => {
     // Remove article category
     const removeArticleCat = async (articleId, catIds, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/removeCategory/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/removeCategory/${articleId}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
@@ -588,7 +588,7 @@ const MainState = (props) => {
     // Update article active user
     const updateActiveUser = async (articleId, userType, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/updateActiveUser/${articleId}`, {
+        let resp = await fetch(`${baseUrl}/article/updateActiveUser/${articleId}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json',
@@ -605,7 +605,7 @@ const MainState = (props) => {
     // Get article date info
     const getArticleInfo = async (userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/article/getArticleInfo?userIp=${userIp}`, {
+        let resp = await fetch(`${baseUrl}/article/getArticleInfo?userIp=${userIp}`, {
             method: 'GET',
             headers: {
                 'content-type': 'application/json',
@@ -621,7 +621,7 @@ const MainState = (props) => {
     // analyzeLinks
     const analyzeLinks = async (urls, topicsArr, userIp) => {
         props.setLoad1(false);
-        let resp = await fetch(`/overview/analyzeLinks`, {
+        let resp = await fetch(`${baseUrl}/overview/analyzeLinks`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -638,7 +638,7 @@ const MainState = (props) => {
     // async function updateUserGroup(name,flag)
     // {
 
-    //     let resp=await fetch(`/user/updateUserGroup/`,{
+    //     let resp=await fetch(`${baseUrl}/user/updateUserGroup/`,{
     //         method:'PUT',
     //         headers:{
     //             'content-type':'application/json',
