@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import MainContext from './MainContext'
 
 const baseUrl="https://stacknexo-backend-app.herokuapp.com";
+// const baseUrl="http://localhost:5001";
 
 const MainState = (props) => {
     const [userData, setUserData] = useState({});
@@ -246,9 +247,16 @@ const MainState = (props) => {
 
     // Temp (For some testing purpose)
     const ua = async () => {
-        let resp = await fetch(`${baseUrl}/ua`);
+        let resp = await fetch(`${baseUrl}/user/sessionHistory`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+                'jwt': JSON.parse(localStorage.getItem('923hufweh8934rbuf3489h348ryc34ry890xcr348efq3we90y')).token
+            }
+        });
         let data = await resp.json();
-        // console.log(data.source);
+        // console.log(data);
+        return data;
     };
 
     /* ------------ Manage user session ------------ */

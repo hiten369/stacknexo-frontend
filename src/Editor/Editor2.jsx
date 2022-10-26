@@ -1021,8 +1021,8 @@ const Editor2 = (props) => {
     // console.log(blockIdsNum);
     // console.log(blockDetails);
     // setMainData(mainData.concat({'a':12}));
-    let savedData = await editorG.save();
-    console.log(savedData);
+    // let savedData = await editorG.save();
+    // console.log(savedData);
     // console.log(idNum);
     // console.log(goals);
     // console.log(mainData);
@@ -1031,6 +1031,7 @@ const Editor2 = (props) => {
     // console.log(blockIds);
     // document.getElementById('').show();
     // console.log(blockDetails);
+    // context.ua();
   };
 
   return (
@@ -1121,7 +1122,7 @@ const Editor2 = (props) => {
           </div>
  
           {/* Topics Cards */}
-          <div className="editor-tc">
+          {/* <div className="editor-tc">
             <div className="editor-tc1">
               <div className="editor-tc11 px-3 text-center">
                 <p>Current Grade</p>
@@ -1386,10 +1387,11 @@ const Editor2 = (props) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Grammar cards with side grammar panel */}
-          {/* <div className="editor-main12">
+          <div className="editor-main12">
+             {/* Side Grammar Panel */}
             <div className="editor-main121">
               <div className="em0">{mainData.length !== 0 ? <><span className={`badge me-3 badge-circle badge-${mainType === 'all' ? 'secondary' : mainType === 'Correctness' ? 'danger' : mainType === 'Clarity' ? 'info' : mainType === 'Engagement' ? 'primary' : mainType === 'Tone' ? 'success' : 'dark'}`}>{tc}</span><b>{mainType === 'all' ? 'All Suggestions' : mainType}</b></> : null}</div>
               {mainType !== 'all' ? <div onClick={(e) => {
@@ -1724,11 +1726,10 @@ const Editor2 = (props) => {
               </div> : null}
             </div>
 
-           
             <GrammarPanel trigger_active={(e) => {
               trigger_active(e, editorContext);
             }} mainData={mainData} sideUtils={sideUtils} toggleAssistant={toggleAssistant} toggleAssistant1={toggleAssistant} onEditorStateChange2={onEditorStateChange2} grammarFlag={grammarFlag} grammarFlag1={grammarFlag1} dataMatch={dataMatch} checkGr={checkGr} tc={tc} />
-          </div> */}
+          </div>
         </div>
       </div>
     </>
@@ -1736,5 +1737,3 @@ const Editor2 = (props) => {
 }
 
 export default Editor2;
-
- {/* Side Grammar Panel */}

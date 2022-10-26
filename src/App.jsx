@@ -123,7 +123,7 @@ const App = () => {
     const now = new Date()
     if (now.getTime() > item.expiry) {
       localStorage.removeItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
-      window.location = 'http://localhost:3000/login';
+      window.location.href = '/login';
     }
   }, []);
 

@@ -5,6 +5,8 @@ import DisconnectAlert from '../Alert/DisconnectAlert';
 import MainContext from '../context/MainContext';
 
 var client1;
+// const baseUrl='http://stacknexo-backend-app.herokuapp.com';
+const baseUrl='stacknexo-backend-app.herokuapp.com';
 const WebSocketHandler = (props) => {
     const navigate = useNavigate();
     const context = useContext(MainContext);
@@ -20,7 +22,9 @@ const WebSocketHandler = (props) => {
                 maxRetries: 10,
             };
 
-            context.client = new ReconnectingWebSocket(`ws://127.0.0.1:5006/socketServer/${token}/${url}`, [], options);
+            // context.client = new ReconnectingWebSocket(`ws://127.0.0.1:5001/socketServer/${token}/${url}`, [], options);
+            // context.client = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
+            context.client = new ReconnectingWebSocket(`ws://${baseUrl}/socketServer/${token}/${url}`, [], options);
             window.addEventListener('offline', () => {
                 context.client.close();
             });
