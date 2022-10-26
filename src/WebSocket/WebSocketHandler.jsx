@@ -6,33 +6,36 @@ import MainContext from '../context/MainContext';
 
 var client1;
 // const baseUrl='http://stacknexo-backend-app.herokuapp.com';
-const baseUrl='stacknexo-backend-app.herokuapp.com';
+const baseUrl = 'stacknexo-backend-app.herokuapp.com';
 const WebSocketHandler = (props) => {
     const navigate = useNavigate();
     const context = useContext(MainContext);
 
     // Constantly check for web socket connection
     useEffect(() => {
-        let url=window.location.pathname.replace(/\//g,'-');
+        let url = window.location.pathname.replace(/\//g, '-');
         if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
             let token = JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token;
-         
+
             const options = {
-                connectionTimeout: 1000,
+                connectionTimeout: 2500,
                 maxRetries: 10,
             };
 
             // context.client = new ReconnectingWebSocket(`ws://127.0.0.1:5001/socketServer/${token}/${url}`, [], options);
             // context.client = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
             context.client = new ReconnectingWebSocket(`wss://${baseUrl}/socketServer/${token}/${url}`, [], options);
+            client1 = context.client;
             window.addEventListener('offline', () => {
+                console.log('offline');
                 context.client.close();
             });
             context.client.addEventListener('close', () => {
+                console.log('close');
                 document.getElementById('dis_modal').style.display = 'block';
             });
             context.client.addEventListener('open', () => {
-                client1 = context.client;
+                console.log('open');
                 document.getElementById('dis_modal').style.display = 'none';
             });
         }
