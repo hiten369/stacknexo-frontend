@@ -112,11 +112,11 @@ const Overview = (props) => {
   const [descriptionColor, setDescriptionColor] = useState('text-success');
   const [isTitleEditable, setIsTitleEditable] = useState(false);
   const [isDescEditable, setIsDescEditable] = useState(false);
-  const [builderVals, setBuilderVals] = useState([]);
-  const [builderEditable, setBuilderEditable] = useState(false);
-  const [builderCardIndex, setBuilderCardIndex] = useState([]);
-  const [builderRefresh, setBuilderRefresh] = useState(false);
-  const [addHeadFlag, setAddHeadFlag] = useState(false);
+  const [builderVals, setBuilderVals] = useState([]); // Setting the builder box entities.
+  const [builderEditable, setBuilderEditable] = useState(false); // if any builder card is selected.
+  const [builderCardIndex, setBuilderCardIndex] = useState([]); // Saving the index of builder card clicked (active).
+  const [builderRefresh, setBuilderRefresh] = useState(false); // To refresh the builder box.
+  const [addHeadFlag, setAddHeadFlag] = useState(false); // if newly created empty line box is open or close (Builder Box).
   const [addHeadIndex, setAddHeadIndex] = useState(0);
   const [editLinkVals, setEditLinkVals] = useState({});
   const [outLineRefresh, setOutLineRefresh] = useState(false);
@@ -941,6 +941,7 @@ const Overview = (props) => {
     localStorage.setItem('stnBuilderVals', JSON.stringify(builderVals));
   };
 
+  // Utility function - to reverse the array (used to reverse builder card array to perform delete operation)
   const isReversed = (arr) => {
     let flag = true;
     for (let i = 0; i < arr.length - 1; i++) {
@@ -953,6 +954,7 @@ const Overview = (props) => {
     return flag;
   };
 
+  // Delete the builder card (single/multiple)
   const handleBuilder_delete = (e) => {
     if (e.target.tagName === 'svg') {
       if (e.target.parentNode.classList.contains('cursor-pointer')) {
@@ -1004,6 +1006,7 @@ const Overview = (props) => {
     }
   };
 
+  // Handling onclick of newly inserted empty line of outline box.
   useEffect(() => {
     if (addHeadFlag) {
       if (document.getElementById("addHeadRight")) {
@@ -1012,8 +1015,11 @@ const Overview = (props) => {
           if (text !== '') {
             let indent = 1;
             let type = "head2";
+
+            // If some builder card is selected and clicked on add icon, to get that's indent, idAdd class is used.Updating the indent.
             if (document.getElementById("addHeadRight").classList.contains('isAdd')) {
               indent = document.getElementById("addHeadRight").classList[2].slice(7,);
+
               if (indent === '2') {
                 type = "head3";
               }
@@ -1021,6 +1027,8 @@ const Overview = (props) => {
                 type = "head4";
               }
             }
+
+            // added builder card position is last.
             if (builderVals.length - 1 === addHeadIndex) {
               builderVals.push({
                 indent,
@@ -1048,9 +1056,13 @@ const Overview = (props) => {
           let text = document.getElementById('addHead').value;
           if (text !== '') {
             let indent = 1;
+
+            // If some builder card is selected and clicked on add icon, to get that's indent, idAdd class is used.Updating the indent.
             if (document.getElementById("addBulletRight").classList.contains('isAdd')) {
               indent = document.getElementById("addBulletRight").classList[2].slice(7,);
             }
+
+            // added builder card position is last.
             if (builderVals.length - 1 === addHeadIndex) {
               builderVals.push({
                 indent,
@@ -1065,6 +1077,7 @@ const Overview = (props) => {
                 type: "bullet"
               });
             }
+
             localStorage.setItem("stnBuilderVals", JSON.stringify(builderVals));
             setBuilderRefresh(!builderRefresh);
             setAddHeadFlag(false);
@@ -1093,6 +1106,7 @@ const Overview = (props) => {
                 url
               });
             }
+
             localStorage.setItem("stnBuilderVals", JSON.stringify(builderVals));
             setBuilderRefresh(!builderRefresh);
             setAddHeadFlag(false);
@@ -1100,6 +1114,7 @@ const Overview = (props) => {
           }
         });
       }
+
       document.getElementById("addHeadClose").addEventListener('click', () => {
         setAddHeadFlag(false);
         document.getElementById("tempAddHead").remove();
@@ -1107,6 +1122,7 @@ const Overview = (props) => {
     }
   }, [addHeadFlag]);
 
+  // Handling the change in types and inserting new empty lines of corresponding type.
   const handleBuilder_heading = (type) => {
     if (builderVals.length > 0) {
       if (addHeadFlag) {
@@ -1114,15 +1130,21 @@ const Overview = (props) => {
         document.getElementById("tempAddHead").remove();
       }
 
+      // If some builder-card/s is/are selected
       if (builderCardIndex.length !== 0) {
         let flag = true;
+
+        // looping in selected builder card's index.
         for (let i of builderCardIndex) {
+
+          // if incoming type is head and previous card with that index is bullet, change it to heading.
           if (type === 'head') {
             if (builderVals[i].type === 'bullet') {
               builderVals[i].type = 'head2';
               flag = false;
             }
           }
+          // if incoming type is bullet and previous card with that index is head, change it to bullet.
           else if (type === 'bullet') {
             if (builderVals[i].type !== 'bullet' && builderVals[i].type !== 'link') {
               builderVals[i].type = 'bullet';
@@ -1130,6 +1152,8 @@ const Overview = (props) => {
             }
           }
         }
+
+        // If there's no change in types i.e., add new empty line.
         if (flag) {
           if (!addHeadFlag) {
             let nc = document.createElement('div');
@@ -1196,6 +1220,7 @@ const Overview = (props) => {
                             `;
             }
 
+            // Insert it at last index of selected builder card.
             document.getElementById(`builder-card-${builderCardIndex[builderCardIndex.length - 1]}`).parentNode.insertBefore(nc, document.getElementById(`builder-card-${builderCardIndex[builderCardIndex.length - 1]}`).nextSibling);
             setAddHeadFlag(true);
             setAddHeadIndex(builderCardIndex[builderCardIndex.length - 1]);
@@ -1272,6 +1297,7 @@ const Overview = (props) => {
                         `;
           }
 
+          // Add it to the last position of builder box.
           document.getElementById(`builder-card-${builderVals.length - 1}`).parentNode.insertBefore(nc, document.getElementById(`builder-card-${builderVals.length - 1}`).nextSibling);
           setAddHeadFlag(true);
           setAddHeadIndex(builderVals.length - 1);
@@ -1280,6 +1306,7 @@ const Overview = (props) => {
     }
   };
 
+  // add text from competitor outlines to builder box.
   const omCardOutlineAdd = (index, index2, index1) => {
     let b1 = document.getElementById(`om-card-outline${index}${index2}${index1}`);
     let temp = JSON.parse(localStorage.getItem('stnBuilderVals'));
@@ -1309,10 +1336,13 @@ const Overview = (props) => {
         url: ''
       }));
     }
+
+    // highlight the inserted text in builder box (highlight to competitor outline section).
     b1.classList.toggle('om-card-outline-active');
     localStorage.setItem('stnBuilderVals', JSON.stringify(temp));
   }
 
+  // Add card to builder box by clicking add button
   const handleBuilder_add = () => {
     if (builderVals.length > 0) {
       if (addHeadFlag) {
@@ -1320,8 +1350,11 @@ const Overview = (props) => {
         document.getElementById("tempAddHead").remove();
       }
 
+      // If any builder card is selected 
       if (builderCardIndex.length !== 0) {
         if (!addHeadFlag) {
+
+          // Getting the builder type of selected card
           let type = builderVals[builderCardIndex[builderCardIndex.length - 1]].type;
           let indent = builderVals[builderCardIndex[builderCardIndex.length - 1]].indent;
 
@@ -1386,6 +1419,7 @@ const Overview = (props) => {
                         `;
           }
 
+          // insert just after the last selected card.
           document.getElementById(`builder-card-${builderCardIndex[builderCardIndex.length - 1]}`).parentNode.insertBefore(nc, document.getElementById(`builder-card-${builderCardIndex[builderCardIndex.length - 1]}`).nextSibling);
           setAddHeadFlag(true);
           setAddHeadIndex(builderCardIndex[builderCardIndex.length - 1]);
@@ -1414,6 +1448,7 @@ const Overview = (props) => {
                         </div>
                     `;
 
+          // insert at last position of builder box
           document.getElementById(`builder-card-${builderVals.length - 1}`).parentNode.insertBefore(nc, document.getElementById(`builder-card-${builderVals.length - 1}`).nextSibling);
           setAddHeadFlag(true);
           setAddHeadIndex(builderVals.length - 1);
@@ -1422,6 +1457,7 @@ const Overview = (props) => {
     }
   };
 
+  // Copy utility
   const copyToClipboard = (target) => {
     navigator.clipboard.writeText(target).then(function () {
       // Setting the message for bottom right alert box
@@ -1435,6 +1471,7 @@ const Overview = (props) => {
     });
   };
 
+  // Copy the builder cards
   const builderCopy = () => {
     let str = "";
     if (builderCardIndex.length > 0) {
@@ -1455,6 +1492,7 @@ const Overview = (props) => {
     copyToClipboard(str);
   };
 
+  // Hide/Show whole side builder box (- icon, top-right)
   const toggleBuilderBox = (flag) => {
     if (flag) {
       document.querySelector('.over-main11').style.width = "100%";

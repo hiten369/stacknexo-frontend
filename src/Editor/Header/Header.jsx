@@ -40,7 +40,7 @@ const Header = (props) => {
     };
 
     const copyToClipboard=()=> {
-        var target = `/editor2/${props.articleId}`;
+        var target = `${window.location.host}/editor2/${props.articleId}`;
         navigator.clipboard.writeText(target).then(function () {
             // Setting the message for bottom right alert box
             clearTimeout(t);
@@ -93,7 +93,7 @@ const Header = (props) => {
                 <div className="e-share1">
                     <input type="text" className="form-control" onChange={(e)=>{
                         e.target.value=e.target.value;
-                    }} value={`/editor2/${props.articleId}`} />
+                    }} value={`${window.location.host}/editor2/${props.articleId}`} />
                     <button onClick={copyToClipboard} className="btn ms-2 btn-icon btn-dark">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
                             <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z" />
