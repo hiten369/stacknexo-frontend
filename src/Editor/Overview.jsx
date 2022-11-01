@@ -83,50 +83,50 @@ const Overview = (props) => {
   const { articleId } = useParams();
   const context = useContext(MainContext);
   const [data, setData] = useState([]);
-  const [topics, setTopics] = useState({});
+  const [topics, setTopics] = useState({}); // setting the topics to display
   const [data1, setData1] = useState([]);
-  const [sliderValue, setSliderValue] = useState(400);
-  const [sliderMax, setSliderMax] = useState(0);
-  const [sliderStep, setSliderStep] = useState(1);
-  const [rewriteTitles, setRewriteTitles] = useState('');
+  const [sliderValue, setSliderValue] = useState(400); // slider bar value
+  const [sliderMax, setSliderMax] = useState(0); // Maximum value of slider
+  const [sliderStep, setSliderStep] = useState(1); // Minimum value of slider
+  const [rewriteTitles, setRewriteTitles] = useState(''); // stores the title which is selected from rewrite modal
   const [mainVals, setMainVals] = useState({
     Title: ['Everything We Know About Ted 3 So Far (Informative)', 'A Ted 3 Update: The Facts With Low Hype', 'The High Quality Video Technology In Ted 3', 'A Complete Timeline Of Ted 3 News'],
     Description: ['In the first full-length trailer for Ted 3, we see that John continues to have problems with Ted. Check out the trailer here.', `Three new Ted movies are coming out after Ted 2. Here's what we know about the three movies so far.`, 'We’re three months out from the third Ted movie and more details have surfaced than we’ve gotten in the past. We’ve collected all the available information here.', "Ted 3 is the sequel to Ted, the highest grossing original R-rated comedy of all time. But the post-production process will take a while so the sequel won't hit theaters until summer 2015. Learn more here."]
-  });
-  const [bookmarkVals, setBookmarkVals] = useState({
+  });      // Stores the fetched values of title and description
+  const [bookmarkVals, setBookmarkVals] = useState({  // Bookmark values from title and description 
     Title: [],
     Description: []
   });
-  const [outlineVals, setOutlineVals] = useState(['Why A Ted 3?', 'Pacific Rim 2: Uprising In March 2018?', 'When Ted 3 Is Happening And What It’s Title Will Be', 'Wahlberg And Mac Farlane Talk Ted 3']);
-  const [outlineVals1, setOutlineVals1] = useState([]);
-  const [rewriteType, setRewriteType] = useState('Title');
-  const [mainRewriteType, setMainRewriteType] = useState('Title');
-  const [refFlag, setRefFlag] = useState(true);
-  const [title, setTitle] = useState('Click to add title');
-  const [title1, setTitle1] = useState('Click to add title');
-  const [titleLength, setTitleLength] = useState(0);
-  const [titleColor, setTitleColor] = useState('text-success');
-  const [description, setDescription] = useState('Click to add description');
-  const [description1, setDescription1] = useState('Click to add description');
-  const [descriptionLength, setDescriptionLength] = useState(0);
-  const [descriptionColor, setDescriptionColor] = useState('text-success');
-  const [isTitleEditable, setIsTitleEditable] = useState(false);
-  const [isDescEditable, setIsDescEditable] = useState(false);
+  const [outlineVals, setOutlineVals] = useState(['Why A Ted 3?', 'Pacific Rim 2: Uprising In March 2018?', 'When Ted 3 Is Happening And What It’s Title Will Be', 'Wahlberg And Mac Farlane Talk Ted 3']);  // Outline ideas in builder box
+  const [outlineVals1, setOutlineVals1] = useState([]); // Selected outlines
+  const [rewriteType, setRewriteType] = useState('Title'); // to know either title is active or description is active (Rewrite Modal)
+  const [mainRewriteType, setMainRewriteType] = useState('Title'); // First rewrite type when rewrite box is opened
+  const [refFlag, setRefFlag] = useState(true); // 
+  const [title, setTitle] = useState('Click to add title'); // Title to display
+  const [title1, setTitle1] = useState('Click to add title'); // refrence value to track original value of title
+  const [titleLength, setTitleLength] = useState(0); // length of the title
+  const [titleColor, setTitleColor] = useState('text-success'); // colour of the title
+  const [description, setDescription] = useState('Click to add description'); // Description to display
+  const [description1, setDescription1] = useState('Click to add description'); // refrence value to track original value of description
+  const [descriptionLength, setDescriptionLength] = useState(0); // length of the description
+  const [descriptionColor, setDescriptionColor] = useState('text-success'); // color of the description
+  const [isTitleEditable, setIsTitleEditable] = useState(false); // if title can be edited
+  const [isDescEditable, setIsDescEditable] = useState(false); // if title can be edited
   const [builderVals, setBuilderVals] = useState([]); // Setting the builder box entities.
-  const [builderEditable, setBuilderEditable] = useState(false); // if any builder card is selected.
+  const [builderEditable, setBuilderEditable] = useState(false); // if any builder card is selected. (to make builder features like up, bototm, etc activate)
   const [builderCardIndex, setBuilderCardIndex] = useState([]); // Saving the index of builder card clicked (active).
   const [builderRefresh, setBuilderRefresh] = useState(false); // To refresh the builder box.
   const [addHeadFlag, setAddHeadFlag] = useState(false); // if newly created empty line box is open or close (Builder Box).
-  const [addHeadIndex, setAddHeadIndex] = useState(0);
-  const [editLinkVals, setEditLinkVals] = useState({});
-  const [outLineRefresh, setOutLineRefresh] = useState(false);
-  const [ignoredTopics, setIgnoredTopics] = useState([]);
-  const [toggleIgnoredTopicsFlag, setToggleIgnoredTopicsFlag] = useState(false);
-  const [topicRefresh, setTopicRefresh] = useState(false);
-  var [startDragIndex, setStartDragIndex] = useState(0);
-  const [wordCountArr, setWordCountArr] = useState([]);
-  const [sliderText, setSliderText] = useState('');
-  const [topicsToCover, setTopicsToCover] = useState([]);
+  const [addHeadIndex, setAddHeadIndex] = useState(0); // Recently added builder card position
+  const [editLinkVals, setEditLinkVals] = useState({}); // Handeling the data in links
+  const [outLineRefresh, setOutLineRefresh] = useState(false); // Refreshing the competitor outlines
+  const [ignoredTopics, setIgnoredTopics] = useState([]); // Store the ignored topics
+  const [toggleIgnoredTopicsFlag, setToggleIgnoredTopicsFlag] = useState(false); // Whether to show ignored topics or not
+  const [topicRefresh, setTopicRefresh] = useState(false); // Refresh the topic cards
+  var [startDragIndex, setStartDragIndex] = useState(0); // Index of card which we are dragging
+  const [wordCountArr, setWordCountArr] = useState([]); // Count number of words in array of recieved articles
+  const [sliderText, setSliderText] = useState(''); // Text above the slider bar
+  const [topicsToCover, setTopicsToCover] = useState([]); // topics which are selected from outlines and topics
 
   useEffect(() => {
     getData();
@@ -351,6 +351,7 @@ const Overview = (props) => {
     },
   ], []);
 
+  // Handeling the sider
   const handleSliderChange = value => {
     setSliderValue(value);
     let nn = 0;
@@ -362,12 +363,16 @@ const Overview = (props) => {
     setSliderText(`Greater than ${(nn / wordCountArr.length) * 100}% of competitors`);
   };
 
+  // Hide/Show bookmark window by clicking bookmark in popups.
   const toggleBookmark = (flag) => {
     setRewriteTitles('');
     if (document.querySelector('.rewrite-selected')) {
       document.querySelector('.rewrite-selected').classList.remove('rewrite-selected');
     }
+
+    // if bookmark (inside the rewrite box --> top-left) is active (bookmark window is toggled)
     if (flag) {
+      console.log('yes');
       setRewriteType(mainRewriteType);
       document.querySelector('.rewrite-tol2-active').classList.remove('rewrite-tol2-active');
 
@@ -387,12 +392,14 @@ const Overview = (props) => {
     }
   };
 
+  // Switch in between title and description (bookmark window)
   const switchBookmart = (e) => {
     setRewriteType(e.target.innerText);
     document.querySelector('.rewrite-tol2-active').classList.remove('rewrite-tol2-active');
     e.target.classList.add('rewrite-tol2-active');
   };
 
+  // selecting the rewrite cards (title and description)
   const selectRewriteCards = (f, id, word) => {
     if (f.target.tagName !== 'svg' && f.target.tagName !== 'path') {
       if (document.querySelector('.rewrite-selected')) {
@@ -400,7 +407,10 @@ const Overview = (props) => {
           document.querySelector('.rewrite-selected').classList.remove('rewrite-selected');
         }
       }
+
       document.getElementById(id).classList.toggle('rewrite-selected');
+
+      // If the same title is selected
       if (rewriteTitles === word) {
         setRewriteTitles('');
       }
@@ -445,6 +455,7 @@ const Overview = (props) => {
     }
   };
 
+  // Clicking on submit button of rewrite title after choosing it
   const handleSelectClick = () => {
     // console.log(rewriteTitles);
     if (rewriteType === 'Title') {
@@ -483,14 +494,17 @@ const Overview = (props) => {
     }
   };
 
+  // refreshing the rewrite to get new data
   const refreshRewrite = () => {
     console.log('refresh');
   };
 
+  // Close the rewrite popup either by clicking outside or cross icon (Title / Description)
   const closeRewrite = () => {
     document.querySelector('.rewrite-box').classList.add('d-none');
   };
 
+  // Open the rewrite box either by clicking on title or description
   const openRewrite = (type) => {
     setMainRewriteType(type);
     setRewriteType(type);
@@ -506,10 +520,12 @@ const Overview = (props) => {
     }
   };
 
+  // Open outline rewrite box
   const openOutline = () => {
     document.querySelector('.outline-box').classList.remove('d-none');
   };
 
+  // Handle change of title input (Div)
   const titleInput = (e) => {
     e.preventDefault();
     const text = e.target.textContent;
@@ -529,6 +545,7 @@ const Overview = (props) => {
     }
   };
 
+  // Handle change of description input (Div)
   const descInput = (e) => {
     e.preventDefault();
     const text = e.target.textContent;
@@ -549,6 +566,7 @@ const Overview = (props) => {
     }
   };
 
+  // Make title in builder box editable
   const titleClick = () => {
     setIsTitleEditable(true);
     document.querySelector('.title-edit2').style.display = 'flex';
@@ -556,6 +574,7 @@ const Overview = (props) => {
     document.querySelector('.overview-title').classList.add('overview-title1');
   };
 
+  // Make description in builder box editable
   const descClick = () => {
     setIsDescEditable(true);
     document.querySelector('.desc-edit2').style.display = 'flex';
@@ -563,6 +582,7 @@ const Overview = (props) => {
     document.querySelector('.overview-desc').classList.add('overview-desc1');
   }
 
+  // Save the title
   const saveTitle = () => {
     if (isTitleEditable) {
       setIsTitleEditable(false);
@@ -582,6 +602,7 @@ const Overview = (props) => {
     }
   };
 
+  // Save the description
   const saveDesc = () => {
     if (isDescEditable) {
       setIsDescEditable(false);
@@ -601,6 +622,7 @@ const Overview = (props) => {
     }
   };
 
+  // Make the title uneditable with saving the text
   const closeTitle = () => {
     document.querySelector('.overview-title').innerText = title1;
     setTitle(title1);
@@ -610,6 +632,7 @@ const Overview = (props) => {
     document.querySelector('.overview-title').classList.remove('overview-title1');
   };
 
+  // Make the description uneditable with saving the text
   const closeDesc = () => {
     document.querySelector('.overview-desc').innerText = description1;
     setDescription(description1);
@@ -619,14 +642,17 @@ const Overview = (props) => {
     document.querySelector('.overview-desc').classList.remove('overview-desc1');
   };
 
+  // Close the outline box model
   const closeOutline = () => {
     document.querySelector('.outline-box').classList.add('d-none');
   };
 
+  // Refresh the outline
   const refreshOutline = () => {
     console.log('refresh outline');
   };
 
+  // Handle click on outline cards
   const selectOutlineCards = (e, id, word) => {
     if (document.getElementById(id).classList.contains('outline-selected')) {
       document.getElementById(id).classList.remove('outline-selected');
@@ -646,6 +672,7 @@ const Overview = (props) => {
     }
   };
 
+  // Handle click on the add outline button
   const handleOutlineClick = () => {
     let temp = [];
     if (outlineVals1.length === 0) {
@@ -685,6 +712,7 @@ const Overview = (props) => {
     document.querySelector('.outline-box').classList.add('d-none');
   };
 
+  // Handle click on builder box card
   const builderCardClick = (e, id, index) => {
     if (e.target.tagName !== 'path' && e.target.tagName !== 'svg') {
       if (document.getElementById(id).classList.contains('om2-inner5-card0')) {
@@ -701,6 +729,7 @@ const Overview = (props) => {
           setBuilderCardIndex(builderCardIndex.concat(index));
         }
 
+        // If at least one card is selected, only after that some builder features are available (up, down, ...)
         if (document.querySelectorAll('.om2-inner5-card-selected').length > 0) {
           setBuilderEditable(true);
         }
@@ -1508,6 +1537,7 @@ const Overview = (props) => {
     }
   };
 
+  // show all/minimize outlines (Competitor Outlines)
   const showAllOutline = (e) => {
     if (outLineN === data.length) {
       outLineN = 3;
@@ -1521,6 +1551,7 @@ const Overview = (props) => {
     setOutLineRefresh(!outLineRefresh);
   };
 
+  // show all/minimize topics
   const showAllTopics = (e) => {
     if (topicsN === Object.keys(topics).length) {
       topicsN = 10;
@@ -1534,7 +1565,9 @@ const Overview = (props) => {
     setTopicRefresh(!topicRefresh);
   };
 
+  // expand/minimize topics
   const topicToggle = (index, e, key) => {
+    // if Ignore topic/Add to outline button is clicked
     if (e.target.classList.contains('om-inner5-outline-btn')) {
       if (e.target.innerText === 'Add to Outline') {
         e.target.innerText = 'Remove from Outline';
@@ -1590,12 +1623,14 @@ const Overview = (props) => {
         delete topics[key];
       }
     }
+    // expand/minimize
     else {
       document.getElementById(`topics-card-title${index}`).classList.toggle('om-inner5-box11-active');
       document.getElementById(`topics-card-detail${index}`).classList.toggle('d-none');
     }
   };
 
+  // add/remove all values of topics to topics to cover array (shown bottom of builder box)
   const addAllToOutline = (e) => {
     if (e.target.innerText === 'Remove All From Outline') {
       setTopicsToCover([]);
@@ -1609,6 +1644,7 @@ const Overview = (props) => {
     }
   };
 
+  // restore the ignored topic
   const recoverTopic = (key, index) => {
     setTopics({ ...topics, [key]: ignoredTopics[index][key] });
     topicsN = Object.keys(topics).length + 1;
@@ -1626,6 +1662,7 @@ const Overview = (props) => {
     setTopicRefresh(!topicRefresh);
   };
 
+  // drag and drop utility
   const ondragstartcapture = (e, index) => {
     setStartDragIndex(index);
     setTimeout(() => {
@@ -1633,6 +1670,7 @@ const Overview = (props) => {
     }, 10);
   };
 
+  // drag and drop utility
   const ondragover = (e, index) => {
     document.getElementById(`builder-card-${startDragIndex}`).style.visibility = 'visible';
     document.getElementById(`builder-card-${index}`).style.visibility = 'hidden';
@@ -1655,12 +1693,14 @@ const Overview = (props) => {
     setStartDragIndex(index);
   };
 
+  // drag and drop utility
   const ondragend = () => {
     document.getElementById(`builder-card-${startDragIndex}`).style.visibility = 'visible';
     setBuilderRefresh(!builderRefresh);
     localStorage.setItem('stnBuilderVals', JSON.stringify(builderVals));
   };
 
+  // Sort by (Competitor Outlines)
   const handleContentGradeFilter = (e) => {
     if (e.target.value === 'Position') {
       data.sort((a, b) => a.position - b.position);
@@ -2528,7 +2568,7 @@ const Overview = (props) => {
                     }) : <p className="my-5 text-center">No bookmarks found</p> : <p className="my-5">No bookmarks found</p> : null}
 
                     <div className="rewrite-tol2-foot">
-                      <button id="rewrite-btn" disabled={rewriteTitles === ''} onClick={handleSelectClick} className="btn btn-info py-2 px-4">Choose Title</button>
+                      <button id="rewrite-btn1" disabled={rewriteTitles === ''} onClick={handleSelectClick} className="btn btn-info py-2 px-4">Choose Title</button>
                     </div>
                   </div>
                 </div>
@@ -2573,7 +2613,7 @@ const Overview = (props) => {
                     }) : <p className="my-5">Collecting ideas ...</p>}
 
                     <div className="rewrite-tol2-foot">
-                      <button id="rewrite-btn" onClick={handleOutlineClick} className="btn btn-info py-2 px-4">{outlineVals1.length === 0 ? 'Add All Headings' : `Add ${outlineVals1.length} Heading`} </button>
+                      <button id="rewrite-btn2" onClick={handleOutlineClick} className="btn btn-info py-2 px-4">{outlineVals1.length === 0 ? 'Add All Headings' : `Add ${outlineVals1.length} Heading`} </button>
                     </div>
 
                   </div>
