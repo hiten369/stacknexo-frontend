@@ -31,6 +31,7 @@ const builderTypes = {
     </svg>`
 };
 
+// Utility to sort used in competitive analysis table (position)
 const positionSort = (rowA, rowB) => {
   const a = rowA.position;
   const b = rowB.position;
@@ -46,6 +47,7 @@ const positionSort = (rowA, rowB) => {
   return 0;
 };
 
+// Utility to sort used in competitive analysis table (Last updated)
 const customUpdateSort = (rowA, rowB) => {
   const a = rowA.lastUpdate.row;
   const b = rowB.lastUpdate.row;
@@ -76,15 +78,15 @@ var contentGradeValue = {
   "E+": 2,
   "E-": 1,
   "F": 0,
-};
+};      // Utility for calculating values of content grade
 
 const Overview = (props) => {
   const navigate = useNavigate();
   const { articleId } = useParams();
   const context = useContext(MainContext);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([]); //store different useful data
   const [topics, setTopics] = useState({}); // setting the topics to display
-  const [data1, setData1] = useState([]);
+  const [data1, setData1] = useState([]); // store data for commonly cited links
   const [sliderValue, setSliderValue] = useState(400); // slider bar value
   const [sliderMax, setSliderMax] = useState(0); // Maximum value of slider
   const [sliderStep, setSliderStep] = useState(1); // Minimum value of slider
@@ -129,10 +131,11 @@ const Overview = (props) => {
   const [topicsToCover, setTopicsToCover] = useState([]); // topics which are selected from outlines and topics
 
   useEffect(() => {
-    getData();
+    getData(false);
   }, []);
 
-  const getData = async () => {
+  // Get the data from APIs (backend)
+  const getData = async (flag) => {
     let urls = ["https://movieweb.com/will-ted-3-happen/", "https://webnewsobserver.com/2021/10/13/ted-3-release-date-cast-plot/", "https://www.looper.com/841977/will-there-be-a-ted-3/", "https://www.michigansportszone.com/ted-3-everything-about-renewal-cancellation-for-2021/", "https://www.fedregsadvisor.com/entertainment/9530/ted-3/", "https://www.liveakhbar.in/2021/06/17/ted-3-release-date-cast-plot/", "https://screenrant.com/ted-3-movie-updates-release-date-story/", "https://alphanewscall.com/2021/10/12/ted-3/", "https://movieideas.fandom.com/wiki/Ted_3", "https://www.imdb.com/title/tt13633880/"];
 
     let topicsArr = ["living teddy bear", "fan"];
@@ -226,14 +229,15 @@ const Overview = (props) => {
     let data;
     let stnOverviewApiData = localStorage.getItem('stnOverviewApiData');
 
-    if (stnOverviewApiData) {
+    if (stnOverviewApiData && !flag) {
       props.setLoad(true);
       stnOverviewApiData = JSON.parse(stnOverviewApiData);
       data = stnOverviewApiData;
     }
     else {
       const userIp = await publicIpv4();
-      data = await context.analyzeLinks(urls, topicsArr, userIp);
+      data = await context.analyzeLinks(urls, topicsArr, userIp, articleId, flag);
+      // data = await context.analyzeLinksDb(articleId, userIp);
       console.log(data);
       localStorage.setItem('stnOverviewApiData', JSON.stringify(data));
     }
@@ -278,6 +282,7 @@ const Overview = (props) => {
     setData1(tempCited);
   }
 
+  // Competitive Analysis table
   const columns = useMemo(() => [
     {
       name: <div className="table1-head">POSITION</div>,
@@ -330,6 +335,7 @@ const Overview = (props) => {
     },
   ], []);
 
+  // Commonly cited links table
   const columns1 = useMemo(() => [
     {
       name: 'TITLE',
@@ -652,6 +658,11 @@ const Overview = (props) => {
     console.log('refresh outline');
   };
 
+  // Call the api again
+  const refreshOutlineMain = () => {
+    getData(true);
+  };
+
   // Handle click on outline cards
   const selectOutlineCards = (e, id, word) => {
     if (document.getElementById(id).classList.contains('outline-selected')) {
@@ -740,6 +751,7 @@ const Overview = (props) => {
     }
   };
 
+  // Make builder box card editable
   const editBuilderVal = (id, index) => {
     if (builderVals[index].type !== 'link') {
       let b1 = document.getElementById(id);
@@ -763,6 +775,7 @@ const Overview = (props) => {
     }
   };
 
+  // handeling link's data onchange
   const handleChangeEdit = (e, index) => {
     setEditLinkVals({
       ...editLinkVals, [index]: {
@@ -771,6 +784,7 @@ const Overview = (props) => {
     });
   };
 
+  // Save the link
   const editLinkSave = (index) => {
     builderVals[index] = {
       ...builderVals[index], "text": editLinkVals[index].editText, "url": editLinkVals[index].editUrl
@@ -780,6 +794,7 @@ const Overview = (props) => {
     setBuilderRefresh(!builderRefresh);
   };
 
+  // close edit option
   const editLinkClose = (index) => {
     delete editLinkVals[index];
     let b2 = document.getElementById(`builder-card-${index}`);
@@ -787,6 +802,7 @@ const Overview = (props) => {
     document.getElementById(`editLink${index}`).style.display = 'none';
   };
 
+  // Save the builder card
   const saveBuilderCard = (index) => {
     let b1 = document.getElementById(`builder-card-div-${index}`);
     builderVals[index] = {
@@ -804,14 +820,17 @@ const Overview = (props) => {
     b1.parentNode.nextElementSibling.style.display = 'block';
   };
 
+  // When there is no card in builder box
   const saveBuilderCard1 = () => {
     let b1 = document.getElementById("builder-card-div-init");
+
     setBuilderVals(builderVals.concat({
       type: "head2",
       text: b1.innerText,
       indent: 1,
       url: ''
     }));
+
     localStorage.setItem('stnBuilderVals', JSON.stringify([{
       type: "head2",
       text: b1.innerText,
@@ -820,6 +839,7 @@ const Overview = (props) => {
     }]));
   };
 
+  // close the builder card
   const closeBuilderCard = (index) => {
     let b1 = document.getElementById(`builder-card-div-${index}`);
     b1.innerText = builderVals[index].text;
@@ -832,6 +852,7 @@ const Overview = (props) => {
     b1.parentNode.nextElementSibling.style.display = 'block';
   };
 
+  // Up shift the card
   const handleBuilder_up = (e) => {
     if (e.target.tagName === 'svg') {
       if (e.target.parentNode.classList.contains('cursor-pointer')) {
@@ -872,6 +893,7 @@ const Overview = (props) => {
     // console.log(builderVals);
   };
 
+  // down shift the card
   const handleBuilder_bottom = (e) => {
     if (e.target.tagName === 'svg') {
       if (e.target.parentNode.classList.contains('cursor-pointer')) {
@@ -912,6 +934,7 @@ const Overview = (props) => {
     // console.log(builderVals);
   };
 
+  // left shift the card
   const handleBuilder_left = (e) => {
     if (e.target.tagName === 'svg') {
       if (e.target.parentNode.classList.contains('cursor-pointer')) {
@@ -941,6 +964,7 @@ const Overview = (props) => {
     localStorage.setItem('stnBuilderVals', JSON.stringify(builderVals));
   };
 
+  // right shift the card
   const handleBuilder_right = (e) => {
     if (e.target.tagName === 'svg') {
       if (e.target.parentNode.classList.contains('cursor-pointer')) {
@@ -1750,6 +1774,13 @@ const Overview = (props) => {
                 <h5 className="mb-4 mt-3">Articles on First Page</h5>
                 <h1 className="my-5 pb-2">71%</h1>
                 <p className="small mt-2">This is the percent of content on the first page of Google that are articles. The higher the percentage, the better an article will do for this keyword.</p>
+              </div>
+              <div onClick={refreshOutlineMain} className="outline-refresh row2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="me-2 bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                  <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                </svg>
+                <p>Refresh</p>
               </div>
             </div>
             <div className="om-inner om-inner2">

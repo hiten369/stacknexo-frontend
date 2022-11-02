@@ -1641,3 +1641,24 @@ p{
 mark{
     padding: 0 !important;
 }
+.outline-refresh{
+    position: absolute;
+    top: 9px;
+    right: 15px;
+    flex-wrap: nowrap;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 5px;
+}
+.outline-refresh:hover{
+    background-color: rgb(243, 243, 243);
+}
+.om-inner1{
+    position: relative;
+}
+.outline-refresh svg{
+    width: fit-content;
+}
+.outline-refresh p{
+    width: fit-content;
+}

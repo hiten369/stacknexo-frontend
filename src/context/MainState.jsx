@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import MainContext from './MainContext'
 
-const baseUrl="https://stacknexo-backend-app.herokuapp.com";
-// const baseUrl="http://localhost:5001";
+// const baseUrl="https://stacknexo-backend-app.herokuapp.com";
+const baseUrl="http://localhost:5001";
 
 const MainState = (props) => {
     const [userData, setUserData] = useState({});
@@ -627,7 +627,7 @@ const MainState = (props) => {
 
     /* ------------- Overview Section -------------- */
     // analyzeLinks
-    const analyzeLinks = async (urls, topicsArr, userIp) => {
+    const analyzeLinks = async (urls, topicsArr, userIp, articleId, flag) => {
         props.setLoad1(false);
         let resp = await fetch(`${baseUrl}/overview/analyzeLinks`, {
             method: 'POST',
@@ -635,7 +635,23 @@ const MainState = (props) => {
                 'content-type': 'application/json',
                 'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token
             },
-            body: JSON.stringify({ urls, topicsArr, userIp })
+            body: JSON.stringify({ urls, topicsArr, userIp, articleId, flag })
+        });
+        let data = await resp.json();
+        props.setLoad1(true);
+        return data;
+    };
+
+    // Fetch analyzeLinks from database
+    const analyzeLinksDb = async (articleId, userIp) => {
+        props.setLoad1(false);
+        let resp = await fetch(`${baseUrl}/overview/analyzeLinksDb`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token
+            },
+            body: JSON.stringify({ articleId, userIp })
         });
         let data = await resp.json();
         props.setLoad1(true);
@@ -661,7 +677,7 @@ const MainState = (props) => {
 
     return (
         <>
-            <MainContext.Provider value={{ login, signin, email2fa, verifyOtp, verifyOtp1, userDetail, userData, genQr, verify2, remove2fa, getCountryData, countryData, verifyReft, ua, verifyJwt, verifySession, logout, removeSession, removeAllSessionByUser, getCurrentSession, heartBeat, putArticle, getArticle, article, updateArticleHead, newArticle, fetchUserArticles, userArciles, getArticleGoals, deleteArticle, getArticleBySlug, updateArticleBySlug, lastHeartBeat, client, getArticleCategories, postArticleCategory, putArticleCategory, deleteArticleCategory, updateArticleCat, removeArticleCat, updateActiveUser, getArticleInfo, getVersionHistory, analyzeLinks, getUserSessions }}>
+            <MainContext.Provider value={{ login, signin, email2fa, verifyOtp, verifyOtp1, userDetail, userData, genQr, verify2, remove2fa, getCountryData, countryData, verifyReft, ua, verifyJwt, verifySession, logout, removeSession, removeAllSessionByUser, getCurrentSession, heartBeat, putArticle, getArticle, article, updateArticleHead, newArticle, fetchUserArticles, userArciles, getArticleGoals, deleteArticle, getArticleBySlug, updateArticleBySlug, lastHeartBeat, client, getArticleCategories, postArticleCategory, putArticleCategory, deleteArticleCategory, updateArticleCat, removeArticleCat, updateActiveUser, getArticleInfo, getVersionHistory, analyzeLinks, getUserSessions, analyzeLinksDb }}>
                 {props.children}
             </MainContext.Provider>
         </>
