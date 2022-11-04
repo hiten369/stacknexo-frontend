@@ -642,22 +642,6 @@ const MainState = (props) => {
         return data;
     };
 
-    // Fetch analyzeLinks from database
-    const analyzeLinksDb = async (articleId, userIp) => {
-        props.setLoad1(false);
-        let resp = await fetch(`${baseUrl}/overview/analyzeLinksDb`, {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'jwt': JSON.parse(localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')).token
-            },
-            body: JSON.stringify({ articleId, userIp })
-        });
-        let data = await resp.json();
-        props.setLoad1(true);
-        return data;
-    };
-
     // Update UserGroup
     // async function updateUserGroup(name,flag)
     // {
@@ -677,7 +661,7 @@ const MainState = (props) => {
 
     return (
         <>
-            <MainContext.Provider value={{ login, signin, email2fa, verifyOtp, verifyOtp1, userDetail, userData, genQr, verify2, remove2fa, getCountryData, countryData, verifyReft, ua, verifyJwt, verifySession, logout, removeSession, removeAllSessionByUser, getCurrentSession, heartBeat, putArticle, getArticle, article, updateArticleHead, newArticle, fetchUserArticles, userArciles, getArticleGoals, deleteArticle, getArticleBySlug, updateArticleBySlug, lastHeartBeat, client, getArticleCategories, postArticleCategory, putArticleCategory, deleteArticleCategory, updateArticleCat, removeArticleCat, updateActiveUser, getArticleInfo, getVersionHistory, analyzeLinks, getUserSessions, analyzeLinksDb }}>
+            <MainContext.Provider value={{ login, signin, email2fa, verifyOtp, verifyOtp1, userDetail, userData, genQr, verify2, remove2fa, getCountryData, countryData, verifyReft, ua, verifyJwt, verifySession, logout, removeSession, removeAllSessionByUser, getCurrentSession, heartBeat, putArticle, getArticle, article, updateArticleHead, newArticle, fetchUserArticles, userArciles, getArticleGoals, deleteArticle, getArticleBySlug, updateArticleBySlug, lastHeartBeat, client, getArticleCategories, postArticleCategory, putArticleCategory, deleteArticleCategory, updateArticleCat, removeArticleCat, updateActiveUser, getArticleInfo, getVersionHistory, analyzeLinks, getUserSessions }}>
                 {props.children}
             </MainContext.Provider>
         </>

@@ -237,9 +237,15 @@ const Overview = (props) => {
     else {
       const userIp = await publicIpv4();
       data = await context.analyzeLinks(urls, topicsArr, userIp, articleId, flag);
-      // data = await context.analyzeLinksDb(articleId, userIp);
       console.log(data);
-      localStorage.setItem('stnOverviewApiData', JSON.stringify(data));
+      if(data.success)
+      {
+        localStorage.setItem('stnOverviewApiData', JSON.stringify(data));
+      }
+      else
+      {
+        props.setAlert("danger", data.message);
+      }
     }
 
     setTimeout(() => {
