@@ -1318,6 +1318,13 @@ export const dltCard = (cardId, ind, index, msg = 'Dismissed', isDict = false, u
     }
 };
 
+const replace_nth = function (s, f, r, n) {
+    // From the given string s, find f, replace as r only on n’th occurrence
+    // return s.replace(RegExp("^(?:.*?" + f + "){" + n + "}"), x => x.replace(RegExp(f + "$"), r));
+    // return s.replace(RegExp("^(?:.*?" + "\\b" + f + "\\b" + "){" + n + "}"), x => x.replace(RegExp(f + "$"), r));
+    return s.replace(RegExp("^(?:.*?" + "\\b" + f + "\\b" + "){" + n + "}"), x => x.replace(RegExp("\\b" + f + "\\b" + "$"), r)); //double changed
+};
+
 // Correcting the text mistake on click
 export const textChange = async (id, text, replacement_text, isNum, ind, ind1, startInd, endInd, matchText, overFlowText, beginFlag, beginInc, editorContext, onEditorStateChange, onEditorStateChange2) => {
     const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails } = editorContext;
@@ -1393,7 +1400,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     mainIndex: ind1
                 };
 
-                document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+                document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
                 blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                 setBlockDetails(blockDetails);
@@ -1443,7 +1450,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     };
 
                     // document.querySelectorAll('.ce-block')[textBlockIndex].children[0].children[0].innerHTML = changeStr;
-                    document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+                    document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
                     // blockDetails[ind].text = changeStr;
                     blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
@@ -1484,7 +1491,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 mainIndex: ind1
             };
 
-            document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+            document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
             setBlockDetails(blockDetails);
@@ -1568,7 +1575,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 mainIndex: ind1
             };
 
-            document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+            document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
             // console.log(changeStr);
             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
             setBlockDetails(blockDetails);
@@ -1610,20 +1617,90 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     let shift = replacement_text.length + strSpace.length;
 
+                    // Insert html tags here
+                    let tagData = JSON.parse(localStorage.getItem("stnTagData"));
+                    let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
+
+                    let tagIndex = 0;
+                    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+
+                    // Inserting the ids to tags for uniquification
+                    for (let i = 0; i < x.length; i++) {
+                        if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+                            x[i].setAttribute("id", `uuid${tagIndex++}`);
+                        }
+                    }
+
+                    let occurranceFlag = false;       // To check if any word with tag is changed
+                    let card01 = document.getElementById(id).getElementsByTagName("*");
+
+                    // if correction text contains tags, then do operations acc. to it
+                    for (let i of card01) {
+
+                        if (i?.tagName !== 'SPAN' && (i.parentNode?.tagName === 'SPAN' || i.parentNode?.tagName === 'DIV')) {
+
+                            // if correction text containing HTML tags
+                            if (i.innerText === document.getElementById(id).textContent) {
+                                let tagArrIndex = tagData1.findIndex(x => x.index = i.id.slice(4,));
+
+                                if (tagData.length > 0 && tagArrIndex !== -1) {
+
+                                    // replacing replacement to replacement with bold and text to corrected text
+                                    tagData[tagArrIndex].replacement = tagData[tagArrIndex].replacement.replaceAll(i.innerText, replacement_text + strSpace + document.getElementById(id).textContent);
+                                    tagData[tagArrIndex].text = replacement_text + strSpace + document.getElementById(id).textContent;
+
+                                    // if text being corrected is different than replacement text and its not the last element of tagData array
+                                    if (i.innerText !== (replacement_text + strSpace + document.getElementById(id).textContent) && tagArrIndex + 1 <= tagData.length) {
+
+                                        for (let j = tagArrIndex + 1; j < tagData.length; j++) {
+
+                                            // Decrement occurance of further tagged words only if their text is equal to the word which is corrected above
+                                            if (tagData[j].text === i.innerText) {
+                                                tagData[j].occurrance -= 1;
+                                                occurranceFlag = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Saving the data
+                    localStorage.setItem("stnTagData", JSON.stringify(tagData));
+                    // console.log(tagData);
+
+
                     undoObj = {
                         role: 'correct',
                         ind,
                         prevStr: blockDetails[ind].text,
+                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
                         shift,
-                        mainIndex: ind1
+                        mainIndex: ind1,
+                        occurranceFlag,
+                        prevTagData: tagData1
                     };
 
                     // To get back removed classes
-                    document.querySelectorAll('.ce-paragraph')[ind].innerHTML = blockDetails[ind].text;
+                    document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = blockDetails[ind].text;
 
+                    // Match text                                              // Replacement Text
                     document.getElementById(id).textContent = replacement_text + strSpace + document.getElementById(id).textContent;
 
-                    let tempEle = document.querySelectorAll('.ce-paragraph')[ind].innerHTML;
+                    // If there is any tags present than replace html with tagged html
+                    if (tagData.length > 0) {
+                        let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
+
+                        for (let i = tagData.length - 1; i >= 0; i--) {
+                            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+                        }
+
+                        // console.log(replacedString);
+                        document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
+                    }
+
+                    let tempEle = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
 
                     // Removing cards with same suggestions
                     for (let i = 0; i < mainData[ind].alerts.length; i++) {
@@ -1644,8 +1721,8 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     // console.log(ind1);
                     // console.log(mainData);
                     // blockDetails[ind].text = tempEle;
+
                     blockDetails[ind].text = tempEle.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
-                    setBlockDetails(blockDetails);
                     setBlockDetails(blockDetails);
                 }
                 else {
@@ -1667,17 +1744,85 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     let shift = (replacement_text.length) - (matchText.length);
 
+                    // Insert html tags here
+                    let tagData = JSON.parse(localStorage.getItem("stnTagData"));
+                    let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
+
+                    let tagIndex = 0;
+                    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+
+                    // Inserting the ids to tags for uniquification
+                    for (let i = 0; i < x.length; i++) {
+                        if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+                            x[i].setAttribute("id", `uuid${tagIndex++}`);
+                        }
+                    }
+
+                    let occurranceFlag = false;       // To check if any word with tag is changed
+                    let card01 = document.getElementById(id).getElementsByTagName("*");
+
+                    // if correction text contains tags, then do operations acc. to it
+                    for (let i of card01) {
+
+                        if (i?.tagName !== 'SPAN' && (i.parentNode?.tagName === 'SPAN' || i.parentNode?.tagName === 'DIV')) {
+
+                            // if correction text containing HTML tags
+                            if (i.innerText === matchText) {
+                                let tagArrIndex = tagData1.findIndex(x => x.index = i.id.slice(4,));
+
+                                if (tagData.length > 0 && tagArrIndex !== -1) {
+
+                                    // replacing replacement to replacement with bold and text to corrected text
+                                    tagData[tagArrIndex].replacement = tagData[tagArrIndex].replacement.replaceAll(i.innerText, replacement_text);
+                                    tagData[tagArrIndex].text = replacement_text;
+
+                                    // if text being corrected is different than replacement text and its not the last element of tagData array
+                                    if (i.innerText !== replacement_text && tagArrIndex + 1 <= tagData.length) {
+
+                                        for (let j = tagArrIndex + 1; j < tagData.length; j++) {
+
+                                            // Decrement occurance of further tagged words only if their text is equal to the word which is corrected above
+                                            if (tagData[j].text === i.innerText) {
+                                                tagData[j].occurrance -= 1;
+                                                occurranceFlag = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Saving the data
+                    localStorage.setItem("stnTagData", JSON.stringify(tagData));
+                    // console.log(tagData);
+
                     undoObj = {
                         role: 'correct',
                         ind,
                         prevStr: blockDetails[ind].text,
+                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
                         shift,
-                        mainIndex: ind1
+                        mainIndex: ind1,
+                        occurranceFlag,
+                        prevTagData: tagData1
                     };
 
-                    document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+                    document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
+
+                    // If there is any tags present than replace html with tagged html
+                    if (tagData.length > 0) {
+                        let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
+
+                        for (let i = tagData.length - 1; i >= 0; i--) {
+                            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+                        }
+
+                        // console.log(replacedString);
+                        document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
+                    }
+
                     blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
-                    setBlockDetails(blockDetails);
                     setBlockDetails(blockDetails);
 
                     // console.log(changeStr);
@@ -1728,6 +1873,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 // If we are at last card position or we matched
                 if (blockDetails[ind].text.slice(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2)) !== matchText) {
                     console.log('reverse needed');
+
                     for (let k = ind2; k >= 0; k--) {
                         var changeStr2 = blockDetails[ind].text.slice(startInd + (77 * (ind3 + 1)) + (7 * ind2), endInd + (77 * (ind3 + 1)) + (7 * ind2));
                         // console.log(k,changeStr2);
@@ -1746,14 +1892,14 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                             role: 'correct',
                             ind,
                             prevStr: blockDetails[ind].text,
+                            prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
                             shift,
                             mainIndex: ind1
                         };
 
-                        document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+                        document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
                         // console.log(changeStr);
                         blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
-                        setBlockDetails(blockDetails);
                         setBlockDetails(blockDetails);
                     }
                     else {
@@ -1770,16 +1916,16 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                                 role: 'correct',
                                 ind,
                                 prevStr: blockDetails[ind].text,
+                                prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
                                 shift,
                                 mainIndex: ind1
                             };
 
-                            document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+                            document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
                             matchText = matchText.trim();
 
                             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
-                            setBlockDetails(blockDetails);
                             setBlockDetails(blockDetails);
                         }
 
@@ -1812,16 +1958,84 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                         role: 'correct',
                         ind,
                         prevStr: blockDetails[ind].text,
+                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
                         shift,
                         mainIndex: ind1
                     };
 
-                    document.querySelectorAll('.ce-paragraph')[ind].innerHTML = changeStr;
+                    document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
                     // console.log(changeStr);
                     // console.log(matchText, replacement_text);
                     blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
+                }
+
+                // Insert html tags here
+                let tagData = JSON.parse(localStorage.getItem("stnTagData"));
+                let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
+
+                let tagIndex = 0;
+                const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+
+                // Inserting the ids to tags for uniquification
+                for (let i = 0; i < x.length; i++) {
+                    if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+                        x[i].setAttribute("id", `uuid${tagIndex++}`);
+                    }
+                }
+
+                let occurranceFlag = false;       // To check if any word with tag is changed
+                let card01 = document.getElementById(id).getElementsByTagName("*");
+
+                // if correction text contains tags, then do operations acc. to it
+                for (let i of card01) {
+
+                    if (i?.tagName !== 'SPAN' && (i.parentNode?.tagName === 'SPAN' || i.parentNode?.tagName === 'DIV')) {
+
+                        // if correction text containing HTML tags
+                        if (i.innerText === matchText) {
+                            let tagArrIndex = tagData1.findIndex(x => x.index = i.id.slice(4,));
+
+                            if (tagData.length > 0 && tagArrIndex !== -1) {
+
+                                // replacing replacement to replacement with bold and text to corrected text
+                                tagData[tagArrIndex].replacement = tagData[tagArrIndex].replacement.replaceAll(i.innerText, replacement_text);
+                                tagData[tagArrIndex].text = replacement_text;
+
+                                // if text being corrected is different than replacement text and its not the last element of tagData array
+                                if (i.innerText !== replacement_text && tagArrIndex + 1 <= tagData.length) {
+
+                                    for (let j = tagArrIndex + 1; j < tagData.length; j++) {
+
+                                        // Decrement occurance of further tagged words only if their text is equal to the word which is corrected above
+                                        if (tagData[j].text === i.innerText) {
+                                            tagData[j].occurrance -= 1;
+                                            occurranceFlag = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Saving the data
+                localStorage.setItem("stnTagData", JSON.stringify(tagData));
+                // console.log(tagData);
+
+                undoObj = { ...undoObj, occurranceFlag, prevTagData: tagData1 };
+
+                // If there is any tags present than replace html with tagged html
+                if (tagData.length > 0) {
+                    let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
+
+                    for (let i = tagData.length - 1; i >= 0; i--) {
+                        replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+                    }
+
+                    // console.log(replacedString);
+                    document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
                 }
 
                 // Removing cards with same suggestions
@@ -1929,7 +2143,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
     if (localStorage.getItem('totalRemovedArr')) {
         for (let i of JSON.parse(localStorage.getItem('totalRemovedArr'))[ind]) {
-            document.querySelectorAll('.ce-paragraph')[ind].querySelectorAll('.gr0am0')[i].className = 'gr0am0';
+            document.querySelectorAll('.ce-block__content')[ind].children[0].querySelectorAll('.gr0am0')[i].className = 'gr0am0';
         }
     }
 
@@ -1985,22 +2199,26 @@ export const alertUndo = (editorContext, onEditorStateChange5) => {
             setSideUtils(sideUtils);
         }
 
-        document.querySelectorAll('.ce-paragraph')[alertUndoMsg.ind].innerHTML = alertUndoMsg.prevStr;
+        // document.querySelectorAll('.ce-block__content')[alertUndoMsg.ind].children[0].innerHTML = alertUndoMsg.prevStr;
+        document.querySelectorAll('.ce-block__content')[alertUndoMsg.ind].children[0].innerHTML = alertUndoMsg.prevStr1;
 
+        // Adding the deleted card back to its position
         for (let i of alertUndoMsg.cardIdArr) {
             mainData[alertUndoMsg.ind].alerts.splice(i.index, 0, i.card);
         }
 
+        // Adding the deleted index back to its index
         for (let i of alertUndoMsg.blockIdArr) {
             blockIds[alertUndoMsg.ind].splice(i.index, 0, i.id);
         }
 
+        // Undo the previously setted string
         blockDetails[alertUndoMsg.ind].text = alertUndoMsg.prevStr;
         setBlockDetails(blockDetails);
         setMainData(mainData);
         setBlockIds(blockIds);
 
-        // (Revert) Shifting further card's start & end index.
+        // (Revert) Shifting further card's start & end index
         for (let i = alertUndoMsg.mainIndex + 1; i < mainData[alertUndoMsg.ind].alerts.length; i++) {
             // console.log('yes');
             // console.log(i);
@@ -2013,7 +2231,7 @@ export const alertUndo = (editorContext, onEditorStateChange5) => {
         tc += alertUndoMsg.tcFinal;
         setTc(tc);
 
-        console.log(alertUndoMsg.originalIndex);
+        // console.log(alertUndoMsg.originalIndex);
 
         // Removing removed index.
         let totalRemovedArr = localStorage.getItem('totalRemovedArr');
@@ -2028,6 +2246,24 @@ export const alertUndo = (editorContext, onEditorStateChange5) => {
             });
             localStorage.setItem('totalRemovedArr', JSON.stringify(totalRemovedArr));
         }
+
+        if (alertUndoMsg.occurranceFlag) {
+            localStorage.setItem("stnTagData", JSON.stringify(alertUndoMsg.prevTagData));
+        }
+
+        // if(alertUndoMsg.occurranceArr.length>0)
+        // {
+        //     // console.log("if");
+        //     let tagArr=JSON.parse(localStorage.getItem("stnTagData"));
+        //     for(let i of alertUndoMsg.occurranceArr)
+        //     {
+        //         console.log(i);
+        //         tagArr[i].occurrance+=1;
+        //     }
+        //     console.log(tagArr);
+
+        //     localStorage.setItem("stnTagData", JSON.stringify(tagArr));
+        // }
     }
 
     // If undo a deleted card

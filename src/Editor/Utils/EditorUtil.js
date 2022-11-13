@@ -622,6 +622,7 @@ export const initializeEditor = async (context, articleId, onEditorStateChange, 
             blocks: ans1
         }
     });
+    
     setEditorS(editor);
     return editor;
 };

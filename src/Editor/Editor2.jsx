@@ -45,7 +45,7 @@ const Editor2 = (props) => {
   const context = useContext(MainContext);
   const editorContext = useContext(EditorContext);
 
-  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag } = editorContext;
+  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData } = editorContext;
   var { intialCardNum, blockNum, tc, setTc } = editorContext;
 
   const navigate = useNavigate();
@@ -124,6 +124,7 @@ const Editor2 = (props) => {
 
   // Check for grammarly
   const onEditorStateChange2 = (text, str, flag, goalsObj) => {
+    // console.log(text, str);
     client1.send(JSON.stringify({
       type: "fetch",
       content: text,
@@ -566,6 +567,21 @@ const Editor2 = (props) => {
                 // Update the editor with blocks sent by grammarly
                 editorG.blocks.update(dataFromServer.data.grammarly.ids, dataFromServer.data.grammarly.str);
 
+                // Insert html tags here
+                let tagData=JSON.parse(localStorage.getItem("stnTagData"));
+                console.log(tagData);
+                if(tagData.length>0)
+                {
+                  let replacedString=document.querySelector('.ce-block__content').children[0].innerHTML;
+  
+                  for (let i=tagData.length-1;i>=0;i--) {
+                    replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+                  }
+  
+                  console.log(replacedString);
+                  document.querySelector('.ce-block__content').children[0].innerHTML=replacedString;
+                }
+
                 // Initialy set the block details sent by grammarly which includes block id and text
                 if (blockDetails.length === 0) {
                   setBlockDetails(blockDetails.concat({
@@ -649,7 +665,7 @@ const Editor2 = (props) => {
                     mainData: localMainData.mainData.concat(dataFromServer.data.grammarly.data), blockDetails: localMainData.blockDetails.concat({
                       id: dataFromServer.data.grammarly.ids,
                       text: dataFromServer.data.grammarly.str.text
-                    }), 
+                    }),
                     intialCardNum: intialCardNum, blockIds: localMainData.blockIds, textList: localMainData.textList, idNum: localMainData.idNum, sideUtils: tempSideUtil
                   }));
                 }
@@ -720,7 +736,7 @@ const Editor2 = (props) => {
                     mainData: [dataFromServer.data.grammarly.data], blockDetails: [{
                       id: dataFromServer.data.grammarly.ids,
                       text: dataFromServer.data.grammarly.str.text
-                    }], 
+                    }],
                     intialCardNum: intialCardNum, blockIds: { "0": blockIds1 }, textList: blockIds2, idNum: tempIdObj, sideUtils: tempSideUtil
                   }));
                 }
@@ -736,7 +752,6 @@ const Editor2 = (props) => {
               }
             }
             else {
-              console.log('else');
               setGrammarFlag(false);
             }
           }
@@ -1009,6 +1024,13 @@ const Editor2 = (props) => {
     }
   };
 
+  const replace_nth = function (s, f, r, n) {
+    // From the given string s, find f, replace as r only on n’th occurrence
+    // return s.replace(RegExp("^(?:.*?" + f + "){" + n + "}"), x => x.replace(RegExp(f + "$"), r));
+    // return s.replace(RegExp("^(?:.*?" + "\\b" + f + "\\b" + "){" + n + "}"), x => x.replace(RegExp(f + "$"), r));
+    return s.replace(RegExp("^(?:.*?" + "\\b" + f + "\\b" + "){" + n + "}"), x => x.replace(RegExp("\\b" + f + "\\b" + "$"), r)); //double changed
+  };
+
   // For testing purpose
   const rand = async () => {
     // post_noti({notiTitle:"demo title",notiDesc:"demo desc",notiType:"info",notiFlag1:true});
@@ -1032,6 +1054,59 @@ const Editor2 = (props) => {
     // document.getElementById('').show();
     // console.log(blockDetails);
     // context.ua();
+    let changeStrArr = [];
+    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+    for (let i = 0; i < x.length; i++) {
+      console.log(x[i].parentNode);
+      if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName==='SPAN' || x[i].parentNode?.tagName==='DIV')) {
+        console.log(i);
+        console.log(x[i]);
+        x[i].setAttribute("id", `uuid${i}`);
+        let tempX = x[i].cloneNode(true);
+        tempX.removeAttribute("id");
+        const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
+        // console.log(htmlPosition);
+        const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
+        // console.log(prevHtml);
+        let nc = document.createElement('div');
+        nc.innerHTML = prevHtml;
+        // console.log(nc.innerText);
+        let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+        changeStrArr.push({
+          text: x[i].innerText,
+          replacement: tempX.outerHTML,
+          occurrance: textOccuranceBefore + 1
+        });
+      }
+    }
+
+    console.log(changeStrArr);
+    let replacedString=document.querySelector('.ce-block__content').children[0].innerHTML;
+
+    for (let i=changeStrArr.length-1;i>=0;i--) {
+      replacedString= replace_nth(replacedString, changeStrArr[i].text, changeStrArr[i].replacement, changeStrArr[i].occurrance);
+    }
+    
+    console.log(replacedString);
+
+    // console.log(x[2].outerHTML);
+    // const stringToRemember = x[2].innerText;
+    // console.log(x[2].innerText);
+    // console.log(document.querySelector('.ce-block__content').children[0]);
+    // console.log(String(x[2]));
+    // const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[2].outerHTML);
+    // console.log(htmlPosition);
+    // const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
+    // console.log(prevHtml);
+    // let nc = document.createElement('div');
+    // nc.innerHTML = prevHtml;
+    // console.log(nc.innerText);
+    // let textOccuranceBefore = (nc.innerText.match(new RegExp(stringToRemember, "g")) || []).length;
+    // console.log(document.querySelector('.ce-block__content').children[0].innerHTML);
+    // console.log(textOccuranceBefore);
+    // find position/word with occurance of textOccuranceBefore+1 of the stringToRemember.
+    // let replacedString=replace_nth(document.querySelector('.ce-block__content').children[0].innerHTML, stringToRemember, "hiten", textOccuranceBefore+1);
+    // console.log(replacedString);
   };
 
   return (
@@ -1120,7 +1195,7 @@ const Editor2 = (props) => {
               }} src="/assets/media/editor/save.svg" alt="Save" />
             </div>
           </div>
- 
+
           {/* Topics Cards */}
           {/* <div className="editor-tc">
             <div className="editor-tc1">
@@ -1391,7 +1466,7 @@ const Editor2 = (props) => {
 
           {/* Grammar cards with side grammar panel */}
           <div className="editor-main12">
-             {/* Side Grammar Panel */}
+            {/* Side Grammar Panel */}
             <div className="editor-main121">
               <div className="em0">{mainData.length !== 0 ? <><span className={`badge me-3 badge-circle badge-${mainType === 'all' ? 'secondary' : mainType === 'Correctness' ? 'danger' : mainType === 'Clarity' ? 'info' : mainType === 'Engagement' ? 'primary' : mainType === 'Tone' ? 'success' : 'dark'}`}>{tc}</span><b>{mainType === 'all' ? 'All Suggestions' : mainType}</b></> : null}</div>
               {mainType !== 'all' ? <div onClick={(e) => {

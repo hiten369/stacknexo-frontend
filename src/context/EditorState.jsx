@@ -57,10 +57,10 @@ const EditorState = (props) => {
     const [targetUserId, setTargetUserId] = useState('');
     var [tc, setTc] = useState(0);
     var [bottomBar, setBottomBar] = useState({
-        words:'0 Words',
-        chars:'0 Characters',
-        rt:'Reading Time - not enough text',
-        st:'Speaking Time - not enough text'
+        words: '0 Words',
+        chars: '0 Characters',
+        rt: 'Reading Time - not enough text',
+        st: 'Speaking Time - not enough text'
     });
 
     // Tooltip initialization
@@ -116,6 +116,40 @@ const EditorState = (props) => {
         // Disabling the check grammar button and set loader
         setGrammarFlag(true);
         setGrammarFlag1(true);
+
+        // Save the tag data here
+        const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+        let tagData = [];
+        let tagIndex=0;
+
+        for (let i = 0; i < x.length; i++) {
+            // console.log(x[i].parentNode);
+            if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+                // console.log(i);
+                // console.log(x[i]);
+                x[i].setAttribute("id", `uuid${tagIndex}`);
+                let tempX = x[i].cloneNode(true);
+                tempX.removeAttribute("id");
+                const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
+                // console.log(htmlPosition);
+                const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
+                // console.log(prevHtml);
+                let nc = document.createElement('div');
+                nc.innerHTML = prevHtml;
+                // console.log(nc.innerText);
+                let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+
+                tagData.push({
+                    index: tagIndex++,
+                    text: x[i].innerText,
+                    replacement: tempX.outerHTML,
+                    occurrance: textOccuranceBefore + 1
+                });
+            }
+        }
+
+        console.log(tagData);
+        localStorage.setItem("stnTagData", JSON.stringify(tagData));
 
         // Sending data to grammar (Web Socket)
         onEditorStateChange2(savedData.blocks, strData, flag, goals);

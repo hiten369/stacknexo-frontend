@@ -23,8 +23,8 @@ const WebSocketHandler = (props) => {
             };
 
             // context.client = new ReconnectingWebSocket(`ws://127.0.0.1:5001/socketServer/${token}/${url}`, [], options);
-            // context.client = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
-            context.client = new ReconnectingWebSocket(`wss://${baseUrl}/socketServer/${token}/${url}`, [], options);
+            context.client = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
+            // context.client = new ReconnectingWebSocket(`wss://${baseUrl}/socketServer/${token}/${url}`, [], options);
             client1 = context.client;
             window.addEventListener('offline', () => {
                 console.log('offline');

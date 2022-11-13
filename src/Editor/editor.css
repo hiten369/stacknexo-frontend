@@ -1662,3 +1662,8 @@ mark{
 .outline-refresh p{
     width: fit-content;
 }
+i{
+    color: unset;
+    font-size: unset;
+    line-height: unset;
+}
