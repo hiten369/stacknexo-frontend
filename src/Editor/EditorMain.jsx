@@ -189,9 +189,9 @@ const EditorMain = (props) => {
         getArticleData();
     }, [mainFlag]);
 
-    const getArticleData=async()=>{
+    const getArticleData = async () => {
         setLoadFlag(false);
-        let userIp=await publicIpv4();
+        let userIp = await publicIpv4();
         let data3 = await context.fetchUserArticles(page, perPage, sortValues.key, sortValues.order, query, filterValue.catId, filterValue.dates, mode, JSON.parse(localStorage.getItem('stackNUser')).designationName, userIp);
         // console.log(data3);
         setTotalRows(data3.total);
@@ -224,7 +224,7 @@ const EditorMain = (props) => {
         setPerPage(newPerPage);
     };
 
-    const catDatesData=async()=>{
+    const catDatesData = async () => {
         const ans = await context.getArticleCategories();
 
         for (let i of ans.data) {
@@ -271,7 +271,7 @@ const EditorMain = (props) => {
             }
         }
 
-        const userIp=await publicIpv4();
+        const userIp = await publicIpv4();
         const dates = await context.getArticleInfo(userIp);
         setDatesInfo(dates.data);
     };
@@ -872,6 +872,6 @@ const EditorMain = (props) => {
             </div>
         </>
     )
-}
+};
 
 export default EditorMain;

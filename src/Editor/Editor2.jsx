@@ -568,18 +568,18 @@ const Editor2 = (props) => {
                 editorG.blocks.update(dataFromServer.data.grammarly.ids, dataFromServer.data.grammarly.str);
 
                 // Insert html tags here
-                let tagData=JSON.parse(localStorage.getItem("stnTagData"));
+                let tagData = JSON.parse(localStorage.getItem("stnTagData"));
                 console.log(tagData);
-                if(tagData.length>0)
-                {
-                  let replacedString=document.querySelector('.ce-block__content').children[0].innerHTML;
-  
-                  for (let i=tagData.length-1;i>=0;i--) {
+
+                if (tagData.length > 0) {
+                  let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML;
+
+                  for (let i = tagData.length - 1; i >= 0; i--) {
                     replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
                   }
-  
+
                   console.log(replacedString);
-                  document.querySelector('.ce-block__content').children[0].innerHTML=replacedString;
+                  document.querySelector('.ce-block__content').children[0].innerHTML = replacedString;
                 }
 
                 // Initialy set the block details sent by grammarly which includes block id and text
@@ -1058,7 +1058,7 @@ const Editor2 = (props) => {
     const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
     for (let i = 0; i < x.length; i++) {
       console.log(x[i].parentNode);
-      if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName==='SPAN' || x[i].parentNode?.tagName==='DIV')) {
+      if ((x[i].tagName !== 'SPAN' && x[i].tagName !=='BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
         console.log(i);
         console.log(x[i]);
         x[i].setAttribute("id", `uuid${i}`);
@@ -1081,12 +1081,12 @@ const Editor2 = (props) => {
     }
 
     console.log(changeStrArr);
-    let replacedString=document.querySelector('.ce-block__content').children[0].innerHTML;
+    let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML;
 
-    for (let i=changeStrArr.length-1;i>=0;i--) {
-      replacedString= replace_nth(replacedString, changeStrArr[i].text, changeStrArr[i].replacement, changeStrArr[i].occurrance);
+    for (let i = changeStrArr.length - 1; i >= 0; i--) {
+      replacedString = replace_nth(replacedString, changeStrArr[i].text, changeStrArr[i].replacement, changeStrArr[i].occurrance);
     }
-    
+
     console.log(replacedString);
 
     // console.log(x[2].outerHTML);
@@ -1809,6 +1809,6 @@ const Editor2 = (props) => {
       </div>
     </>
   );
-}
+};
 
 export default Editor2;
