@@ -1024,11 +1024,177 @@ const Editor2 = (props) => {
     }
   };
 
+  // Get word nth index inside string
+  const getWordIndex = (n, string, needle) => {
+    let counter = n;
+    let nThIndex = 0;
+
+    if (counter > 0) {
+      if (counter === 1) {
+        nThIndex = string.indexOf(needle);
+      }
+      else {
+        while (counter--) {
+          nThIndex = string.indexOf(needle, nThIndex + needle.length);
+        };
+      }
+    }
+    return nThIndex;
+  };
+
+  // Check if the word reside in between tags, returns further appearing number of words in the tag
+  const isInTags = (index, tagIndexLength) => {
+    for (let i of Object.keys(tagIndexLength)) {
+      if (index >= Number(i.split('-')[0]) && index < Number(i.split('-')[1])) {
+        return Number(i.split('-')[1]) - index;
+      }
+    }
+    return 0;
+  };
+
+  // Reccursively check if the word reside in between tags.
+  const recurCheck = (remainingString, needle, oldIndex, tagIndexLength, s) => {
+    let wordIndex = getWordIndex(1, remainingString, needle);
+    // console.log(wordIndex);
+    let currentIndex = oldIndex + wordIndex;
+    // console.log(currentIndex);
+
+    if (isInTags(currentIndex, tagIndexLength) !== 0) {
+      currentIndex += isInTags(wordIndex, tagIndexLength);
+      // console.log(currentIndex);
+      let remainingString = s.slice(currentIndex,);
+      // console.log(remainingString);
+      recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
+    }
+    else {
+      return currentIndex;
+    }
+  };
+
+  // Storing the tags start - end index along with there length
+  const tagIndexLengthUtil = (s) => {
+    let tagIndexLength = {};
+
+    let nc = document.createElement('div');
+    nc.setAttribute("id", "hitId");
+    nc.innerHTML = s;
+    // console.log(nc);
+    let al = nc.getElementsByTagName("*");
+
+    for (let i of al) {
+      // console.log(i.outerHTML);
+      let startIndex = i.outerHTML.indexOf("<");
+      let endIndex = i.outerHTML.indexOf(">");
+      // console.log(startIndex, endIndex);
+      let stringToMatch = i.outerHTML.slice(startIndex, endIndex + 1);
+      // console.log(stringToMatch);
+      let tagStartIndex = s.indexOf(stringToMatch);
+      let tagEndIndex = stringToMatch.length + s.indexOf(stringToMatch);
+
+      // console.log(tagStartIndex, tagEndIndex);
+      // console.log(s.slice(tagStartIndex, tagEndIndex));
+
+      tagIndexLength[`${tagStartIndex}-${tagEndIndex}`] = stringToMatch.length;
+
+    };
+
+    return tagIndexLength;
+  };
+
+  // Replace nth character utility
+  const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
+    let string = s;
+    let prevString = s;
+    let finalIndex = 0; // current index of the word
+
+    for (let i = 1; i <= n; i++) {
+      // console.log(occurrenceToChange);
+      console.log(string);
+
+      console.log(needle);
+      let wordIndex = getWordIndex(occurrenceToChange, string, needle);
+      console.log(wordIndex);
+
+      finalIndex = wordIndex;
+      // console.log(finalIndex);
+      let tagIndexLength = tagIndexLengthUtil(string);
+      console.log(tagIndexLength);
+
+      if (isInTags(wordIndex, tagIndexLength) !== 0) {
+        finalIndex += isInTags(wordIndex, tagIndexLength);
+        console.log(finalIndex);
+        let remainingString = string.slice(finalIndex,);
+        // console.log(remainingString);
+        let finalIndex1 = recurCheck(remainingString, needle, finalIndex, tagIndexLength, s);
+        string = string.slice(finalIndex1 + 1,);
+        // console.log(string);
+        if (indexToChange > 0) {
+          indexToChange += 1;
+        }
+        indexToChange += finalIndex1;
+        occurrenceToChange = 1;
+      }
+      else {
+        if (string !== prevString) {
+          indexToChange += wordIndex;
+        }
+        else {
+          indexToChange = wordIndex;
+        }
+        occurrenceToChange++;
+      }
+    }
+    return indexToChange;
+  };
+
+  // Replace the nth character
   const replace_nth = function (s, f, r, n) {
-    // From the given string s, find f, replace as r only on n’th occurrence
-    // return s.replace(RegExp("^(?:.*?" + f + "){" + n + "}"), x => x.replace(RegExp(f + "$"), r));
-    // return s.replace(RegExp("^(?:.*?" + "\\b" + f + "\\b" + "){" + n + "}"), x => x.replace(RegExp(f + "$"), r));
-    return s.replace(RegExp("^(?:.*?" + "\\b" + f + "\\b" + "){" + n + "}"), x => x.replace(RegExp("\\b" + f + "\\b" + "$"), r)); //double changed
+    r = r.replaceAll('&nbsp;', ' ').replace(/\u00A0/, " ");
+    s = s.replaceAll('&nbsp;', ' ').replace(/\u00A0/, " ");
+    console.log(n);
+    console.log(r);
+    let needle = f.replace(/\u00A0/, " ").trim(); // word to change
+    let indexToChange = 0; // index to be changed 
+    let occurrenceToChange = 1;
+    let wordIndex = getWordIndex(occurrenceToChange, s, needle);
+    let wordSplit=needle.split(' ');
+    let prevR=r;
+    console.log(wordSplit);
+
+    if (wordIndex === -1 && wordSplit.length > 1) {
+      console.log('if');
+      for (let i=0; i<wordSplit.length; i++) {
+        r=prevR;
+        console.log(wordSplit);
+        for(let j=0;j<wordSplit.length;j++)        
+        {
+          if(i!==j)
+          {
+            console.log(i);
+            console.log(j);
+            r=r.replace(wordSplit[j], "");
+            console.log(r);
+          }
+        }
+
+        needle=wordSplit[i];
+        r=r.replaceAll(' ','');
+        console.log(r);
+        indexToChange = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+        console.log(indexToChange);
+        s = s.substring(0, indexToChange) + r + s.substring(indexToChange + needle.length);
+        console.log("Output >>>> " + s);
+      }
+      return s;
+    }
+
+    indexToChange = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+
+    console.log(indexToChange);
+    console.log(r);
+    let second = s.substring(0, indexToChange) + r + s.substring(indexToChange + needle.length);
+    console.log("Output >>>> " + second);
+    return second;
   };
 
   // For testing purpose
@@ -1055,25 +1221,55 @@ const Editor2 = (props) => {
     // console.log(blockDetails);
     // context.ua();
     let changeStrArr = [];
-    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+    // const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+    const y = document.querySelector('.ce-block__content');
+    let z=y.cloneNode(true);
+    let x=z.children[0].getElementsByTagName("*");
+
+    // x=x.children[0].getElementsByTagName("*");
+    // console.log(x[0]);
+    // console.log(x[1]);
+
     for (let i = 0; i < x.length; i++) {
-      console.log(x[i].parentNode);
-      if ((x[i].tagName !== 'SPAN' && x[i].tagName !=='BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-        console.log(i);
-        console.log(x[i]);
+    // for (let i = 0; i < x.children[0].getElementsByTagName("*").length; i++) {
+      // console.log(x[i].parentNode);
+      if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+      // if ((x.children[0].getElementsByTagName("*")[i].tagName !== 'SPAN' && x.children[0].getElementsByTagName("*")[i].tagName !== 'BR') && (x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'SPAN' || x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'DIV')) {
+        // console.log(i);
+        // console.log(x[i]);
+        
         x[i].setAttribute("id", `uuid${i}`);
+        // x.children[0].getElementsByTagName("*")[i].setAttribute("id", `uuid${i}`);
+        // console.log(x[i]);
+
         let tempX = x[i].cloneNode(true);
+        // let tempX = x.children[0].getElementsByTagName("*")[i].cloneNode(true);
         tempX.removeAttribute("id");
-        const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
+        // console.log(x.children[0].innerHTML);
+        console.log(z.children[0].innerHTML);
+        // console.log(document.querySelector('.ce-block__content').children[0].innerHTML);
+        // console.log(x.children[0].getElementsByTagName("*")[i].outerHTML);
+
+        // const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
+        // const htmlPosition = x.children[0].innerHTML.indexOf(x.children[0].getElementsByTagName("*")[i].outerHTML);
+        const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
         // console.log(htmlPosition);
-        const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
-        // console.log(prevHtml);
+
+        // const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
+        // const prevHtml = x.children[0].innerHTML.slice(0, htmlPosition);
+        const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
+        console.log(prevHtml);
         let nc = document.createElement('div');
         nc.innerHTML = prevHtml;
-        // console.log(nc.innerText);
+        console.log(nc.innerText);
+
         let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+        // let textOccuranceBefore = (nc.innerText.match(new RegExp(x.children[0].getElementsByTagName("*")[i].innerText, "g")) || []).length;
+        console.log(textOccuranceBefore);
+
         changeStrArr.push({
           text: x[i].innerText,
+          // text: x.children[0].getElementsByTagName("*")[i].innerText,
           replacement: tempX.outerHTML,
           occurrance: textOccuranceBefore + 1
         });
@@ -1081,7 +1277,9 @@ const Editor2 = (props) => {
     }
 
     console.log(changeStrArr);
-    let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML;
+    let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML; // Might need to change this also
+    replacedString = replacedString.replaceAll("&nbsp;", "");
+    console.log(replacedString);
 
     for (let i = changeStrArr.length - 1; i >= 0; i--) {
       replacedString = replace_nth(replacedString, changeStrArr[i].text, changeStrArr[i].replacement, changeStrArr[i].occurrance);
