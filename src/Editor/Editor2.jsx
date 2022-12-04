@@ -124,7 +124,7 @@ const Editor2 = (props) => {
 
   // Check for grammarly
   const onEditorStateChange2 = (text, str, flag, goalsObj) => {
-    // console.log(text, str);
+    console.log(text, str);
     client1.send(JSON.stringify({
       type: "fetch",
       content: text,

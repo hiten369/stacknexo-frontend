@@ -1450,11 +1450,11 @@ const replace_nth = function (s, f, r, n) {
         n - Occurance of string f
     */
 
-    r = r.replaceAll('&nbsp;', ' ').replace(/\u00A0/, " ");
-    s = s.replaceAll('&nbsp;', ' ').replace(/\u00A0/, " ");
+    r = r.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+    s = s.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
     console.log(n);
     console.log(r);
-    let needle = f.replace(/\u00A0/, " ").trim(); // word to change
+    let needle = f.replace(/\u00A0/g, " ").trim(); // word to change
     let indexToChange = 0; // index to be changed 
     let occurrenceToChange = 1;
     let wordIndex = getWordIndex(occurrenceToChange, s, needle);
@@ -1503,6 +1503,8 @@ const replace_nth = function (s, f, r, n) {
 export const textChange = async (id, text, replacement_text, isNum, ind, ind1, startInd, endInd, matchText, overFlowText, beginFlag, beginInc, editorContext, onEditorStateChange, onEditorStateChange2) => {
     const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails } = editorContext;
     var { editorS, tc, setTc } = editorContext;
+
+    console.log(blockDetails[ind].text);
 
     const startIndS = startInd;
     const endIndS = endInd;
@@ -1944,6 +1946,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 // console.log(document.getElementById(id).textContent);
                 // console.log(document.getElementById(id).textContent.slice(0, text));
                 console.log('else else if');
+                console.log(text);
                 if (text < 0) {
                     console.log('else else if if');
 
@@ -2062,6 +2065,10 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     // console.log(ind1);
                     // console.log(mainData);
                     // blockDetails[ind].text = tempEle;
+
+                    // Fix this
+
+                    console.log(tempEle.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''));
 
                     blockDetails[ind].text = tempEle.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
@@ -2191,24 +2198,6 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 var ind4 = Number(idNum[id]); // card index
                 var ind5 = Number(idNum[id]); // card index
 
-                // console.log(mainData[ind].alerts.length);
-
-                // checking correction card's correction index, increasing card's checking index count if not found
-                for (let h = ind1; h < (mainData[ind].alerts.length); h++) {
-                    var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
-                    // console.log(startInd+(77*(ind5+1))+(7*ind2),endInd+(77*(ind5+1))+(7*ind2));
-                    // console.log(blockDetails[ind].text);
-                    // console.log(ind5, ind2);
-                    // console.log(changeStr1, matchText);
-
-                    if (changeStr1 === matchText) {
-                        break;
-                    }
-                    ++ind5;
-                }
-
-                let shift = (replacement_text.length) - (matchText.length);
-
                 // Insert html tags here
                 let tagData = JSON.parse(localStorage.getItem("stnTagData"));
                 let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
@@ -2287,6 +2276,25 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 localStorage.setItem("stnTagData", JSON.stringify(tagData));
                 // console.log(tagData);
 
+                // console.log(mainData[ind].alerts.length);
+
+                // checking correction card's correction index, increasing card's checking index count if not found
+                for (let h = ind1; h < (mainData[ind].alerts.length); h++) {
+                    var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
+                    console.log(startInd+(77*(ind5+1))+(7*ind2),endInd+(77*(ind5+1))+(7*ind2));
+                    // console.log(blockDetails[ind].text);
+                    console.log(ind5, ind2);
+                    console.log(changeStr1, matchText);
+
+                    if (changeStr1 === matchText) {
+                        break;
+                    }
+                    ++ind5;
+                }
+
+                let shift = (replacement_text.length) - (matchText.length);
+
+                console.log(blockDetails[ind].text);
                 console.log((startInd + (77 * (ind5 + 1)) + (7 * ind2)));
                 console.log(endInd + (77 * (ind5 + 1)) + (7 * ind2));
                 console.log(ind5);

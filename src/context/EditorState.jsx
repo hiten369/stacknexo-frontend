@@ -120,90 +120,107 @@ const EditorState = (props) => {
         // Save the tag data here
         // const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
         const y = document.querySelector('.ce-block__content');
-        let x=y.cloneNode(true);
+        let z=y.cloneNode(true);
+        let x=z.children[0].getElementsByTagName("*");
         
         let tagData = [];
         let tagIndex=0;
 
-        // for (let i = 0; i < x.length; i++) {
-        for (let i = 0; i < x.children[0].getElementsByTagName("*").length; i++) {
+        for (let i = 0; i < x.length; i++) {
+        // for (let i = 0; i < x.children[0].getElementsByTagName("*").length; i++) {
 
             // console.log(x[i].parentNode);
 
-            // if (x[i].tagName !== 'SPAN' && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                if ((x.children[0].getElementsByTagName("*")[i].tagName !== 'SPAN' && x.children[0].getElementsByTagName("*")[i].tagName !== 'BR') && (x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'SPAN' || x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'DIV')) {
+            if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+                // if ((x.children[0].getElementsByTagName("*")[i].tagName !== 'SPAN' && x.children[0].getElementsByTagName("*")[i].tagName !== 'BR') && (x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'SPAN' || x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'DIV')) {
 
                 // console.log(i);
-                // console.log(x[i]);
+                console.log(x[i]);
 
-                // let wordSplit=x[i].innerText.trim().split(' ');
-                let wordSplit=x.children[0].getElementsByTagName("*")[i].innerText.trim().split(' ');
+                let wordSplit=x[i].innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
+                console.log(wordSplit);
+                wordSplit=wordSplit.split(' ');
+                console.log(wordSplit);
+                // let wordSplit=x.children[0].getElementsByTagName("*")[i].innerText.trim().split(' ');
 
                 if(wordSplit.length>1)
                 {
                     console.log('if');
+
                     for(let j=0;j<wordSplit.length;j++)
                     {
-                        // x[i].innerText=wordSplit[j];
-                        x.children[0].getElementsByTagName("*")[i].innerText=wordSplit[j];
-
-                        // x[i].setAttribute("id", `uuid${tagIndex}`);
-                        x.children[0].getElementsByTagName("*")[i].setAttribute("id", `uuid${tagIndex}`);
-
-                        // let tempX = x[i].cloneNode(true);
-                        let tempX = x.children[0].getElementsByTagName("*")[i].cloneNode(true);
-                        
-                        tempX.removeAttribute("id");
-                        let replacementText=tempX.outerHTML;
-        
-                        // const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
-                        const htmlPosition = x.children[0].innerHTML.indexOf(x.children[0].getElementsByTagName("*")[i].outerHTML);
-                        // console.log(htmlPosition);
-
-                        // const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
-                        const prevHtml = x.children[0].innerHTML.slice(0, htmlPosition);
-
-                        // console.log(prevHtml);
-                        let nc = document.createElement('div');
-                        nc.innerHTML = prevHtml;
-                        // console.log(nc.innerText);
-                        // let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
-                        let textOccuranceBefore = (nc.innerText.match(new RegExp(x.children[0].getElementsByTagName("*")[i].innerText, "g")) || []).length;
-
-        
-                        tagData.push({
-                            index: tagIndex++,
-                            // text: x[i].innerText,
-                            text: x[i].children[0].getElementsByTagName("*").innerText,
-                            replacement: replacementText,
-                            occurrance: textOccuranceBefore + 1
-                        });
+                        if(wordSplit[j]!=='')
+                        {
+                            x[i].innerText=wordSplit[j];
+                            // x.children[0].getElementsByTagName("*")[i].innerText=wordSplit[j];
+    
+                            x[i].setAttribute("id", `uuid${tagIndex}`);
+                            // x.children[0].getElementsByTagName("*")[i].setAttribute("id", `uuid${tagIndex}`);
+    
+                            let tempX = x[i].cloneNode(true);
+                            // let tempX = x.children[0].getElementsByTagName("*")[i].cloneNode(true);
+                            
+                            tempX.removeAttribute("id");
+                            let replacementText=tempX.outerHTML;
+            
+                            // const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
+                            // const htmlPosition = x.children[0].innerHTML.indexOf(x.children[0].getElementsByTagName("*")[i].outerHTML);
+                            const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
+                            // console.log(htmlPosition);
+    
+                            // const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
+                            // const prevHtml = x.children[0].innerHTML.slice(0, htmlPosition);
+                            const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
+    
+                            // console.log(prevHtml);
+                            let nc = document.createElement('div');
+                            nc.innerHTML = prevHtml;
+                            // console.log(nc.innerText);
+    
+                            let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+                            // let textOccuranceBefore = (nc.innerText.match(new RegExp(x.children[0].getElementsByTagName("*")[i].innerText, "g")) || []).length;
+    
+            
+                            tagData.push({
+                                index: tagIndex++,
+                                text: x[i].innerText,
+                                // text: x[i].children[0].getElementsByTagName("*").innerText,
+                                replacement: replacementText,
+                                occurrance: textOccuranceBefore + 1
+                            });
+                        }
                     }
                 }
                 else
                 {
                     console.log('else');
-                    x[i].setAttribute("id", `uuid${tagIndex}`);
+                    if(x[i].innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim()!=='')
+                    {
+                        x[i].setAttribute("id", `uuid${tagIndex}`);
+    
+                        let tempX = x[i].cloneNode(true);
+                        tempX.removeAttribute("id");
+                        let replacementText=tempX.outerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
 
-                    let tempX = x[i].cloneNode(true);
-                    tempX.removeAttribute("id");
-                    let replacementText=tempX.outerHTML;
+                        // const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
+                        const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
+                        // console.log(htmlPosition);
+                        // const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
+                        const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
+                        // console.log(prevHtml);
+                        let nc = document.createElement('div');
+                        nc.innerHTML = prevHtml;
+                        // console.log(nc.innerText);
+                        // let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+                        let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
     
-                    const htmlPosition = document.querySelector('.ce-block__content').children[0].innerHTML.indexOf(x[i].outerHTML);
-                    // console.log(htmlPosition);
-                    const prevHtml = document.querySelector('.ce-block__content').children[0].innerHTML.slice(0, htmlPosition);
-                    // console.log(prevHtml);
-                    let nc = document.createElement('div');
-                    nc.innerHTML = prevHtml;
-                    // console.log(nc.innerText);
-                    let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
-    
-                    tagData.push({
-                        index: tagIndex++,
-                        text: x[i].innerText,
-                        replacement: replacementText,
-                        occurrance: textOccuranceBefore + 1
-                    });
+                        tagData.push({
+                            index: tagIndex++,
+                            text: x[i].innerText,
+                            replacement: replacementText,
+                            occurrance: textOccuranceBefore + 1
+                        });
+                    }
                 }
             }
         }
