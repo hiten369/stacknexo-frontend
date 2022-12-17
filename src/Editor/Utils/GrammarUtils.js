@@ -1322,6 +1322,7 @@ export const dltCard = (cardId, ind, index, msg = 'Dismissed', isDict = false, u
 const getWordIndex = (n, string, needle) => {
     let counter = n;
     let nThIndex = 0;
+    let flag = false;
 
     if (counter > 0) {
         if (counter === 1) {
@@ -1329,7 +1330,13 @@ const getWordIndex = (n, string, needle) => {
         }
         else {
             while (counter--) {
-                nThIndex = string.indexOf(needle, nThIndex + needle.length);
+                if (nThIndex === 0 && !flag) {
+                    nThIndex = string.indexOf(needle, nThIndex + 0);
+                }
+                else {
+                    nThIndex = string.indexOf(needle, nThIndex + needle.length);
+                }
+                flag = true;
             };
         }
     }
@@ -1354,11 +1361,12 @@ const recurCheck = (remainingString, needle, oldIndex, tagIndexLength, s) => {
     // console.log(currentIndex);
 
     if (isInTags(currentIndex, tagIndexLength) !== 0) {
-        currentIndex += isInTags(wordIndex, tagIndexLength);
-        // console.log(currentIndex);
+        let tempTags=isInTags(currentIndex, tagIndexLength)
+        // console.log(tempTags);
+        currentIndex = currentIndex + tempTags;
         let remainingString = s.slice(currentIndex,);
         // console.log(remainingString);
-        recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
+        return recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
     }
     else {
         return currentIndex;
@@ -1400,6 +1408,8 @@ const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
     let string = s;
     let prevString = s;
     let finalIndex = 0; // current index of the word
+    let needleFlag = false; // if we are changing needle
+    let needle1 = needle;
 
     for (let i = 1; i <= n; i++) {
         // console.log(occurrenceToChange);
@@ -1408,6 +1418,15 @@ const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
         console.log(needle);
         let wordIndex = getWordIndex(occurrenceToChange, string, needle);
         console.log(wordIndex);
+
+        if (wordIndex === -1) {
+            while (needle1 !== '' && wordIndex === -1) {
+                needleFlag = true;
+                needle1 = needle1.slice(0, -1);
+                wordIndex = getWordIndex(occurrenceToChange, string, needle1);
+            }
+            console.log(wordIndex, needle1);
+        }
 
         finalIndex = wordIndex;
         // console.log(finalIndex);
@@ -1438,7 +1457,11 @@ const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
             occurrenceToChange++;
         }
     }
-    return indexToChange;
+    return {
+        indexToChange,
+        needleFlag,
+        needle1
+    };
 };
 
 // Replace the nth character
@@ -1455,6 +1478,7 @@ const replace_nth = function (s, f, r, n) {
     console.log(n);
     console.log(r);
     let needle = f.replace(/\u00A0/g, " ").trim(); // word to change
+    let indexToChangeObj; // index to be changed 
     let indexToChange = 0; // index to be changed 
     let occurrenceToChange = 1;
     let wordIndex = getWordIndex(occurrenceToChange, s, needle);
@@ -1464,7 +1488,6 @@ const replace_nth = function (s, f, r, n) {
 
     // Tag is wrapped around more than 1 text (including correction text)
     if (wordIndex === -1 && wordSplit.length > 1) {
-        console.log('if');
         for (let i = 0; i < wordSplit.length; i++) {
             r = prevR;
             console.log(wordSplit);
@@ -1482,18 +1505,40 @@ const replace_nth = function (s, f, r, n) {
             needle = wordSplit[i];
             r = r.replaceAll(' ', '');
             console.log(r);
-            indexToChange = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+            indexToChangeObj = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
             console.log(indexToChange);
+            indexToChange = indexToChangeObj.indexToChange;
+
+            if (indexToChangeObj.needleFlag) {
+                needle = indexToChangeObj.needle1;
+            }
+
             s = s.substring(0, indexToChange) + r + s.substring(indexToChange + needle.length);
             console.log("Output >>>> " + s);
         }
         return s;
     }
 
-    indexToChange = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+    indexToChangeObj = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+    console.log(indexToChangeObj);
 
-    console.log(indexToChange);
-    console.log(r);
+    indexToChange = indexToChangeObj.indexToChange;
+
+    if (indexToChangeObj.needleFlag) {
+        needle = indexToChangeObj.needle1;
+        let tempEle = document.createElement('div');
+        console.log(r);
+        tempEle.innerHTML = r;
+        let textToReplace = tempEle.innerText;
+        r = r.replaceAll(textToReplace, needle);
+        // console.log(tempEle.innerText);
+        // tempEle.innerText=needle;
+        // console.log(tempEle);
+        // r=tempEle.innerHTML;
+    }
+
+    // console.log(indexToChange);
+    // console.log(r);
     let second = s.substring(0, indexToChange) + r + s.substring(indexToChange + needle.length);
     console.log("Output >>>> " + second);
     return second;
@@ -1501,10 +1546,13 @@ const replace_nth = function (s, f, r, n) {
 
 // Correcting the text mistake on click
 export const textChange = async (id, text, replacement_text, isNum, ind, ind1, startInd, endInd, matchText, overFlowText, beginFlag, beginInc, editorContext, onEditorStateChange, onEditorStateChange2) => {
-    const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails } = editorContext;
+    const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails, undoFlag, setUndoFlag } = editorContext;
     var { editorS, tc, setTc } = editorContext;
+    console.log(mainData);
 
-    console.log(blockDetails[ind].text);
+    setUndoFlag(!undoFlag);
+
+    // console.log(blockDetails[ind].text);
 
     const startIndS = startInd;
     const endIndS = endInd;
@@ -1544,6 +1592,17 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         }
         startInd += beginInc;
     }
+
+    let repeatFlag = false;
+    for (let i = 0; i < mainData[ind].alerts.length; i++) {
+        if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
+            if (repeatFlag) {
+                idNum[id] = i + 1;
+            }
+            repeatFlag = true;
+        }
+    }
+    console.log(idNum[id]);
 
     // Dealing with cards whose highlight index are changed in order to prevent inter collision (overlap)
     // if the card is manipulated in backend to prevent collision, then handle that card here
@@ -1665,7 +1724,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                 setBlockDetails(blockDetails);
 
-                // Removing cards with same suggestions
+                // Removing cards with same suggestions (includes the selected card also)
                 for (let i = 0; i < mainData[ind].alerts.length; i++) {
                     if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                         toBeRemovedArr.push(i);
@@ -1716,7 +1775,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
 
-                    // Removing cards with same suggestions
+                    // Removing cards with same suggestions (includes the selected card also)
                     for (let i = 0; i < mainData[ind].alerts.length; i++) {
                         if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                             toBeRemovedArr.push(i);
@@ -1757,7 +1816,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
             setBlockDetails(blockDetails);
 
-            // Removing cards with same suggestions
+            // Removing cards with same suggestions (includes the selected card also)
             for (let i = 0; i < mainData[ind].alerts.length; i++) {
                 if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                     toBeRemovedArr.push(i);
@@ -1925,7 +1984,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
             setBlockDetails(blockDetails);
 
-            // Removing cards with same suggestions
+            // Removing cards with same suggestions (includes the selected card also)
             for (let i = 0; i < mainData[ind].alerts.length; i++) {
                 if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                     toBeRemovedArr.push(i);
@@ -2046,7 +2105,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     let tempEle = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
 
-                    // Removing cards with same suggestions
+                    // Removing cards with same suggestions (includes the selected card also)
                     for (let i = 0; i < mainData[ind].alerts.length; i++) {
                         if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                             toBeRemovedArr.push(i);
@@ -2068,7 +2127,17 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     // Fix this
 
-                    console.log(tempEle.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''));
+                    // for(let i of document.querySelectorAll('.ce-block__content')[ind].children[0].getElementsByTagName("*"))
+                    // {
+                    //     console.log(i);
+                    // }
+
+                    let tagsToRemove = ['<b>', '</b>', '<i>', '</i>'];
+                    for (let i of tagsToRemove) {
+                        tempEle = tempEle.replaceAll(i, '');
+                    }
+
+                    // console.log(tempEle.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''));
 
                     blockDetails[ind].text = tempEle.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
@@ -2175,7 +2244,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     // console.log(changeStr);
 
-                    // Removing cards with same suggestions
+                    // Removing cards with same suggestions (includes the selected card also)
                     for (let i = 0; i < mainData[ind].alerts.length; i++) {
                         if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                             toBeRemovedArr.push(i);
@@ -2193,6 +2262,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             }
             else {
                 console.log('else else if else else');
+                console.log(Number(idNum[id]));
                 var ind2 = Number(idNum[id]); // card index
                 var ind3 = Number(idNum[id]); // card index
                 var ind4 = Number(idNum[id]); // card index
@@ -2214,7 +2284,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                 // let occurranceFlag = false;       // To check if any word with tag is changed
                 let card01 = document.getElementById(id).getElementsByTagName("*");
-                console.log(card01);
+                // console.log(card01);
 
                 // if correction text contains tags, then do operations acc. to it
                 for (let i of card01) {
@@ -2239,6 +2309,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                         if (tagInnerText === correctionText) {
                             console.log(i.id.slice(4,));
                             console.log(tagData1);
+                            
                             // To find index of the tag word to be manupilated
                             let tagArrIndex = tagData1.findIndex(x => x.index === Number(i.id.slice(4,)));
                             console.log(tagArrIndex);
@@ -2278,10 +2349,12 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                 // console.log(mainData[ind].alerts.length);
 
+                console.log(blockDetails[ind].text);
+
                 // checking correction card's correction index, increasing card's checking index count if not found
                 for (let h = ind1; h < (mainData[ind].alerts.length); h++) {
                     var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
-                    console.log(startInd+(77*(ind5+1))+(7*ind2),endInd+(77*(ind5+1))+(7*ind2));
+                    console.log(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
                     // console.log(blockDetails[ind].text);
                     console.log(ind5, ind2);
                     console.log(changeStr1, matchText);
@@ -2294,7 +2367,6 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                 let shift = (replacement_text.length) - (matchText.length);
 
-                console.log(blockDetails[ind].text);
                 console.log((startInd + (77 * (ind5 + 1)) + (7 * ind2)));
                 console.log(endInd + (77 * (ind5 + 1)) + (7 * ind2));
                 console.log(ind5);
@@ -2314,6 +2386,9 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                         }
                         --ind2;
                     }
+
+                    console.log(ind3, ind2);
+                    console.log(blockDetails[ind].text);
 
                     console.log((blockDetails[ind].text.slice(startInd + (77 * (ind3 + 1)) + (7 * ind2), endInd + (77 * (ind3 + 1)) + (7 * ind2))));
                     console.log(matchText);
@@ -2425,7 +2500,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
                 }
 
-                // Removing cards with same suggestions
+                // Removing cards with same suggestions (includes the selected card also)
                 for (let i = 0; i < mainData[ind].alerts.length; i++) {
                     if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
                         toBeRemovedArr.push(i);
@@ -2449,6 +2524,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
     var blockIdArr = []; // Storing block id and index for undo purpose
     let originalIndex = []; // Original index of the corrected word card, for undo purpose
 
+    // Function to remove highlights/update correction types and some above undo puropose things
     mainData[ind].alerts = mainData[ind].alerts.filter((e, index) => {
         if (toBeRemovedArr.includes(index)) {
             originalIndex.push(idNum[blockIds[ind][index]]);
@@ -2505,6 +2581,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 index
             });
 
+            // Saving new correction's index to removed old (removed) highlights
             let tt = idNum[blockIds[ind][index]];
             let totalRemovedArr = localStorage.getItem('totalRemovedArr');
             if (totalRemovedArr) {
@@ -2528,6 +2605,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         return !toBeRemovedArr.includes(index);
     });
 
+    // Removing all highlights of removed/corrected cards which is causing by setting the innerHTML equals to main str
     if (localStorage.getItem('totalRemovedArr')) {
         for (let i of JSON.parse(localStorage.getItem('totalRemovedArr'))[ind]) {
             document.querySelectorAll('.ce-block__content')[ind].children[0].querySelectorAll('.gr0am0')[i].className = 'gr0am0';
@@ -2575,7 +2653,7 @@ export const closeAlert = (editorContext) => {
 
 // Undo the changes in text/deletion and alerts
 export const alertUndo = (editorContext, onEditorStateChange5) => {
-    const { mainData, setMainData, setFlag2, setFlag3, alertUndoMsg, blockIds, setBlockIds, sideUtils, setSideUtils, dictWords, setDictWords, blockDetails, setBlockDetails } = editorContext;
+    const { mainData, setMainData, setFlag2, setFlag3, alertUndoMsg, blockIds, setBlockIds, sideUtils, setSideUtils, dictWords, setDictWords, blockDetails, setBlockDetails, undoFlag, setUndoFlag } = editorContext;
     var { tc, setTc } = editorContext;
 
     // If undo a correction
@@ -2617,7 +2695,7 @@ export const alertUndo = (editorContext, onEditorStateChange5) => {
 
         tc += alertUndoMsg.tcFinal;
         setTc(tc);
-
+        
         // console.log(alertUndoMsg.originalIndex);
 
         // Removing removed index.
@@ -2678,4 +2756,5 @@ export const alertUndo = (editorContext, onEditorStateChange5) => {
     // Removing the bottom right alert box
     setFlag2(false);
     clearTimeout(tm1);
+    setUndoFlag(!undoFlag);
 };

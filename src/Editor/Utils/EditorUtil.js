@@ -58,16 +58,20 @@ export const func = async (context, articleId, onEditorStateChange1, editorConte
 // Getting the document title width to set it dynamically
 export const getTextWidth = () => {
     let el = document.getElementById('editor_head');
-    // uses a cached canvas if available
-    var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
-    var context = canvas.getContext("2d");
-    // get the full font style property
-    var font = window.getComputedStyle(el, null).getPropertyValue('font');
-    var text = el.value;
-    // set the font attr for the canvas text
-    context.font = font;
-    var textMeasurement = context.measureText(text);
-    return textMeasurement.width;
+
+    if (el) {
+        // uses a cached canvas if available
+        var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+        var context = canvas.getContext("2d");
+        // get the full font style property
+        var font = window.getComputedStyle(el, null)?.getPropertyValue('font');
+        var text = el?.value;
+        // set the font attr for the canvas text
+        context.font = font;
+        var textMeasurement = context?.measureText(text);
+        return textMeasurement?.width;
+    }
+    return 0;
 };
 
 // Change the article title
@@ -84,7 +88,7 @@ export const editor_head_change = (e, editorContext) => {
 
 // Intializiong the editor
 export const initializeEditor = async (context, articleId, onEditorStateChange, onEditorStateChange1, getVersionHistory, editorContext) => {
-    const { setEditor_head, setData, setUpdateTime, setPublishTime, setDataMatch, setStrData, setEditorS } = editorContext;
+    const { setEditor_head, setData, setUpdateTime, setPublishTime, setDataMatch, strData, setStrData, setEditorS } = editorContext;
     var { editor, setBottomBar } = editorContext;
 
     // Fetching the article details by article id
@@ -622,7 +626,7 @@ export const initializeEditor = async (context, articleId, onEditorStateChange, 
             blocks: ans1
         }
     });
-    
+
     setEditorS(editor);
     return editor;
 };
@@ -684,37 +688,47 @@ export const toggleAssistant = () => {
     }
 };
 
-export const toggleText = async (mainData, editorContext) => {
-    const { setMainData, textList, setSideUtils, blockIds, setBlockIds, setFlag3, idNum } = editorContext;
-    var { setTc } = editorContext;
-
+// Toggle corresponding highlight's card on click on highlight and removing highlight & card on changing perticular highlighted word
+export const toggleText = async (editorContext) => {
+    const { setMainData, setSideUtils, setBlockIds, setFlag3, idNum } = editorContext;
+    var { setTc, mainData, blockIds, textList } = editorContext;
+   
     if (mainData.length !== 0) {
         // Toggle between highlighted texts
         let b1 = document.querySelectorAll('.gr0am0');
 
         for (var i = 0; i < b1.length; i++) {
             b1[i].addEventListener('click', (e) => {
+                let target = e.target;
+                if (target.tagName !== 'SPAN') {
+                    while (target.tagName !== 'SPAN') {
+                        // console.log(target);
+                        target = target.parentNode;
+                    }
+                }
+                // console.log(target);
 
                 for (var j of b1) {
                     j.style.backgroundColor = 'unset';
                 }
 
-                if (e.target.classList.contains('gr0am0-clarity-ht') || e.target.classList.contains('gr0am1-clarity-ht')) {
-                    e.target.style.backgroundColor = 'rgb(224 202 252)';
-                    expandById(e.target.id);
+                if (target.classList.contains('gr0am0-clarity-ht') || target.classList.contains('gr0am1-clarity-ht')) {
+                    target.style.backgroundColor = 'rgb(224 202 252)';
+                    expandById(target.id);
                 }
-                else if (e.target.classList.contains('gr0am0-correct-ht') || e.target.classList.contains('gr0am1-correct-ht')) {
-                    e.target.style.backgroundColor = '#ffcdcd';
-                    expandById(e.target.id);
-                    // console.log('yes');
+                else if (target.classList.contains('gr0am0-correct-ht') || target.classList.contains('gr0am1-correct-ht')) {
+                    target.style.backgroundColor = 'rgb(255, 205, 205)';
+                    expandById(target.id);
+                    console.log('yes');
                 }
-                else if (e.target.classList.contains('gr0am0-engagem-ht') || e.target.classList.contains('gr0am1-engagem-ht')) {
-                    e.target.style.backgroundColor = 'rgb(202 226 252)';
-                    expandById(e.target.id);
+
+                else if (target.classList.contains('gr0am0-engagem-ht') || target.classList.contains('gr0am1-engagem-ht')) {
+                    target.style.backgroundColor = 'rgb(202 226 252)';
+                    expandById(target.id);
                 }
-                else if (e.target.classList.contains('gr0am0-tone-ht') || e.target.classList.contains('gr0am1-tone-ht')) {
-                    e.target.style.backgroundColor = 'rgb(216 252 202)';
-                    expandById(e.target.id);
+                else if (target.classList.contains('gr0am0-tone-ht') || target.classList.contains('gr0am1-tone-ht')) {
+                    target.style.backgroundColor = 'rgb(216 252 202)';
+                    expandById(target.id);
                 }
             });
         }
@@ -740,80 +754,104 @@ export const toggleText = async (mainData, editorContext) => {
 
                 if (Number(temp1) === b2.length - (i1)) {
                     localStorage.setItem('ttc', 0);
-                    let b10 = document.querySelectorAll('.gr0am0');
-                    var tt1 = [];
-                    var tt2 = [];
+                    let b10 = document.querySelectorAll('.ce-block__content');
+                    var tt1 = {};
+                    var tt2 = {};
 
                     for (let i = 0; i < b10.length; i++) {
-                        tt1.push(b10[i].innerText);
-                        tt2.push(b10[i].innerText);
+                        for(let j=0;j<b10[i].children[0].querySelectorAll('.gr0am0').length;j++)
+                        {
+                            if (tt1[i]) {
+                                tt1[i].push(b10[i].children[0].querySelectorAll('.gr0am0')[j].innerText);
+                                tt2[i].push(b10[i].children[0].querySelectorAll('.gr0am0')[j].innerText);
+                            }
+                            else {
+                                tt1[i] = [b10[i].children[0].querySelectorAll('.gr0am0')[j].innerText];
+                                tt2[i] = [b10[i].children[0].querySelectorAll('.gr0am0')[j].innerText];
+                            }
+                        }
                     }
 
                     var ttFlag = false;
 
-                    for (let j = 0; j < tt1.length; j++) {
+                    textList=JSON.parse(localStorage.getItem('localMainData')).textList;
+                    for (let j of Object.keys(tt1)) {
+                        for (let k = 0; k < tt1[j].length; k++) {
+                            if (textList[j][k] !== tt1[j][k]) {
+                                let tempUtils = JSON.parse(localStorage.getItem('localMainData')).sideUtils;
 
-                        if (textList[j] !== tt1[j]) {
-                            let tempUtils = JSON.parse(localStorage.getItem('localMainData')).sideUtils;
+                                if (b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am0-clarity-ht') || b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am1-clarity-ht')) {
+                                    tempUtils = { ...tempUtils, 'Clarity': --tempUtils.Clarity };
+                                }
+                                else if (b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am0-engagem-ht') || b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am1-engagem-ht')) {
+                                    tempUtils = { ...tempUtils, 'Engagement': --tempUtils.Engagement };
+                                }
+                                else if (b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am0-correct-ht') || b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am1-correct-ht')) {
+                                    tempUtils = { ...tempUtils, 'Correctness': --tempUtils.Correctness };
+                                }
+                                else if (b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am0-tone-ht') || b10[j].children[0].querySelectorAll('.gr0am0')[k].classList.contains('gr0am1-tone-ht')) {
+                                    tempUtils = { ...tempUtils, 'Tone': --tempUtils.Tone };
+                                }
 
-                            if (b10[j].classList.contains('gr0am0-clarity-ht') || b10[j].classList.contains('gr0am1-clarity-ht')) {
-                                tempUtils = { ...tempUtils, 'Clarity': --tempUtils.Clarity };
+                                setSideUtils(tempUtils);
+
+                                ttFlag = true;
+
+                                // Removing the card
+                                mainData = JSON.parse(localStorage.getItem('localMainData')).mainData;
+                                blockIds = JSON.parse(localStorage.getItem('localMainData')).blockIds;
+                                mainData[i1].alerts = mainData[i1].alerts.filter((e, index) => {
+                                    return blockIds[i1][index] !== b10[j].children[0].querySelectorAll('.gr0am0')[k].id;
+                                });
+
+                                // Adding removed card index to tackle card highlights after card correction which is causing by setting innerHTML to main str (change str)
+                                let tt = idNum[blockIds[i1][k]];
+                                let totalRemovedArr = localStorage.getItem('totalRemovedArr');
+
+                                if (totalRemovedArr) {
+                                    totalRemovedArr = JSON.parse(totalRemovedArr);
+                                }
+                                else {
+                                    totalRemovedArr = {};
+                                }
+
+                                if (Object.keys(totalRemovedArr).includes(String(i1))) {
+                                    totalRemovedArr[i1].push(tt);
+                                }
+                                else {
+                                    totalRemovedArr[i1] = [tt];
+                                }
+                                localStorage.setItem('totalRemovedArr', JSON.stringify(totalRemovedArr));
+
+                                blockIds[i1].splice(k, 1);
+                                setBlockIds(blockIds);
+                                setMainData(mainData);
+
+                                b10[j].children[0].querySelectorAll('.gr0am0')[k].style.backgroundColor = "white";
+                                b10[j].children[0].querySelectorAll('.gr0am0')[k].className = "";
+                                tt1[j].splice(k, 1);
+                                textList[j].splice(k, 1);
+                                let tempTc=0;
+
+                                // localStorage.setItem('localMainData', JSON.stringify({ ...JSON.parse(localStorage.getItem('localMainData')), 'sideUtils': tempUtils }));
+                                localStorage.setItem('localMainData', JSON.stringify({...JSON.parse(localStorage.getItem('localMainData')), mainData, textList, sideUtils: tempUtils}));
+
+                                for(let i of Object.keys(textList))
+                                {
+                                    tempTc+=textList[i].length;
+                                }
+
+                                setTc(tempTc);
+
+                                if (tempTc === 0) {
+                                    setFlag3(true);
+                                    document.querySelector('.em2').style.display = 'none';
+                                }
                             }
-                            else if (b10[j].classList.contains('gr0am0-engagem-ht') || b10[j].classList.contains('gr0am1-engagem-ht')) {
-                                tempUtils = { ...tempUtils, 'Engagement': --tempUtils.Engagement };
+
+                            if (ttFlag) {
+                                break;
                             }
-                            else if (b10[j].classList.contains('gr0am0-correct-ht') || b10[j].classList.contains('gr0am1-correct-ht')) {
-                                tempUtils = { ...tempUtils, 'Correctness': --tempUtils.Correctness };
-                            }
-                            else if (b10[j].classList.contains('gr0am0-tone-ht') || b10[j].classList.contains('gr0am1-tone-ht')) {
-                                tempUtils = { ...tempUtils, 'Tone': --tempUtils.Tone };
-                            }
-
-                            setSideUtils(tempUtils);
-                            localStorage.setItem('localMainData', JSON.stringify({ ...JSON.parse(localStorage.getItem('localMainData')), 'sideUtils': tempUtils }));
-                            ttFlag = true;
-
-                            mainData[i1].alerts = mainData[i1].alerts.filter((e, index) => {
-                                return blockIds[i1][index] !== b10[j].id;
-                            });
-
-                            // Adding removed card index to tackle card highlights after card correction.
-                            let tt = idNum[blockIds[i1][j]];
-                            let totalRemovedArr = localStorage.getItem('totalRemovedArr');
-
-                            if (totalRemovedArr) {
-                                totalRemovedArr = JSON.parse(totalRemovedArr);
-                            }
-                            else {
-                                totalRemovedArr = {};
-                            }
-
-                            if (Object.keys(totalRemovedArr).includes(String(i1))) {
-                                totalRemovedArr[i1].push(tt);
-                            }
-                            else {
-                                totalRemovedArr[i1] = [tt];
-                            }
-                            localStorage.setItem('totalRemovedArr', JSON.stringify(totalRemovedArr));
-
-
-                            blockIds[i1].splice(j, 1);
-                            setBlockIds(blockIds);
-                            setMainData(mainData);
-                            b10[j].className = "";
-                            b10[j].style.backgroundColor = "white";
-                            tt1.splice(j, 1);
-                            textList.splice(j, 1);
-                            setTc(textList.length);
-
-                            if (textList.length === 0) {
-                                setFlag3(true);
-                                document.querySelector('.em2').style.display = 'none';
-                            }
-                        }
-
-                        if (ttFlag) {
-                            break;
                         }
                     }
                 }

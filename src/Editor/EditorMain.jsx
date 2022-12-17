@@ -11,7 +11,7 @@ import { NavLink } from 'react-router-dom';
 import HeartBeatHandler from '../HeartBeatHandler';
 import SetFeaturedModal from './Modals/SetFeaturedImageModal';
 import Select from 'react-select';
-import ReactTooltip from 'react-tooltip';
+import ReactTooltip  from 'react-tooltip' 
 import EditArticleModal from './Modals/EditArticleModal';
 import { publicIpv4 } from 'public-ip';
 
@@ -355,13 +355,19 @@ const EditorMain = (props) => {
                 wrap: true,
             },
             {
-                id: 'title',
+                id: 'Options',
                 name: 'Options',
-                selector: (row, index) => <div><img data-bs-toggle="modal" data-bs-target="#EditArticleModal" onClick={() => {
-                    filterCats(row);
-                }} data-tip="Edit" className="me-2 cursor-pointer" src="/assets/media/editor/edit.svg" alt="edit" /><ReactTooltip place="bottom" effect="solid" className="px-2 py-2" /><img onClick={() => {
-                    deleteArticle(index, row);
-                }} data-tip="Delete" className="cursor-pointer" src="/assets/media/editor/delete.svg" alt="Delete" /></div>,
+                selector: (row, index) => <div>
+                    <ReactTooltip place="bottom" effect="solid" className="px-2 py-2" />
+                    <div className='row4'>
+                        <img data-bs-toggle="modal" data-bs-target="#EditArticleModal" onClick={() => {
+                            filterCats(row);
+                        }} data-tip="Edit" className="me-2 cursor-pointer" src="/assets/media/editor/edit.svg" alt="edit" />
+                        <img onClick={() => {
+                            deleteArticle(index, row);
+                        }} data-tip="Delete" className="cursor-pointer" src="/assets/media/editor/delete.svg" alt="Delete" />
+                    </div>
+                </div>,
                 center: true,
                 wrap: true,
                 grow: 0.4

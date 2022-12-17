@@ -162,7 +162,7 @@ const MainState = (props) => {
     // Fetch the information of currently logged in user from backend and save user details to localstorage (stackNUser)
     const userDetail = async (ip) => {
         // props.setLoad1(false);
-        let resp = await fetch(`${baseUrl}${baseUrl}/user/userInfo`, {
+        let resp = await fetch(`${baseUrl}/user/userInfo`, {
             method: 'POST',
             headers: {
                 'reft': JSON.parse(localStorage.getItem('923hufweh8934rbuf3489h348ryc34ry890xcr348efq3we90y')).token,

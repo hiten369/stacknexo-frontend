@@ -27,27 +27,78 @@ let str = 'hiten';
 // let s = str.substring(str.indexOf("ite"), "ite".length+str.indexOf("ite"));
 // console.log(s);
 
-let s="i";
+// let s="i";
 
 // console.log(str.indexOf(s));
 // console.log(str.indexOf(s)+s.length);
 
-let obj=[{
-    a:1,
-    b:"a"
-},{
-    a:2,
-    b:"b"
-},{
-    a:3,
-    b:"c"
-},{
-    a:4,
-    b:"d"
-},];
+// let obj=[{
+//     a:1,
+//     b:"a"
+// },{
+//     a:2,
+//     b:"b"
+// },{
+//     a:3,
+//     b:"c"
+// },{
+//     a:4,
+//     b:"d"
+// },];
 
-let findIndex=obj.findIndex(x=>x.a===4);
-console.log(findIndex);
+// let findIndex=obj.findIndex(x=>x.a===4);
+// console.log(findIndex);
+
+// let h="hiten";
+// h=h.slice(0,-1);
+// h=h.slice(0,-1);
+// h=h.slice(-1);
+// console.log(h);
+// let t=`The image, content, and videos fall under fair use. The <span id="l9lFZzdq6jxAslEdgKC9zHTCHwL4sXsP" class="gr0am0 gr0am0-engagem-ht">images</span> <span id="jzpYnjrl2D9X1u7PXHv4SZjZ2EOZnxR0" class="gr0am0 gr0am1-correct-ht"></span><span id="60n3VMUZXrvDR0Z7PRQb3ftOmWPMxv8C" class="gr0am0 gr0am0-clarity-ht">is given</span> proper
+// credit, <span id="Mw7HcjdAr04hV1HRUTpNynSkP1Gtz60H" class="gr0am0 gr0am0-correct-ht"><span id="qqBUwDLGNZ3y5bk9VCblQb5ceiZok2n1" class="gr0am0 gr0am0-correct-ht">and ,</span></span> the videos are YouTube <span id="qySyO2RKwKVginqdcoSNHvkaCDxwuUxh" class="gr0am0 gr0am0-correct-ht">embxed</span>.`;
+// let t1=`<span id="l9lFZzdq6jxAslEdgKC9zHTCHwL4sXsP" class="gr0am0 gr0am0-engagem-ht">`;
+// let t2=`<span id="jzpYnjrl2D9X1u7PXHv4SZjZ2EOZnxR0" class="gr0am0 gr0am1-correct-ht">`;
+// let t3=`<span id="60n3VMUZXrvDR0Z7PRQb3ftOmWPMxv8C" class="gr0am0 gr0am0-clarity-ht">`;
+// let t4=`<span id="Mw7HcjdAr04hV1HRUTpNynSkP1Gtz60H" class="gr0am0 gr0am0-correct-ht">`;
+// let t5=`<span id="qqBUwDLGNZ3y5bk9VCblQb5ceiZok2n1" class="gr0am0 gr0am0-correct-ht">`;
+// let t6=`<span id="qySyO2RKwKVginqdcoSNHvkaCDxwuUxh" class="gr0am0 gr0am0-correct-ht">`;
+// console.log(t.indexOf(t6));
+// console.log(t.indexOf(t6)+t6.length);
+// console.log(t.slice((t.indexOf(t6)+t6.length), ));
+
+const getWordIndex = (n, string, needle) => {
+    let counter = n;
+    let nThIndex = 0;
+    let flag=false;
+
+    if (counter > 0) {
+        if (counter === 1) {
+            nThIndex = string.indexOf(needle);
+        }
+        else {
+            while (counter--) {
+                if(nThIndex===0 && !flag)
+                {
+                    nThIndex = string.indexOf(needle, nThIndex + 0);
+                }
+                else
+                {
+                    nThIndex = string.indexOf(needle, nThIndex + needle.length);
+                }
+                flag=true;
+            };
+        }
+    }
+    return nThIndex;
+};
+
+let str1 = `The image, content, and videos fall under fair use. The <span id="v0YRxeejnY7c5HYRbiWHALBYeR8ERc5x" class="gr0am0 gr0am0-engagem-ht"><b>images</b></span> <span id="N5gu0UFaM8cxKCHBTvNsaQkW0YfcpH7l" class="gr0am0 gr0am1-correct-ht"></span><span id="LRXZEOIAKJz5PyJCv9UlF5szBir2MK8c" class="gr0am0 gr0am0-clarity-ht"><b>is</b> <b>given</b></span> <b>proper</b>
+<b>credit</b><b>,</b> <span id="sysAYH2PzND0xYGIm7RnsPU6hklzorkk" class="gr0am0 gr0am0-correct-ht"><span id="h86HEr54bl8kTWJrXc7JIm4P3btwUOXz" class="gr0am0 gr0am0-correct-ht"><b>and</b> ,</span></span> <b>the</b> <b>videos</b> <b>are</b> <b>YouTube</b> <span id="JOzOI9BaSwVYFP5g0NUiPTLCcNAHvbkS" class="gr0am0 gr0am0-correct-ht"><b>embxed</b></span>.`;
+let wordIndex = getWordIndex(2, str1, "The");
+// let str1="a hound is a the hello is hello world hello hello";
+// let str1="a hello is hello world hello hello";
+// let wordIndex = getWordIndex(2, str1, "hello");
+console.log(wordIndex);
 
 /* 
 

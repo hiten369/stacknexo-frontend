@@ -113,18 +113,28 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    const itemStr = localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
-    if (!itemStr) {
-      return null;
+  // Authenticating the user
+  const checkUser=()=>{
+    if(window.location.pathname!=="/login")
+    {
+      const itemStr = localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
+      if (!itemStr) {
+        localStorage.removeItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
+        window.location.href = '/login';
+      }
+  
+      const item = JSON.parse(itemStr);
+      const now = new Date();
+      if (now.getTime() > item.expiry) {
+        localStorage.removeItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
+        window.location.href = '/login';
+      }
     }
+  };
 
-    const item = JSON.parse(itemStr);
-    const now = new Date()
-    if (now.getTime() > item.expiry) {
-      localStorage.removeItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
-      window.location.href = '/login';
-    }
+  // Authenticating the user
+  useEffect(() => {
+    checkUser();
   }, []);
 
   // Trigger alert

@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import DataTable from 'react-data-table-component';
-import ReactTooltip from 'react-tooltip';
+import ReactTooltip from 'react-tooltip'
 import { publicIpv4 } from 'public-ip';
 
 const tConvert = (time) => {
@@ -500,7 +500,9 @@ const DrawerChat = (props) => {
             <div className='menu1' id="kt_drawer_chat_toggle1">
                 <img src="/assets/media/editor/menu.svg" alt="menu" />
             </div>
+
             {AlertFlag ? <EditorHomeAlert msg={AlertMsg} undoArticle={undoArticle} closeAlert={closeAlert} /> : null}
+            
             <div id="kt_drawer_chat" className='bg-body' data-kt-drawer="true" data-kt-drawer-name="chat" data-kt-drawer-activate="true" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'300px', 'md': '1000px'}" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_drawer_chat_toggle1" data-kt-drawer-close="#kt_drawer_chat_close">
                 {/*begin::Messenger*/}
                 <div className="card edit-box w-100 rounded-0 border-0" id="kt_drawer_chat_messenger">

@@ -45,7 +45,7 @@ const Editor2 = (props) => {
   const context = useContext(MainContext);
   const editorContext = useContext(EditorContext);
 
-  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData } = editorContext;
+  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData, undoFlag } = editorContext;
   var { intialCardNum, blockNum, tc, setTc } = editorContext;
 
   const navigate = useNavigate();
@@ -191,6 +191,7 @@ const Editor2 = (props) => {
     }));
   };
 
+  // Take Over functionality if multiple users are trying to access same article
   const takeOver = async (e, flag) => {
     if (!flag) {
       // send request to the user who is currently accessing the article.
@@ -253,6 +254,7 @@ const Editor2 = (props) => {
     return false;
   };
 
+  // Handeling Multi-User and overview api data
   const getMultiData = async () => {
     let data = null;
     let stnOverviewApiData = localStorage.getItem('stnOverviewApiData');
@@ -396,6 +398,7 @@ const Editor2 = (props) => {
     }
   };
 
+  // Setting the goals
   const getGoalsData = async () => {
     localStorage.setItem('ttc', 0);
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
@@ -414,6 +417,7 @@ const Editor2 = (props) => {
     getMultiData();
   }, []);
 
+  // Managing date time, article heading, page title and editor js
   const getEditorData = async () => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
       let ans = await initializeEditor(context, articleId, onEditorStateChange, onEditorStateChange1, getVersionHistory, editorContext);
@@ -610,11 +614,13 @@ const Editor2 = (props) => {
                   }
 
                   let tempArr = [];
+                  let tempTextListArr=[];
                   let tempIdNum1 = 0;
 
                   for (let i of temp1.children) {
                     localMainData.idNum[i.id] = tempIdNum1++;
-                    localMainData.textList.push(i.innerText);
+                    // localMainData.textList.push(i.innerText);
+                    tempTextListArr.push(i.innerText);
                     tempArr.push(i.id);
 
                     if (i.children.length !== 0) {
@@ -622,7 +628,8 @@ const Editor2 = (props) => {
 
                       for (let j of k) {
                         localMainData.idNum[j.id] = tempIdNum1++;
-                        localMainData.textList.push(j.innerText);
+                        // localMainData.textList.push(j.innerText);
+                        tempTextListArr.push(j.innerText);
                         tempArr.push(j.id);
 
                         if (j.children.length !== 0) {
@@ -634,7 +641,9 @@ const Editor2 = (props) => {
 
                   setIdNum(localMainData.idNum);
                   localMainData.blockIds[blockNum - 1] = tempArr;
+                  localMainData.textList[blockNum - 1] = tempTextListArr;
                   setBlockIds(localMainData.blockIds);
+                  // setTextList(localMainData.textList);
                   setTextList(localMainData.textList);
 
                   // Concating previous localstorage data and Setting block details and main data (alerts) with the help of local storage
@@ -701,7 +710,8 @@ const Editor2 = (props) => {
 
                   setIdNum(tempIdObj);
                   setBlockIds({ "0": blockIds1 });
-                  setTextList(blockIds2);
+                  // setTextList(blockIds2);
+                  setTextList({ "0": blockIds2 });
 
                   // Setting sidebar section values (alerts)
                   let tempSideUtil = {
@@ -737,7 +747,7 @@ const Editor2 = (props) => {
                       id: dataFromServer.data.grammarly.ids,
                       text: dataFromServer.data.grammarly.str.text
                     }],
-                    intialCardNum: intialCardNum, blockIds: { "0": blockIds1 }, textList: blockIds2, idNum: tempIdObj, sideUtils: tempSideUtil
+                    intialCardNum: intialCardNum, blockIds: { "0": blockIds1 }, textList: { "0": blockIds2 }, idNum: tempIdObj, sideUtils: tempSideUtil
                   }));
                 }
                 // console.log(intialCardNum);
@@ -820,13 +830,15 @@ const Editor2 = (props) => {
   // Toggling between highlighted texts and triggering cards by clicking it, edit highlighted text.
   useEffect(() => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
-      toggleText(mainData, editorContext);
+      toggleText(editorContext);
     }
     else {
       props.setAlert('danger', 'Not Authorised! Login in to continue');
       navigate('/login');
     }
-  }, [mainData]);
+    // }, [blockDetails]); // fix this
+    // }, [strData]); // fix this
+  }, [undoFlag, blockDetails]);
 
   // Handling mark js.
   useEffect(() => {
@@ -1028,6 +1040,7 @@ const Editor2 = (props) => {
   const getWordIndex = (n, string, needle) => {
     let counter = n;
     let nThIndex = 0;
+    let flag = false;
 
     if (counter > 0) {
       if (counter === 1) {
@@ -1035,7 +1048,13 @@ const Editor2 = (props) => {
       }
       else {
         while (counter--) {
-          nThIndex = string.indexOf(needle, nThIndex + needle.length);
+          if (nThIndex === 0 && !flag) {
+            nThIndex = string.indexOf(needle, nThIndex + 0);
+          }
+          else {
+            nThIndex = string.indexOf(needle, nThIndex + needle.length);
+          }
+          flag = true;
         };
       }
     }
@@ -1060,11 +1079,14 @@ const Editor2 = (props) => {
     // console.log(currentIndex);
 
     if (isInTags(currentIndex, tagIndexLength) !== 0) {
-      currentIndex += isInTags(wordIndex, tagIndexLength);
+      // console.log(currentIndex);
+      let tempTags = isInTags(currentIndex, tagIndexLength)
+      // console.log(tempTags);
+      currentIndex = currentIndex + tempTags;
       // console.log(currentIndex);
       let remainingString = s.slice(currentIndex,);
       // console.log(remainingString);
-      recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
+      return recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
     }
     else {
       return currentIndex;
@@ -1089,6 +1111,7 @@ const Editor2 = (props) => {
       let stringToMatch = i.outerHTML.slice(startIndex, endIndex + 1);
       // console.log(stringToMatch);
       let tagStartIndex = s.indexOf(stringToMatch);
+      // console.log(tagStartIndex);
       let tagEndIndex = stringToMatch.length + s.indexOf(stringToMatch);
 
       // console.log(tagStartIndex, tagEndIndex);
@@ -1106,14 +1129,24 @@ const Editor2 = (props) => {
     let string = s;
     let prevString = s;
     let finalIndex = 0; // current index of the word
+    let needleFlag = false; // if we are changing needle
+    let needle1 = needle;
 
     for (let i = 1; i <= n; i++) {
-      // console.log(occurrenceToChange);
+      console.log(occurrenceToChange);
       console.log(string);
-
       console.log(needle);
       let wordIndex = getWordIndex(occurrenceToChange, string, needle);
       console.log(wordIndex);
+
+      if (wordIndex === -1) {
+        while (needle1 !== '' && wordIndex === -1) {
+          needleFlag = true;
+          needle1 = needle1.slice(0, -1);
+          wordIndex = getWordIndex(occurrenceToChange, string, needle1);
+        }
+        console.log(wordIndex, needle1);
+      }
 
       finalIndex = wordIndex;
       // console.log(finalIndex);
@@ -1121,11 +1154,13 @@ const Editor2 = (props) => {
       console.log(tagIndexLength);
 
       if (isInTags(wordIndex, tagIndexLength) !== 0) {
+        // console.log('if');
         finalIndex += isInTags(wordIndex, tagIndexLength);
         console.log(finalIndex);
         let remainingString = string.slice(finalIndex,);
         // console.log(remainingString);
         let finalIndex1 = recurCheck(remainingString, needle, finalIndex, tagIndexLength, s);
+        console.log(finalIndex1);
         string = string.slice(finalIndex1 + 1,);
         // console.log(string);
         if (indexToChange > 0) {
@@ -1135,6 +1170,7 @@ const Editor2 = (props) => {
         occurrenceToChange = 1;
       }
       else {
+        // console.log('else');
         if (string !== prevString) {
           indexToChange += wordIndex;
         }
@@ -1144,7 +1180,12 @@ const Editor2 = (props) => {
         occurrenceToChange++;
       }
     }
-    return indexToChange;
+    // return indexToChange;
+    return {
+      indexToChange,
+      needleFlag,
+      needle1
+    };
   };
 
   // Replace the nth character
@@ -1154,44 +1195,66 @@ const Editor2 = (props) => {
     console.log(n);
     console.log(r);
     let needle = f.replace(/\u00A0/, " ").trim(); // word to change
+    let indexToChangeObj; // index to be changed 
     let indexToChange = 0; // index to be changed 
     let occurrenceToChange = 1;
     let wordIndex = getWordIndex(occurrenceToChange, s, needle);
-    let wordSplit=needle.split(' ');
-    let prevR=r;
+    let wordSplit = needle.split(' ');
+    let prevR = r;
     console.log(wordSplit);
 
     if (wordIndex === -1 && wordSplit.length > 1) {
       console.log('if');
-      for (let i=0; i<wordSplit.length; i++) {
-        r=prevR;
+      for (let i = 0; i < wordSplit.length; i++) {
+        r = prevR;
         console.log(wordSplit);
-        for(let j=0;j<wordSplit.length;j++)        
-        {
-          if(i!==j)
-          {
+
+        for (let j = 0; j < wordSplit.length; j++) {
+          if (i !== j) {
             console.log(i);
             console.log(j);
-            r=r.replace(wordSplit[j], "");
+            r = r.replace(wordSplit[j], "");
             console.log(r);
           }
         }
 
-        needle=wordSplit[i];
-        r=r.replaceAll(' ','');
+        needle = wordSplit[i];
+        r = r.replaceAll(' ', '');
         console.log(r);
-        indexToChange = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
-        console.log(indexToChange);
+        indexToChangeObj = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+        indexToChange = indexToChangeObj.indexToChange;
+
+        if (indexToChangeObj.needleFlag) {
+          needle = indexToChangeObj.needle1;
+        }
+
+        // console.log(indexToChange);
         s = s.substring(0, indexToChange) + r + s.substring(indexToChange + needle.length);
         console.log("Output >>>> " + s);
       }
       return s;
     }
 
-    indexToChange = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+    indexToChangeObj = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
+
+    indexToChange = indexToChangeObj.indexToChange;
+
+    if (indexToChangeObj.needleFlag) {
+      needle = indexToChangeObj.needle1;
+      let tempEle = document.createElement('div');
+      console.log(r);
+      tempEle.innerHTML = r;
+      let textToReplace = tempEle.innerText;
+      r = r.replaceAll(textToReplace, needle);
+      // console.log(tempEle.innerText);
+      // tempEle.innerText=needle;
+      // console.log(tempEle);
+      // r=tempEle.innerHTML;
+    }
 
     console.log(indexToChange);
     console.log(r);
+    console.log(needle);
     let second = s.substring(0, indexToChange) + r + s.substring(indexToChange + needle.length);
     console.log("Output >>>> " + second);
     return second;
@@ -1223,21 +1286,21 @@ const Editor2 = (props) => {
     let changeStrArr = [];
     // const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
     const y = document.querySelector('.ce-block__content');
-    let z=y.cloneNode(true);
-    let x=z.children[0].getElementsByTagName("*");
+    let z = y.cloneNode(true);
+    let x = z.children[0].getElementsByTagName("*");
 
     // x=x.children[0].getElementsByTagName("*");
     // console.log(x[0]);
     // console.log(x[1]);
 
     for (let i = 0; i < x.length; i++) {
-    // for (let i = 0; i < x.children[0].getElementsByTagName("*").length; i++) {
+      // for (let i = 0; i < x.children[0].getElementsByTagName("*").length; i++) {
       // console.log(x[i].parentNode);
       if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-      // if ((x.children[0].getElementsByTagName("*")[i].tagName !== 'SPAN' && x.children[0].getElementsByTagName("*")[i].tagName !== 'BR') && (x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'SPAN' || x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'DIV')) {
+        // if ((x.children[0].getElementsByTagName("*")[i].tagName !== 'SPAN' && x.children[0].getElementsByTagName("*")[i].tagName !== 'BR') && (x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'SPAN' || x.children[0].getElementsByTagName("*")[i].parentNode?.tagName === 'DIV')) {
         // console.log(i);
         // console.log(x[i]);
-        
+
         x[i].setAttribute("id", `uuid${i}`);
         // x.children[0].getElementsByTagName("*")[i].setAttribute("id", `uuid${i}`);
         // console.log(x[i]);
@@ -1677,6 +1740,8 @@ const Editor2 = (props) => {
                 <h5 className="my-2">Nothing to check yet</h5>
                 <p>Start writing or upload a document to see feedback</p>
               </div> : null}
+
+              {/* Grammar cards */}
               {mainData.length !== 0 ? <div className="em2">
                 {mainData.map((g, ind) => {
                   if (blockDetails[ind]) {
