@@ -74,36 +74,6 @@ const EditorState = (props) => {
     const [undoFlag, setUndoFlag] = useState(false);
     let multiTagArr = [];
 
-    // const multiTagUtil = (html) => {
-    //     console.log(html);
-    //     let nc = document.createElement('div');
-    //     nc.innerHTML = html;
-    //     for (let i of nc.getElementsByTagName('*')) {
-    //         if (i.parentNode.tagName === 'DIV') {
-    //             if (i.getElementsByTagName('*').length > 0) {
-    //                 console.log('more tags');
-    //                 let htmlText = i.innerHTML.trim();
-    //                 let firstIndexOfTag = htmlText.indexOf('<');
-    //                 let htmlToSend = htmlText;
-    //                 if (firstIndexOfTag > 0) {
-    //                     htmlToSend = htmlText.slice(firstIndexOfTag,);
-    //                     let wordWithNoTag = htmlText.slice(0, firstIndexOfTag);
-    //                     console.log(wordWithNoTag);
-    //                     /* What if text contains spaces between words. */
-    //                     multiTagArr.push({ wordWithNoTag: i.tagName });
-    //                 }
-    //                 console.log(htmlToSend);
-    //                 multiTagUtil(htmlToSend);
-    //             }
-    //             else {
-    //                 /* What if text contains spaces between words. */
-    //                 multiTagArr.push({ [i.innerHTML]: i.tagName });
-    //             }
-    //         }
-    //     }
-    //     // return multiTagArr;
-    // };
-
     const textWithSpaceUtil = (wordSplit, tagIndex, x, i, z, tagData) => {
         for (let j = 0; j < wordSplit.length; j++) {
             if (wordSplit[j] !== '') {
@@ -137,29 +107,32 @@ const EditorState = (props) => {
         };
     };
 
-    const textWithoutSpaceUtil = (x, i, z, tagIndex, tagData, word = '') => {
+    const textWithoutSpaceUtil = (html, z, tagIndex, tagData, word = '') => {
         if (word !== '') {
-            x[i].innerText = word.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
+            html.innerText = word.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
         }
 
-        if (x[i].innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim() !== '') {
-            x[i].setAttribute("id", `uuid${tagIndex}`);
-
-            let tempX = x[i].cloneNode(true);
+        if (html.innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim() !== '') {
+            html.setAttribute("id", `uuid${tagIndex}`);
+            console.log(html);
+            let tempX = html.cloneNode(true);
             tempX.removeAttribute("id");
             let replacementText = tempX.outerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-            const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
-            // console.log(htmlPosition);
+            console.log(replacementText);
+            console.log(html.outerHTML);
+            console.log(z.children[0].innerHTML);
+            const htmlPosition = z.children[0].innerHTML.indexOf(html.outerHTML);
+            console.log(htmlPosition);
             const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
-            // console.log(prevHtml);
+            console.log(prevHtml);
             let nc = document.createElement('div');
             nc.innerHTML = prevHtml;
-            // console.log(nc.innerText);
-            let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+            console.log(nc.innerText);
+            let textOccuranceBefore = (nc.innerText.match(new RegExp(html.innerText, "g")) || []).length;
 
             tagData.push({
                 index: tagIndex++,
-                text: x[i].innerText,
+                text: html.innerText,
                 replacement: replacementText,
                 occurrance: textOccuranceBefore + 1
             });
@@ -170,8 +143,11 @@ const EditorState = (props) => {
         };
     };
 
-    const multiTagUtil = (tagIndex, html, tagArr, textArr) => {
+    const multiTagUtil = (tagIndex, html, tagArr, textArr, maxIndex, prevStringToCheck, occurranceArr, tempOccuranceArr) => {
         let tempIndex = tagIndex;
+        if (tempIndex > maxIndex) {
+            maxIndex = tempIndex;
+        }
         let tempStr = html.innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
         let childrenArr = [];
 
@@ -180,41 +156,71 @@ const EditorState = (props) => {
         }
 
         console.log(childrenArr);
-        // let textArr = [];
         let childrenArr1 = [];
-        // let tagArr = [];
+        console.log(tagArr);
         tagArr.push(html.tagName);
+        localStorage.setItem('stnTagArr', JSON.stringify(tagArr));
+        console.log(tagArr);
 
         for (let h of childrenArr) {
             h = h.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
+            console.log(tempStr);
             let ind = tempStr.indexOf(h);
             console.log(ind);
+
             if (ind > 0) {
+                console.log('if0');
                 let text1 = tempStr.slice(0, ind).trim();
                 console.log(text1);
                 text1 = text1.split(' ');
 
                 for (let h1 of text1) {
+                    // console.log(prevStringToCheck);
+                    // console.log(h1);
+                    let textOccuranceBefore = (prevStringToCheck.match(new RegExp(h1, "g")) || []).length + 1;
+                    console.log(textOccuranceBefore);
+                    textOccuranceBefore += occurranceArr.filter(x => x === h1).length;
+                    console.log(textOccuranceBefore);
+
+                    tempOccuranceArr.push({
+                        index: tempIndex,
+                        occurrance: textOccuranceBefore,
+                        text: h1
+                    });
+
                     textArr.push({
                         text: h1,
                         index: tempIndex,
-                        tag: tagArr
+                        tag: JSON.parse(localStorage.getItem('stnTagArr')),
+                        occurrance: textOccuranceBefore
                     });
                     tempIndex++;
+                    occurranceArr.push(h1);
                 }
+                console.log(textArr);
 
+                // Saving the same children with current index given by above loop
                 childrenArr1.push({
                     text: h,
                     index: tempIndex
                 });
+                console.log(tempIndex);
 
                 tempStr = tempStr.slice(ind,);
-                tempStr = tempStr.replace(h, '');
+                console.log(tempStr);
+                tempStr = tempStr.replace(h, '').trim();
+                console.log(tempStr);
                 let nc1 = document.createElement('div');
                 nc1.innerHTML = h;
                 tempIndex += nc1.innerText.split(' ').length;
+                console.log(tempIndex);
+                if (tempIndex > maxIndex) {
+                    maxIndex = tempIndex;
+                }
             }
+            // Index is 0 which means the children is at starting
             else {
+                console.log('else0');
                 childrenArr1.push({
                     text: h,
                     index: tempIndex
@@ -224,6 +230,9 @@ const EditorState = (props) => {
                 let nc1 = document.createElement('div');
                 nc1.innerHTML = h;
                 tempIndex += nc1.innerText.split(' ').length;
+                if (tempIndex > maxIndex) {
+                    maxIndex = tempIndex;
+                }
             }
         }
 
@@ -232,12 +241,32 @@ const EditorState = (props) => {
             console.log(tempStr);
 
             for (let h1 of tempStr) {
+                console.log(h1);
+                console.log(prevStringToCheck);
+                let textOccuranceBefore = (prevStringToCheck.match(new RegExp(h1, "g")) || []).length+1;
+                console.log(textOccuranceBefore);
+                textOccuranceBefore += occurranceArr.filter(x => x === h1).length;
+                console.log(textOccuranceBefore);
+
+                tempOccuranceArr.push({
+                    index: tempIndex,
+                    occurrance: textOccuranceBefore,
+                    text: h1
+                });
+
                 textArr.push({
                     text: h1,
                     index: tempIndex,
-                    tag: tagArr
+                    tag: JSON.parse(localStorage.getItem('stnTagArr')),
+                    occurrance: textOccuranceBefore
                 });
                 tempIndex++;
+                occurranceArr.push(h1);
+            }
+            console.log(textArr);
+            console.log(tempIndex);
+            if (tempIndex > maxIndex) {
+                maxIndex = tempIndex;
             }
         }
 
@@ -245,14 +274,15 @@ const EditorState = (props) => {
 
         for (let h of childrenArr1) {
             // recursive function 
-            let nc=document.createElement('div');
-            nc.innerHTML=h.text;
-            return multiTagUtil(h.index, nc.children[0], tagArr, textArr);
+            let nc = document.createElement('div');
+            nc.innerHTML = h.text;
+            return multiTagUtil(h.index, nc.children[0], tagArr, textArr, maxIndex, prevStringToCheck, occurranceArr, tempOccuranceArr);
         }
 
         return {
             textArr,
-            tempIndex
+            maxIndex,
+            tempOccuranceArr
         };
     };
 
@@ -298,11 +328,10 @@ const EditorState = (props) => {
         localStorage.removeItem('localBlockCount');
 
         // Disabling the check grammar button and set loader
-        /*         setGrammarFlag(true);
-                setGrammarFlag1(true); */
+                setGrammarFlag(true);
+                setGrammarFlag1(true);
 
         // Save the tag data here
-        // const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
         const y = document.querySelector('.ce-block__content');
         let z = y.cloneNode(true);
         let x = z.children[0].getElementsByTagName("*");
@@ -312,12 +341,11 @@ const EditorState = (props) => {
 
         for (let i = 0; i < x.length; i++) {
             if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                console.log(x[i]);
 
                 let wordSplit = x[i].innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
                 // console.log(wordSplit);
                 wordSplit = wordSplit.split(' ');
-                console.log(wordSplit);
+                // console.log(wordSplit);
 
                 if (wordSplit.length > 1) {
                     console.log('if');
@@ -328,75 +356,61 @@ const EditorState = (props) => {
                         // console.log(x[i].children);
                         // let htmlText = x[i].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
                         // console.log(htmlText);
+                        // console.log(x[i]);
+                        let prevStringToCheck = z.children[0].innerHTML.slice(0, z.children[0].innerHTML.indexOf(x[i].outerHTML));
+                        // console.log(index1);
 
-                        let tempIndex = tagIndex
-                        let tempStr = x[i].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
-                        let childrenArr = [];
+                        let ans1 = multiTagUtil(tagIndex, x[i], [], [], -1, prevStringToCheck, [], []);
+                        console.log(ans1);
+                        let tempOccuranceArr=ans1.tempOccuranceArr;
+                        tempOccuranceArr=tempOccuranceArr.filter((e)=>{
+                            const text = e.text;
 
-                        for (let h of x[i].children) {
-                            childrenArr.push(h.outerHTML);
-                        }
-                        console.log(childrenArr);
-                        let textArr = [];
-                        let childrenArr1 = [];
-                        let tagArr = [];
-                        tagArr.push(x[i].tagName);
+                            // Count the text occurance in above array
+                            const textCount = tempOccuranceArr.reduce((acc, cur) => cur.text === text ? ++acc : acc, 0);
+                            // console.log(text, textCount);
+                            // if(textCount)
+                            return textCount>1;
+                        }).sort((a,b)=> a.index-b.index);
+                        console.log(tempOccuranceArr);
 
-                        for (let h of childrenArr) {
-                            h = h.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
-                            let ind = tempStr.indexOf(h);
-                            console.log(ind);
-                            if (ind > 0) {
-                                let text1 = tempStr.slice(0, ind).trim();
-                                console.log(text1);
-                                text1 = text1.split(' ');
-                                for (let h1 of text1) {
-                                    textArr.push({
-                                        text: h1,
-                                        index: tempIndex,
-                                        tag: tagArr
-                                    });
-                                    tempIndex++;
+                        // Bubble sort the occurance according to index order (if index 1>index 2, then occurence follows the same)
+                        for(let m =0;m< tempOccuranceArr.length-1;m++)
+                        {
+                            for(let n=0;n<tempOccuranceArr.length-1;n++)
+                            {
+                                if((tempOccuranceArr[n].index<tempOccuranceArr[n+1].index && tempOccuranceArr[n].occurrance>tempOccuranceArr[n+1].occurrance) || (tempOccuranceArr[n].index>tempOccuranceArr[n+1].index && tempOccuranceArr[n].occurrance<tempOccuranceArr[n+1].occurrance))
+                                {
+                                    [ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n].index)].occurrance, ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n+1].index)].occurrance]=[ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n+1].index)].occurrance, ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n].index)].occurrance];
+                                 
+                                    [tempOccuranceArr[n].occurrance, tempOccuranceArr[n+1].occurrance]=[tempOccuranceArr[n+1].occurrance, tempOccuranceArr[n].occurrance];
                                 }
-                                childrenArr1.push({
-                                    text: h,
-                                    index: tempIndex
-                                });
-                                tempStr = tempStr.slice(ind,);
-                                tempStr = tempStr.replace(h, '');
-                                let nc1 = document.createElement('div');
-                                nc1.innerHTML = h;
-                                tempIndex += nc1.innerText.split(' ').length;
-                            }
-                            else {
-                                childrenArr1.push({
-                                    text: h,
-                                    index: tempIndex
-                                });
-                                tempStr = tempStr.replace(h, '');
-                                let nc1 = document.createElement('div');
-                                nc1.innerHTML = h;
-                                tempIndex += nc1.innerText.split(' ').length;
                             }
                         }
+                        console.log(ans1.textArr);
 
-                        if (tempStr !== '') {
-                            tempStr = tempStr.split(' ');
-                            console.log(tempStr);
-                            for (let h1 of tempStr) {
-                                textArr.push({
-                                    text: h1,
-                                    index: tempIndex,
-                                    tag: tagArr
-                                });
-                                tempIndex++;
-                            }
-                        }
+                        for (let q of ans1.textArr) {
+                            let htmlStr = '';
 
-                        console.log(childrenArr1);
-                        for (let h of childrenArr1) {
-                            // recursive function 
+                            for (let h = 0; h < q.tag.length; h++) {
+                                htmlStr += `<${q.tag[h].toLowerCase()}>`;
+                            }
+
+                            htmlStr += q.text;
+
+                            for (let h1 = q.tag.length - 1; h1 >= 0; h1--) {
+                                htmlStr += `</${q.tag[h1].toLowerCase()}>`
+                            }
+                            console.log(htmlStr);
+
+                            tagData.push({
+                                index: q.index,
+                                occurrance: q.occurrance,
+                                replacement: htmlStr,
+                                text: q.text
+                            });
                         }
+                        tagIndex = ans1.maxIndex;
 
                         /* let firstIndexOfTag = htmlText.indexOf('<');
                         let htmlToSend = htmlText;
@@ -434,66 +448,12 @@ const EditorState = (props) => {
                         tagData = ans.tagData;
                         tagIndex = ans.tagIndex;
                     }
-
-                    /* for(let j=0;j<wordSplit.length;j++)
-                       {
-                           if(wordSplit[j]!=='')
-                           {
-                               x[i].innerText=wordSplit[j];
-                               x[i].setAttribute("id", `uuid${tagIndex}`);
-                               let tempX = x[i].cloneNode(true);
-                               tempX.removeAttribute("id");
-                               let replacementText=tempX.outerHTML;
-                               const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
-                               // console.log(htmlPosition);
-   
-                               const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
-       
-                               // console.log(prevHtml);
-                               let nc = document.createElement('div');
-                               nc.innerHTML = prevHtml;
-                               // console.log(nc.innerText);
-                               let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
-               
-                               tagData.push({
-                                   index: tagIndex++,
-                                   text: x[i].innerText,
-                                   replacement: replacementText,
-                                   occurrance: textOccuranceBefore + 1
-                               });
-                           }
-                       } */
-
                 }
                 else {
                     console.log('else');
-                    let ans = textWithoutSpaceUtil(x, i, z, tagIndex, tagData);
+                    let ans = textWithoutSpaceUtil(x[i], z, tagIndex, tagData);
                     tagData = ans.tagData;
                     tagIndex = ans.tagIndex;
-
-                    /* if(x[i].innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim()!=='')
-                                        {
-                                            x[i].setAttribute("id", `uuid${tagIndex}`);
-                        
-                                            let tempX = x[i].cloneNode(true);
-                                            tempX.removeAttribute("id");
-                                            let replacementText=tempX.outerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-                                            const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
-                                            // console.log(htmlPosition);
-                                            const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
-                                            // console.log(prevHtml);
-                                            let nc = document.createElement('div');
-                                            nc.innerHTML = prevHtml;
-                                            // console.log(nc.innerText);
-                                            let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
-                        
-                                            tagData.push({
-                                                index: tagIndex++,
-                                                text: x[i].innerText,
-                                                replacement: replacementText,
-                                                occurrance: textOccuranceBefore + 1
-                                            });
-                                        } */
                 }
             }
         }
@@ -502,7 +462,7 @@ const EditorState = (props) => {
         localStorage.setItem("stnTagData", JSON.stringify(tagData));
 
         // Sending data to grammar (Web Socket)
-        /* onEditorStateChange2(savedData.blocks, strData, flag, goals); */
+        onEditorStateChange2(savedData.blocks, strData, flag, goals);
     };
 
     return (

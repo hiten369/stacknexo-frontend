@@ -124,7 +124,7 @@ const Editor2 = (props) => {
 
   // Check for grammarly
   const onEditorStateChange2 = (text, str, flag, goalsObj) => {
-    console.log(text, str);
+    // console.log(text, str);
     client1.send(JSON.stringify({
       type: "fetch",
       content: text,
@@ -574,6 +574,8 @@ const Editor2 = (props) => {
                 // Insert html tags here
                 let tagData = JSON.parse(localStorage.getItem("stnTagData"));
                 console.log(tagData);
+
+                tagData.sort((a,b) => a.index - b.index);
 
                 if (tagData.length > 0) {
                   let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML;
