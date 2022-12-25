@@ -72,31 +72,36 @@ const EditorState = (props) => {
 
     const [editorS, setEditorS] = useState(editor);
     const [undoFlag, setUndoFlag] = useState(false);
-    let multiTagArr = [];
 
-    const textWithSpaceUtil = (wordSplit, tagIndex, x, i, z, tagData) => {
+    // The html which is sent here does not contains multiple tags and contains spaces
+    const textWithSpaceUtil = (wordSplit, tagIndex, html, z, tagData) => {
         for (let j = 0; j < wordSplit.length; j++) {
             if (wordSplit[j] !== '') {
-                x[i].innerText = wordSplit[j];
-                x[i].setAttribute("id", `uuid${tagIndex}`);
-                let tempX = x[i].cloneNode(true);
+
+                // Setting the html inner text the split text, than work accordingly
+                html.innerText = wordSplit[j];
+                html.setAttribute("id", `uuid${tagIndex}`);
+                let tempX = html.cloneNode(true);
                 tempX.removeAttribute("id");
                 let replacementText = tempX.outerHTML;
-                const htmlPosition = z.children[0].innerHTML.indexOf(x[i].outerHTML);
+
+                // The index of affected word
+                const htmlPosition = z.children[0].innerHTML.indexOf(html.outerHTML);
                 // console.log(htmlPosition);
 
+                // Previous html before above index
                 const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
 
                 // console.log(prevHtml);
                 let nc = document.createElement('div');
                 nc.innerHTML = prevHtml;
                 // console.log(nc.innerText);
-                let textOccuranceBefore = (nc.innerText.match(new RegExp(x[i].innerText, "g")) || []).length;
+                let textOccuranceBefore = (nc.innerText.match(new RegExp(html.innerText, "g")) || []).length;
 
                 tagData.push({
                     index: tagIndex++,
-                    text: x[i].innerText,
-                    replacement: replacementText,
+                    text: html.innerText.trim(),
+                    replacement: replacementText.replaceAll(' ',''),
                     occurrance: textOccuranceBefore + 1
                 });
             }
@@ -107,33 +112,39 @@ const EditorState = (props) => {
         };
     };
 
+    // The html which is sent here does not contains multiple tags and does not contains spaces
     const textWithoutSpaceUtil = (html, z, tagIndex, tagData, word = '') => {
+        // If we are sending some custom word than setting it as innertext to process
         if (word !== '') {
-            html.innerText = word.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
+            html.innerText = word.trim();
         }
 
-        if (html.innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim() !== '') {
+        if (html.innerText.trim() !== '') {
             html.setAttribute("id", `uuid${tagIndex}`);
-            console.log(html);
+            // console.log(html);
             let tempX = html.cloneNode(true);
             tempX.removeAttribute("id");
-            let replacementText = tempX.outerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-            console.log(replacementText);
-            console.log(html.outerHTML);
-            console.log(z.children[0].innerHTML);
+            let replacementText = tempX.outerHTML;
+            // console.log(replacementText);
+            // console.log(html.outerHTML);
+            // console.log(z.children[0].innerHTML);
+
+            // The index of affected word
             const htmlPosition = z.children[0].innerHTML.indexOf(html.outerHTML);
-            console.log(htmlPosition);
+            // console.log(htmlPosition);
+
+            // Previous html before above index
             const prevHtml = z.children[0].innerHTML.slice(0, htmlPosition);
-            console.log(prevHtml);
+            // console.log(prevHtml);
             let nc = document.createElement('div');
             nc.innerHTML = prevHtml;
-            console.log(nc.innerText);
+            // console.log(nc.innerText);
             let textOccuranceBefore = (nc.innerText.match(new RegExp(html.innerText, "g")) || []).length;
 
             tagData.push({
                 index: tagIndex++,
-                text: html.innerText,
-                replacement: replacementText,
+                text: html.innerText.trim(),
+                replacement: replacementText.replaceAll(' ',''),
                 occurrance: textOccuranceBefore + 1
             });
         }
@@ -143,37 +154,57 @@ const EditorState = (props) => {
         };
     };
 
+    // The html which contains multiple tags
     const multiTagUtil = (tagIndex, html, tagArr, textArr, maxIndex, prevStringToCheck, occurranceArr, tempOccuranceArr) => {
+
+        /* 
+            tagIndex: Index of current word,
+            html: the affected data,
+            tagArr: stores tags used to wrap texts,
+            textArr: Main array in which all things are storing,
+            maxIndex: the maximum index appears,
+            prevStringToCheck: string prior to affected html,
+            occurranceArr: stores the words which has been checked, add those word's count to manipulate occurance,
+            tempOccuranceArr: to manipulate text arr
+        */
+        
+        // Setting the maximum index appears in this function
         let tempIndex = tagIndex;
         if (tempIndex > maxIndex) {
             maxIndex = tempIndex;
         }
-        let tempStr = html.innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
-        let childrenArr = [];
+
+        // we will be moving in below string, it contains every word with tag
+        let tempStr = html.innerHTML.trim();
+        let childrenArr = []; // the array in which children are stored, that will be used to make any other tag free, ex - <b><i></i></b> ---> <b></b>
 
         for (let h of html.children) {
-            childrenArr.push(h.outerHTML);
+            childrenArr.push(h.outerHTML); // storing the tags which is inside the html sent
         }
 
         console.log(childrenArr);
-        let childrenArr1 = [];
+        let childrenArr1 = []; // to store current index of that perticular entity processed in childrenArr
         console.log(tagArr);
-        tagArr.push(html.tagName);
-        localStorage.setItem('stnTagArr', JSON.stringify(tagArr));
+
+        tagArr.push(html.tagName); // To store the tags
+        localStorage.setItem('stnTagArr', JSON.stringify(tagArr)); // this is done because it was storing its final form to every depedencies
         console.log(tagArr);
 
         for (let h of childrenArr) {
-            h = h.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
+            h = h.trim();
             console.log(tempStr);
             let ind = tempStr.indexOf(h);
             console.log(ind);
 
+            // there are some text before the tag
             if (ind > 0) {
                 console.log('if0');
+                // text before the tag
                 let text1 = tempStr.slice(0, ind).trim();
                 console.log(text1);
                 text1 = text1.split(' ');
 
+                // Storing the words and their data accordingly
                 for (let h1 of text1) {
                     // console.log(prevStringToCheck);
                     // console.log(h1);
@@ -182,6 +213,7 @@ const EditorState = (props) => {
                     textOccuranceBefore += occurranceArr.filter(x => x === h1).length;
                     console.log(textOccuranceBefore);
 
+                    // to further manipulate textArr
                     tempOccuranceArr.push({
                         index: tempIndex,
                         occurrance: textOccuranceBefore,
@@ -236,6 +268,7 @@ const EditorState = (props) => {
             }
         }
 
+        // when the string remains after removing all nested tags
         if (tempStr !== '') {
             tempStr = tempStr.split(' ');
             console.log(tempStr);
@@ -243,7 +276,7 @@ const EditorState = (props) => {
             for (let h1 of tempStr) {
                 console.log(h1);
                 console.log(prevStringToCheck);
-                let textOccuranceBefore = (prevStringToCheck.match(new RegExp(h1, "g")) || []).length+1;
+                let textOccuranceBefore = (prevStringToCheck.match(new RegExp(h1, "g")) || []).length + 1;
                 console.log(textOccuranceBefore);
                 textOccuranceBefore += occurranceArr.filter(x => x === h1).length;
                 console.log(textOccuranceBefore);
@@ -272,8 +305,8 @@ const EditorState = (props) => {
 
         console.log(childrenArr1);
 
+        // reccursively calling it
         for (let h of childrenArr1) {
-            // recursive function 
             let nc = document.createElement('div');
             nc.innerHTML = h.text;
             return multiTagUtil(h.index, nc.children[0], tagArr, textArr, maxIndex, prevStringToCheck, occurranceArr, tempOccuranceArr);
@@ -328,29 +361,30 @@ const EditorState = (props) => {
         localStorage.removeItem('localBlockCount');
 
         // Disabling the check grammar button and set loader
-                setGrammarFlag(true);
-                setGrammarFlag1(true);
+        setGrammarFlag(true);
+        setGrammarFlag1(true);
 
         // Save the tag data here
-        const y = document.querySelector('.ce-block__content');
+        let y = document.querySelector('.ce-block__content');
+        let nb = document.createElement('div');
+        nb.innerHTML = y.outerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+        y = nb.children[0];
         let z = y.cloneNode(true);
         let x = z.children[0].getElementsByTagName("*");
 
         let tagData = [];
         let tagIndex = 0;
 
+        // Storing tagged words, their replacement,occurence,index
         for (let i = 0; i < x.length; i++) {
             if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-
-                let wordSplit = x[i].innerText.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
-                // console.log(wordSplit);
+                let wordSplit = x[i].innerText.trim();
                 wordSplit = wordSplit.split(' ');
                 // console.log(wordSplit);
 
+                // Checking if there are multiple words
                 if (wordSplit.length > 1) {
-                    console.log('if');
-
-                    // console.log(x[i].getElementsByTagName('*'));
+                    // if there are multiple tags are present
                     if (x[i].getElementsByTagName('*').length > 0) {
                         console.log('yes');
                         // console.log(x[i].children);
@@ -362,33 +396,32 @@ const EditorState = (props) => {
 
                         let ans1 = multiTagUtil(tagIndex, x[i], [], [], -1, prevStringToCheck, [], []);
                         console.log(ans1);
-                        let tempOccuranceArr=ans1.tempOccuranceArr;
-                        tempOccuranceArr=tempOccuranceArr.filter((e)=>{
+                        let tempOccuranceArr = ans1.tempOccuranceArr;
+
+                        // only texts with occurence with greater than 1 remains
+                        tempOccuranceArr = tempOccuranceArr.filter((e) => {
                             const text = e.text;
 
                             // Count the text occurance in above array
                             const textCount = tempOccuranceArr.reduce((acc, cur) => cur.text === text ? ++acc : acc, 0);
-                            // console.log(text, textCount);
-                            // if(textCount)
-                            return textCount>1;
-                        }).sort((a,b)=> a.index-b.index);
+                            return textCount > 1;
+                        }).sort((a, b) => a.index - b.index);
+
                         console.log(tempOccuranceArr);
 
                         // Bubble sort the occurance according to index order (if index 1>index 2, then occurence follows the same)
-                        for(let m =0;m< tempOccuranceArr.length-1;m++)
-                        {
-                            for(let n=0;n<tempOccuranceArr.length-1;n++)
-                            {
-                                if((tempOccuranceArr[n].index<tempOccuranceArr[n+1].index && tempOccuranceArr[n].occurrance>tempOccuranceArr[n+1].occurrance) || (tempOccuranceArr[n].index>tempOccuranceArr[n+1].index && tempOccuranceArr[n].occurrance<tempOccuranceArr[n+1].occurrance))
-                                {
-                                    [ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n].index)].occurrance, ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n+1].index)].occurrance]=[ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n+1].index)].occurrance, ans1.textArr[ans1.textArr.findIndex(x=>x.index===tempOccuranceArr[n].index)].occurrance];
-                                 
-                                    [tempOccuranceArr[n].occurrance, tempOccuranceArr[n+1].occurrance]=[tempOccuranceArr[n+1].occurrance, tempOccuranceArr[n].occurrance];
+                        for (let m = 0; m < tempOccuranceArr.length - 1; m++) {
+                            for (let n = 0; n < tempOccuranceArr.length - 1; n++) {
+                                if ((tempOccuranceArr[n].index < tempOccuranceArr[n + 1].index && tempOccuranceArr[n].occurrance > tempOccuranceArr[n + 1].occurrance) || (tempOccuranceArr[n].index > tempOccuranceArr[n + 1].index && tempOccuranceArr[n].occurrance < tempOccuranceArr[n + 1].occurrance)) {
+                                    [ans1.textArr[ans1.textArr.findIndex(x => x.index === tempOccuranceArr[n].index)].occurrance, ans1.textArr[ans1.textArr.findIndex(x => x.index === tempOccuranceArr[n + 1].index)].occurrance] = [ans1.textArr[ans1.textArr.findIndex(x => x.index === tempOccuranceArr[n + 1].index)].occurrance, ans1.textArr[ans1.textArr.findIndex(x => x.index === tempOccuranceArr[n].index)].occurrance];
+
+                                    [tempOccuranceArr[n].occurrance, tempOccuranceArr[n + 1].occurrance] = [tempOccuranceArr[n + 1].occurrance, tempOccuranceArr[n].occurrance];
                                 }
                             }
                         }
                         console.log(ans1.textArr);
 
+                        // wrapping inside the tag and inserting into tagData
                         for (let q of ans1.textArr) {
                             let htmlStr = '';
 
@@ -406,45 +439,15 @@ const EditorState = (props) => {
                             tagData.push({
                                 index: q.index,
                                 occurrance: q.occurrance,
-                                replacement: htmlStr,
-                                text: q.text
+                                replacement: htmlStr.replaceAll(' ',''),
+                                text: q.text.trim()
                             });
                         }
                         tagIndex = ans1.maxIndex;
-
-                        /* let firstIndexOfTag = htmlText.indexOf('<');
-                        let htmlToSend = htmlText;
-                        if (firstIndexOfTag > 0) {
-                            htmlToSend = htmlText.slice(firstIndexOfTag,);
-                            let wordWithNoTag = htmlText.slice(0, firstIndexOfTag);
-
-                            console.log(wordWithNoTag);
-
-                            let wordSplit = wordWithNoTag.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ").trim();
-                            // console.log(wordSplit);
-                            wordSplit = wordSplit.split(' ');
-                            console.log(wordSplit);
-
-                            if (wordSplit.length > 1) {
-                                console.log('if -');
-                                let ans = textWithSpaceUtil(wordSplit, tagIndex, x, i, z, tagData);
-                                tagData = ans.tagData;
-                                tagIndex = ans.tagIndex;
-                            }
-                            else {
-                                console.log('else -');
-                                let ans = textWithoutSpaceUtil(x, i, z, tagIndex, tagData, wordWithNoTag);
-                                tagData = ans.tagData;
-                                tagIndex = ans.tagIndex;
-                            }
-                        }
-                        console.log(htmlToSend);
-                        multiTagUtil(htmlToSend);
-                        console.log(multiTagArr); */
                     }
                     else {
-                        // below code here
-                        let ans = textWithSpaceUtil(wordSplit, tagIndex, x, i, z, tagData);
+                        // No tags are present just multiple words
+                        let ans = textWithSpaceUtil(wordSplit, tagIndex, x[i], z, tagData);
                         tagData = ans.tagData;
                         tagIndex = ans.tagIndex;
                     }

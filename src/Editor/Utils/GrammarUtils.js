@@ -1319,7 +1319,7 @@ export const dltCard = (cardId, ind, index, msg = 'Dismissed', isDict = false, u
 };
 
 // Get word nth index inside string
-const getWordIndex = (n, string, needle) => {
+export const getWordIndex = (n, string, needle) => {
     let counter = n;
     let nThIndex = 0;
     let flag = false;
@@ -1344,7 +1344,7 @@ const getWordIndex = (n, string, needle) => {
 };
 
 // Check if the word reside in between tags, returns further appearing number of words in the tag
-const isInTags = (index, tagIndexLength) => {
+export const isInTags = (index, tagIndexLength) => {
     for (let i of Object.keys(tagIndexLength)) {
         if (index >= Number(i.split('-')[0]) && index < Number(i.split('-')[1])) {
             return Number(i.split('-')[1]) - index;
@@ -1354,14 +1354,14 @@ const isInTags = (index, tagIndexLength) => {
 };
 
 // Reccursively check if the word reside in between tags.
-const recurCheck = (remainingString, needle, oldIndex, tagIndexLength, s) => {
+export const recurCheck = (remainingString, needle, oldIndex, tagIndexLength, s) => {
     let wordIndex = getWordIndex(1, remainingString, needle);
     // console.log(wordIndex);
     let currentIndex = oldIndex + wordIndex;
     // console.log(currentIndex);
 
     if (isInTags(currentIndex, tagIndexLength) !== 0) {
-        let tempTags=isInTags(currentIndex, tagIndexLength)
+        let tempTags = isInTags(currentIndex, tagIndexLength)
         // console.log(tempTags);
         currentIndex = currentIndex + tempTags;
         let remainingString = s.slice(currentIndex,);
@@ -1374,7 +1374,7 @@ const recurCheck = (remainingString, needle, oldIndex, tagIndexLength, s) => {
 };
 
 // Storing the tags start - end index along with there length
-const tagIndexLengthUtil = (s) => {
+export const tagIndexLengthUtil = (s) => {
     let tagIndexLength = {};
 
     let nc = document.createElement('div');
@@ -1404,13 +1404,14 @@ const tagIndexLengthUtil = (s) => {
 };
 
 // Replace nth character utility
-const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
+export const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
     let string = s;
     let prevString = s;
     let finalIndex = 0; // current index of the word
     let needleFlag = false; // if we are changing needle
     let needle1 = needle;
 
+    // looping through all the occurences (n)
     for (let i = 1; i <= n; i++) {
         // console.log(occurrenceToChange);
         // console.log(string);
@@ -1419,11 +1420,12 @@ const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
         let wordIndex = getWordIndex(occurrenceToChange, string, needle);
         console.log(wordIndex);
 
-        if(wordIndex===-1 && i>1)
-        {
+        // if word not found it means its index is already found, no need to check for further occrences
+        if (wordIndex === -1 && i > 1) {
             break;
         }
 
+        // if text not found
         if (wordIndex === -1) {
             while (needle1 !== '' && wordIndex === -1) {
                 needleFlag = true;
@@ -1438,11 +1440,14 @@ const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
         let tagIndexLength = tagIndexLengthUtil(string);
         console.log(tagIndexLength);
 
+        // Check if send to recursive function
         if (isInTags(wordIndex, tagIndexLength) !== 0) {
             finalIndex += isInTags(wordIndex, tagIndexLength);
             console.log(finalIndex);
             let remainingString = string.slice(finalIndex,);
             // console.log(remainingString);
+
+            // It returns the index of the word to be changed in given string (remaining string; sliced by occurence)
             let finalIndex1 = recurCheck(remainingString, needle, finalIndex, tagIndexLength, s);
             string = string.slice(finalIndex1 + 1,);
             // console.log(string);
@@ -1470,7 +1475,7 @@ const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange) => {
 };
 
 // Replace the nth character
-const replace_nth = function (s, f, r, n) {
+export const replace_nth = function (s, f, r, n) {
     /* 
         s - String to be replaced
         f - The string to be found to replace
@@ -1478,11 +1483,12 @@ const replace_nth = function (s, f, r, n) {
         n - Occurance of string f
     */
 
-    r = r.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-    s = s.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+    // r = r.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+    // s = s.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
     console.log(n);
     console.log(r);
-    let needle = f.replace(/\u00A0/g, " ").trim(); // word to change
+    // let needle = f.replace(/\u00A0/g, " ").trim(); // word to change
+    let needle = f; // word to change
     let indexToChangeObj; // index to be changed 
     let indexToChange = 0; // index to be changed 
     let occurrenceToChange = 1;
@@ -1493,6 +1499,7 @@ const replace_nth = function (s, f, r, n) {
     console.log(wordIndex);
 
     // Tag is wrapped around more than 1 text (including correction text)
+    // there are multiple text in tagdata.text (it should not be the case-check it)
     if (wordIndex === -1 && wordSplit.length > 1) {
         for (let i = 0; i < wordSplit.length; i++) {
             r = prevR;
@@ -1551,7 +1558,7 @@ const replace_nth = function (s, f, r, n) {
 };
 
 // if correction text contains tags, then do operations acc. to it
-const tagUtil1=(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag)=>{
+const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag) => {
     for (let i of card01) {
         console.log(i);
         if (i?.tagName !== 'SPAN' && (i.parentNode?.tagName === 'SPAN' || i.parentNode?.tagName === 'DIV')) {
@@ -1576,7 +1583,7 @@ const tagUtil1=(card01, matchText, tagData1, tagData, replacement_text, tagUtilF
             if (tagInnerText === correctionText || tagUtilFlag) {
                 console.log(i.id.slice(4,));
                 console.log(tagData1);
-                
+
                 // To find index of the tag word to be manupilated
                 let tagArrIndex = tagData1.findIndex(x => x.index === Number(i.id.slice(4,)));
                 console.log(tagArrIndex);
@@ -1614,6 +1621,46 @@ const tagUtil1=(card01, matchText, tagData1, tagData, replacement_text, tagUtilF
     return tagData;
 };
 
+// Inserting the ids to tags for uniquification
+const insertIdToTags = (x, tagIndex) => {
+    for (let i = 0; i < x.length; i++) {
+        if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
+            x[i].setAttribute("id", `uuid${tagIndex++}`);
+        }
+    }
+};
+
+// Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+const removeCards = (mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift) => {
+    for (let i = 0; i < mainData[ind].alerts.length; i++) {
+        if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
+            toBeRemovedArr.push(i);
+        }
+    }
+
+    for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
+        mainData[ind].alerts[i].begin += (shift);
+        mainData[ind].alerts[i].end += (shift);
+        mainData[ind].alerts[i].highlightBegin += (shift);
+        mainData[ind].alerts[i].highlightEnd += (shift);
+    }
+    return toBeRemovedArr;
+};
+
+// If there is any tags present than replace html with tagged html
+const replaceTags = (tagData, ind) => {
+    if (tagData.length > 0) {
+        let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
+
+        for (let i = tagData.length - 1; i >= 0; i--) {
+            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+        }
+
+        // console.log(replacedString);
+        document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
+    }
+}
+
 // Correcting the text mistake on click
 export const textChange = async (id, text, replacement_text, isNum, ind, ind1, startInd, endInd, matchText, overFlowText, beginFlag, beginInc, editorContext, onEditorStateChange, onEditorStateChange2) => {
     const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails, undoFlag, setUndoFlag } = editorContext;
@@ -1625,7 +1672,12 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
     const startIndS = startInd;
     const endIndS = endInd;
-    var undoObj = {};
+    var undoObj = {
+        role: 'correct',
+        ind,
+        prevStr: blockDetails[ind].text,
+        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '')
+    };
     var toBeRemovedArr = [];
 
     // Number(idNum[id]) - It returns the index of card according to its initial index when first response appears
@@ -1690,11 +1742,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
 
         // Inserting the ids to tags for uniquification
-        for (let i = 0; i < x.length; i++) {
-            if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                x[i].setAttribute("id", `uuid${tagIndex++}`);
-            }
-        }
+        insertIdToTags(x, tagIndex);
 
         let card01;
 
@@ -1710,13 +1758,12 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         console.log(document.getElementById(id));
 
         // if correction text contains tags, then do operations acc. to it
-        let tagUtilFlag=false;
+        let tagUtilFlag = false;
 
-        if(mainData[ind].alerts[ind1].text=== matchText)
-        {
-            tagUtilFlag=true;
+        if (mainData[ind].alerts[ind1].text === matchText) {
+            tagUtilFlag = true;
         }
-        tagData=tagUtil1(card01, matchText, tagData1, tagData, replacement_text);
+        tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
 
         // Saving the data
         localStorage.setItem("stnTagData", JSON.stringify(tagData));
@@ -1730,16 +1777,14 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
             if (changeStr1 === matchText1) {
                 console.log('yes 2');
+
                 let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2)) + blockDetails[ind].text.slice(startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2), endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2) + 7 - (endInd - startInd)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2) + 7,);
                 // console.log(changeStr);
 
                 let shift = (replacement_text.length) - (endInd - startInd);
 
                 undoObj = {
-                    role: 'correct',
-                    ind,
-                    prevStr: blockDetails[ind].text,
-                    prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                    ...undoObj,
                     shift,
                     mainIndex: ind1
                 };
@@ -1749,20 +1794,8 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                 setBlockDetails(blockDetails);
 
-                // Removing cards with same suggestions (includes the selected card also)
-                for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                    if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                        toBeRemovedArr.push(i);
-                    }
-                }
-
-                // Shifting further card's start & end index.
-                for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                    mainData[ind].alerts[i].begin += (shift);
-                    mainData[ind].alerts[i].end += (shift);
-                    mainData[ind].alerts[i].highlightBegin += (shift);
-                    mainData[ind].alerts[i].highlightEnd += (shift);
-                }
+                // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+                toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
             }
             else {
                 console.log('yes 2 1');
@@ -1786,10 +1819,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     let shift = (replacement_text.length) - (matchText.length);
 
                     undoObj = {
-                        role: 'correct',
-                        ind,
-                        prevStr: blockDetails[ind].text,
-                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                        ...undoObj,
                         shift,
                         mainIndex: ind1,
                     };
@@ -1800,20 +1830,8 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
 
-                    // Removing cards with same suggestions (includes the selected card also)
-                    for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                        if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                            toBeRemovedArr.push(i);
-                        }
-                    }
-
-                    // Shifting further card's start & end index.
-                    for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                        mainData[ind].alerts[i].begin += (shift);
-                        mainData[ind].alerts[i].end += (shift);
-                        mainData[ind].alerts[i].highlightBegin += (shift);
-                        mainData[ind].alerts[i].highlightEnd += (shift);
-                    }
+                    // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+                    toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
                 }
                 else {
                     console.log('Something went wrong');
@@ -1828,10 +1846,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             let shift = (replacement_text.length) - (matchText.length);
 
             undoObj = {
-                role: 'correct',
-                ind,
-                prevStr: blockDetails[ind].text,
-                prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                ...undoObj,
                 shift,
                 mainIndex: ind1
             };
@@ -1841,36 +1856,15 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
             setBlockDetails(blockDetails);
 
-            // Removing cards with same suggestions (includes the selected card also)
-            for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                    toBeRemovedArr.push(i);
-                }
-            }
-
-            // Shifting further card's start & end index.
-            for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                mainData[ind].alerts[i].begin += (shift);
-                mainData[ind].alerts[i].end += (shift);
-                mainData[ind].alerts[i].highlightBegin += (shift);
-                mainData[ind].alerts[i].highlightEnd += (shift);
-            }
+            // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+            toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
         }
 
         undoObj = { ...undoObj, prevTagData: tagData1 };
-
         console.log(tagData);
+
         // If there is any tags present than replace html with tagged html
-        if (tagData.length > 0) {
-            let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
-
-            for (let i = tagData.length - 1; i >= 0; i--) {
-                replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
-            }
-
-            // console.log(replacedString);
-            document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
-        }
+        replaceTags(tagData, ind);
     }
     else {
         if (overFlowText) {
@@ -1878,6 +1872,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             var nestedParentSpanIndex = 0;
             var currNode = document.getElementById(id);
 
+            // There are nested span tags, getting up to the parent span
             for (let k = Number(idNum[id]); k >= 0; k--) {
                 if (currNode.parentNode.tagName !== 'SPAN') {
                     break;
@@ -1934,32 +1929,24 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
 
             // Inserting the ids to tags for uniquification
-            for (let i = 0; i < x.length; i++) {
-                if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                    x[i].setAttribute("id", `uuid${tagIndex++}`);
-                }
-            }
+            insertIdToTags(x, tagIndex);
 
             let card01 = document.getElementById(id).getElementsByTagName("*");
 
             // if correction text contains tags, then do operations acc. to it
-            let tagUtilFlag=false;
+            let tagUtilFlag = false;
 
-            if(mainData[ind].alerts[ind1].text=== matchText)
-            {
-                tagUtilFlag=true;
+            if (mainData[ind].alerts[ind1].text === matchText) {
+                tagUtilFlag = true;
             }
-            tagData=tagUtil1(card01, matchText, tagData1, tagData, replacement_text);
+            tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
 
             // Saving the data
             localStorage.setItem("stnTagData", JSON.stringify(tagData));
             // console.log(tagData);
 
             undoObj = {
-                role: 'correct',
-                ind,
-                prevStr: blockDetails[ind].text,
-                prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                ...undoObj,
                 shift,
                 mainIndex: ind1,
                 prevTagData: tagData1
@@ -1968,35 +1955,14 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
             // If there is any tags present than replace html with tagged html
-            if (tagData.length > 0) {
-                let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
-
-                for (let i = tagData.length - 1; i >= 0; i--) {
-                    replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
-                }
-
-                // console.log(replacedString);
-                document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
-            }
+            replaceTags(tagData, ind);
 
             // console.log(changeStr);
             blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
             setBlockDetails(blockDetails);
 
-            // Removing cards with same suggestions (includes the selected card also)
-            for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                    toBeRemovedArr.push(i);
-                }
-            }
-
-            // Shifting further card's start & end index.
-            for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                mainData[ind].alerts[i].begin += (shift);
-                mainData[ind].alerts[i].end += (shift);
-                mainData[ind].alerts[i].highlightBegin += (shift);
-                mainData[ind].alerts[i].highlightEnd += (shift);
-            }
+            // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+            toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
         }
         else {
             if (isNum) {
@@ -2028,33 +1994,26 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
 
                     // Inserting the ids to tags for uniquification
-                    for (let i = 0; i < x.length; i++) {
-                        if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                            x[i].setAttribute("id", `uuid${tagIndex++}`);
-                        }
-                    }
+                    insertIdToTags(x, tagIndex);
 
                     let card01 = document.getElementById(id).getElementsByTagName("*");
 
                     // if correction text contains tags, then do operations acc. to it 
-                    // below case may not required for this case
+                    // below case may not required for this case **
                     // let tagUtilFlag=false;
 
                     // if(mainData[ind].alerts[ind1].text=== matchText)
                     // {
                     //     tagUtilFlag=true;
                     // }
-                    tagData=tagUtil1(card01, document.getElementById(id).textContent, tagData1, tagData, replacement_text + strSpace + document.getElementById(id).textContent, false);
+                    tagData = tagUtil1(card01, document.getElementById(id).textContent, tagData1, tagData, replacement_text + strSpace + document.getElementById(id).textContent, false);
 
                     // Saving the data
                     localStorage.setItem("stnTagData", JSON.stringify(tagData));
                     // console.log(tagData);
 
                     undoObj = {
-                        role: 'correct',
-                        ind,
-                        prevStr: blockDetails[ind].text,
-                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                        ...undoObj,
                         shift,
                         mainIndex: ind1,
                         prevTagData: tagData1
@@ -2067,45 +2026,16 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     document.getElementById(id).textContent = replacement_text + strSpace + document.getElementById(id).textContent;
 
                     // If there is any tags present than replace html with tagged html
-                    if (tagData.length > 0) {
-                        let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
-
-                        for (let i = tagData.length - 1; i >= 0; i--) {
-                            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
-                        }
-
-                        // console.log(replacedString);
-                        document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
-                    }
+                    replaceTags(tagData, ind);
 
                     let tempEle = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
 
-                    // Removing cards with same suggestions (includes the selected card also)
-                    for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                        if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                            toBeRemovedArr.push(i);
-                        }
-                    }
-
-                    // Shifting further card's start & end index.
-                    for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                        mainData[ind].alerts[i].begin += (shift);
-                        mainData[ind].alerts[i].end += (shift);
-                        mainData[ind].alerts[i].highlightBegin += (shift);
-                        mainData[ind].alerts[i].highlightEnd += (shift);
-                    }
+                    // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+                    toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
 
                     // console.log(shift);
                     // console.log(ind1);
                     // console.log(mainData);
-                    // blockDetails[ind].text = tempEle;
-
-                    // Fix this
-
-                    // for(let i of document.querySelectorAll('.ce-block__content')[ind].children[0].getElementsByTagName("*"))
-                    // {
-                    //     console.log(i);
-                    // }
 
                     let tagsToRemove = ['<b>', '</b>', '<i>', '</i>'];
                     for (let i of tagsToRemove) {
@@ -2144,71 +2074,42 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
 
                     // Inserting the ids to tags for uniquification
-                    for (let i = 0; i < x.length; i++) {
-                        if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                            x[i].setAttribute("id", `uuid${tagIndex++}`);
-                        }
-                    }
+                    insertIdToTags(x, tagIndex);
 
                     let card01 = document.getElementById(id).getElementsByTagName("*");
 
                     // if correction text contains tags, then do operations acc. to it
-                    let tagUtilFlag=false;
+                    let tagUtilFlag = false;
 
-                    if(mainData[ind].alerts[ind1].text=== matchText)
-                    {
-                        tagUtilFlag=true;
+                    if (mainData[ind].alerts[ind1].text === matchText) {
+                        tagUtilFlag = true;
                     }
-                    tagData=tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
+                    tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
 
                     // Saving the data
                     localStorage.setItem("stnTagData", JSON.stringify(tagData));
                     // console.log(tagData);
 
                     undoObj = {
-                        role: 'correct',
-                        ind,
-                        prevStr: blockDetails[ind].text,
-                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                        ...undoObj,
                         shift,
                         mainIndex: ind1,
                         prevTagData: tagData1
                     };
-                    
+
 
                     document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
                     // If there is any tags present than replace html with tagged html
-                    if (tagData.length > 0) {
-                        let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
-
-                        for (let i = tagData.length - 1; i >= 0; i--) {
-                            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
-                        }
-
-                        // console.log(replacedString);
-                        document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
-                    }
+                    replaceTags(tagData, ind);
 
                     blockDetails[ind].text = changeStr.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', '');
                     setBlockDetails(blockDetails);
 
                     // console.log(changeStr);
 
-                    // Removing cards with same suggestions (includes the selected card also)
-                    for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                        if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                            toBeRemovedArr.push(i);
-                        }
-                    }
-
-                    // Shifting further card's start & end index.
-                    for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                        mainData[ind].alerts[i].begin += (shift);
-                        mainData[ind].alerts[i].end += (shift);
-                        mainData[ind].alerts[i].highlightBegin += (shift);
-                        mainData[ind].alerts[i].highlightEnd += (shift);
-                    }
+                    // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+                    toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
                 }
             }
             else {
@@ -2227,23 +2128,18 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 let x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
 
                 // Inserting the ids to tags for uniquification
-                for (let i = 0; i < x.length; i++) {
-                    if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
-                        x[i].setAttribute("id", `uuid${tagIndex++}`);
-                    }
-                }
+                insertIdToTags(x, tagIndex);
 
                 let card01 = document.getElementById(id).getElementsByTagName("*");
                 // console.log(card01);
 
                 // if correction text contains tags, then do operations acc. to it
-                let tagUtilFlag=false;
+                let tagUtilFlag = false;
 
-                if(mainData[ind].alerts[ind1].text=== matchText)
-                {
-                    tagUtilFlag=true;
+                if (mainData[ind].alerts[ind1].text === matchText) {
+                    tagUtilFlag = true;
                 }
-                tagData=tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
+                tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
 
                 // Saving the data
                 localStorage.setItem("stnTagData", JSON.stringify(tagData));
@@ -2301,10 +2197,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                         let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (ind3 + 1)) + (7 * ind2)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (ind3 + 1)) + (7 * ind2),);
 
                         undoObj = {
-                            role: 'correct',
-                            ind,
-                            prevStr: blockDetails[ind].text,
-                            prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                            ...undoObj,
                             shift,
                             mainIndex: ind1
                         };
@@ -2327,10 +2220,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                             // console.log(changeStr);
 
                             undoObj = {
-                                role: 'correct',
-                                ind,
-                                prevStr: blockDetails[ind].text,
-                                prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                                ...undoObj,
                                 shift,
                                 mainIndex: ind1
                             };
@@ -2369,10 +2259,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     // console.log(ind1);
 
                     undoObj = {
-                        role: 'correct',
-                        ind,
-                        prevStr: blockDetails[ind].text,
-                        prevStr1: document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML.replaceAll(' style="background-color: unset;"', '').replaceAll(' style="background-color: rgb(255, 205, 205);"', '').replaceAll(' style="background-color: rgb(224, 202, 252);"', '').replaceAll(' style="background-color: rgb(202, 226, 252);"', '').replaceAll(' style="background-color: rgb(216, 252, 202);"', ''),
+                        ...undoObj,
                         shift,
                         mainIndex: ind1
                     };
@@ -2388,32 +2275,12 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 undoObj = { ...undoObj, prevTagData: tagData1 };
 
                 console.log(tagData);
+
                 // If there is any tags present than replace html with tagged html
-                if (tagData.length > 0) {
-                    let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
+                replaceTags(tagData, ind);
 
-                    for (let i = tagData.length - 1; i >= 0; i--) {
-                        replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
-                    }
-
-                    console.log(replacedString);
-                    document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
-                }
-
-                // Removing cards with same suggestions (includes the selected card also)
-                for (let i = 0; i < mainData[ind].alerts.length; i++) {
-                    if (startIndS === mainData[ind].alerts[i].begin && endIndS === mainData[ind].alerts[i].end) {
-                        toBeRemovedArr.push(i);
-                    }
-                }
-
-                // Shifting further card's start & end index.
-                for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
-                    mainData[ind].alerts[i].begin += (shift);
-                    mainData[ind].alerts[i].end += (shift);
-                    mainData[ind].alerts[i].highlightBegin += (shift);
-                    mainData[ind].alerts[i].highlightEnd += (shift);
-                }
+                // Removing cards with same suggestions (includes the selected card also) & Shifting further card's start & end index.
+                toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
             }
         }
     }
@@ -2595,7 +2462,7 @@ export const alertUndo = (editorContext, onEditorStateChange5) => {
 
         tc += alertUndoMsg.tcFinal;
         setTc(tc);
-        
+
         // console.log(alertUndoMsg.originalIndex);
 
         // Removing removed index.
