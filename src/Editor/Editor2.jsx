@@ -14,7 +14,7 @@ import DictionaryModal from './Modals/DictionaryModal';
 import TakeOverModal from './Modals/TakeOverModal';
 import TakeOverModal1 from './Modals/TakeOverModal1';
 import { func1, func, editor_head_change, initializeEditor, toggleAssistant, toggleText, saveAlert, editor_head_save } from './Utils/EditorUtil';
-import { closeAlert, dltCard, expand1, expand2, textChange, trigger_active, alertUndo, getWordIndex, isInTags, recurCheck, tagIndexLengthUtil, replace_nth_util, replace_nth } from './Utils/GrammarUtils';
+import { closeAlert, dltCard, expand1, expand2, textChange, trigger_active, alertUndo, replace_nth } from './Utils/GrammarUtils';
 import { dis_goals, goalsReset, initializeGoals, setGoals1, toggleGoalsUniversal, toggle_goals, toggle_intent } from './Utils/GoalsUtils';
 import { updateDict, updateDictModal } from './Utils/DictionaryUtil';
 import EditorContext from '../context/EditorContext';

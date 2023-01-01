@@ -1114,7 +1114,7 @@ export const expand1 = (e, ids) => {
 
             if (e.target.tagName === 'P') {
                 // e.target.parentNode.parentNode.
-                e.target.parentNode.nextElementSibling.classList.add('em2-box2-ani');
+                e.target?.parentNode?.nextElementSibling?.classList?.add('em2-box2-ani');
                 e.target.parentNode.style.display = 'none';
             }
             else if (e.target.tagName === 'path' || e.target.tagName === 'I') {
@@ -1356,24 +1356,30 @@ export const isInTags = (index, tagIndexLength) => {
 // Reccursively check if the word reside in between tags.
 export const recurCheck = (remainingString, needle, oldIndex, tagIndexLength, s) => {
     let wordIndex = getWordIndex(1, remainingString, needle);
-    // console.log(wordIndex);
-    let currentIndex = oldIndex + wordIndex;
-    // console.log(currentIndex);
-
-    if (isInTags(currentIndex, tagIndexLength) !== 0) {
-        let tempTags = isInTags(currentIndex, tagIndexLength)
-        // console.log(tempTags);
-        currentIndex = currentIndex + tempTags;
-        let remainingString = s.slice(currentIndex,);
-        // console.log(remainingString);
-        return recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
+    console.log(wordIndex);
+    if(wordIndex!==-1)
+    {
+        let currentIndex = oldIndex + wordIndex;
+        console.log(currentIndex);
+        console.log(tagIndexLength);
+    
+        if (isInTags(currentIndex, tagIndexLength) !== 0) {
+            let tempTags = isInTags(currentIndex, tagIndexLength);
+            // console.log(tempTags);
+            currentIndex = currentIndex + tempTags;
+            console.log(currentIndex);
+            let remainingString = s.slice(currentIndex,);
+            console.log(remainingString);
+            return recurCheck(remainingString, needle, currentIndex, tagIndexLength, s);
+        }
+        else {
+            return currentIndex;
+        }
     }
-    else {
-        return currentIndex;
-    }
+    return -1;
 };
 
-// Storing the tags start - end index along with there length
+// Storing the tags start - end index along with their length
 export const tagIndexLengthUtil = (s) => {
     let tagIndexLength = {};
 
@@ -1382,22 +1388,76 @@ export const tagIndexLengthUtil = (s) => {
     nc.innerHTML = s;
     // console.log(nc);
     let al = nc.getElementsByTagName("*");
+    let flag=false;
 
     for (let i of al) {
-        // console.log(i.outerHTML);
-        let startIndex = i.outerHTML.indexOf("<");
-        let endIndex = i.outerHTML.indexOf(">");
-        // console.log(startIndex, endIndex);
-        let stringToMatch = i.outerHTML.slice(startIndex, endIndex + 1);
-        // console.log(stringToMatch);
-        let tagStartIndex = s.indexOf(stringToMatch);
-        let tagEndIndex = stringToMatch.length + s.indexOf(stringToMatch);
+        if(i.tagName==='SPAN')
+        {
+            // console.log(i.outerHTML);
+    
+            /* If `</` comes before `<` then check if index of `<` is greater than index of `</` in s  */
+            let n1=s.indexOf('</');
+            let n2=s.indexOf('<');
+            // console.log(n1, n2);
+            let n3=1;
 
-        // console.log(tagStartIndex, tagEndIndex);
-        // console.log(s.slice(tagStartIndex, tagEndIndex));
-
-        tagIndexLength[`${tagStartIndex}-${tagEndIndex}`] = stringToMatch.length;
-
+            // Visit this once because it will check for n times in the same string (s)
+            while(n2>=n1 && !flag && n1!==-1)
+            {
+                let s1=getWordIndex(n3, s, '</');
+                // console.log(s1);
+                let s2=s1+7;
+                tagIndexLength[`${s1}-${s2}`] = 7;
+                ++n3;
+                n1=getWordIndex(n3, s, '</');
+            }
+    
+            let startIndex = i.outerHTML.indexOf("<");
+            let endIndex = i.outerHTML.indexOf(">");
+            // console.log(startIndex, endIndex);
+            let stringToMatch = i.outerHTML.slice(startIndex, endIndex + 1);
+            // console.log(stringToMatch);
+            let tagStartIndex = s.indexOf(stringToMatch);
+            let tagEndIndex = stringToMatch.length + s.indexOf(stringToMatch);
+    
+            // console.log(tagEndIndex);
+            let text2=s.slice(tagEndIndex, );
+            // console.log(text2);
+            let endTagStartIndex=text2.indexOf("</");
+            let endTagEndIndex=endTagStartIndex+7;  // length of </span>
+            // console.log(endTagStartIndex, endTagEndIndex);
+            // console.log(endTagStartIndex+tagEndIndex, endTagEndIndex+tagEndIndex);
+    
+            /* After tagEndIndex, first `</` & `>` will be the closing tags element, get index of them. slice after tagEndIndex */
+    
+            // console.log(tagStartIndex, tagEndIndex);
+            // console.log(s.slice(tagStartIndex, tagEndIndex));
+    
+            tagIndexLength[`${tagStartIndex}-${tagEndIndex}`] = stringToMatch.length;
+    
+            // if closing span with start - close index is already present. ex- <span><span></span</span>
+            // if(tagIndexLength[`${endTagStartIndex+tagEndIndex}-${endTagEndIndex+tagEndIndex+1}`])
+            if(tagIndexLength[`${endTagStartIndex+tagEndIndex}-${endTagEndIndex+tagEndIndex}`])
+            {
+                // console.log('if');
+                // console.log('already present');
+                let text21=s.slice(endTagEndIndex+tagEndIndex, );
+                // console.log(text21);
+                let endTagStartIndex1=text21.indexOf("</");
+                let endTagEndIndex1=endTagStartIndex1+7;
+                // console.log(endTagStartIndex1, endTagEndIndex1);
+                // console.log(endTagEndIndex+tagEndIndex+endTagStartIndex1, endTagEndIndex+tagEndIndex+1+endTagEndIndex1);
+                // tagIndexLength[`${endTagEndIndex+tagEndIndex+endTagStartIndex1}-${endTagEndIndex+tagEndIndex+1+endTagEndIndex1}`] = 7;
+                tagIndexLength[`${endTagEndIndex+tagEndIndex+endTagStartIndex1}-${endTagEndIndex+tagEndIndex+endTagEndIndex1}`] = 7;
+            }
+            else
+            {
+                // console.log('else');
+                // tagIndexLength[`${endTagStartIndex+tagEndIndex}-${endTagEndIndex+tagEndIndex+1}`] = 7;
+                tagIndexLength[`${endTagStartIndex+tagEndIndex}-${endTagEndIndex+tagEndIndex}`] = 7;
+            }
+            flag=true;
+        }
     };
 
     return tagIndexLength;
@@ -1416,7 +1476,7 @@ export const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange
         // console.log(occurrenceToChange);
         // console.log(string);
 
-        console.log(needle);
+        // console.log(needle);
         let wordIndex = getWordIndex(occurrenceToChange, string, needle);
         console.log(wordIndex);
 
@@ -1437,6 +1497,7 @@ export const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange
 
         finalIndex = wordIndex;
         // console.log(finalIndex);
+        // console.log(string);
         let tagIndexLength = tagIndexLengthUtil(string);
         console.log(tagIndexLength);
 
@@ -1445,12 +1506,15 @@ export const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange
             finalIndex += isInTags(wordIndex, tagIndexLength);
             console.log(finalIndex);
             let remainingString = string.slice(finalIndex,);
-            // console.log(remainingString);
+            console.log(remainingString);
 
             // It returns the index of the word to be changed in given string (remaining string; sliced by occurence)
-            let finalIndex1 = recurCheck(remainingString, needle, finalIndex, tagIndexLength, s);
+            // let finalIndex1 = recurCheck(remainingString, needle, finalIndex, tagIndexLength, s);
+            let finalIndex1 = recurCheck(remainingString, needle, finalIndex, tagIndexLength, string);
+            console.log(finalIndex1);
             string = string.slice(finalIndex1 + 1,);
-            // console.log(string);
+            console.log(string);
+
             if (indexToChange > 0) {
                 indexToChange += 1;
             }
@@ -1475,7 +1539,7 @@ export const replace_nth_util = (n, needle, occurrenceToChange, s, indexToChange
 };
 
 // Replace the nth character
-export const replace_nth = function (s, f, r, n) {
+export const replace_nth = function (s, f, r, n, addedText) {
     /* 
         s - String to be replaced
         f - The string to be found to replace
@@ -1485,10 +1549,11 @@ export const replace_nth = function (s, f, r, n) {
 
     // r = r.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
     // s = s.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-    console.log(n);
-    console.log(r);
-    // let needle = f.replace(/\u00A0/g, " ").trim(); // word to change
-    let needle = f; // word to change
+    // console.log("addedText is - ", addedText);
+    console.log("n is - ", n);
+    console.log("r is - ", r);
+    // let needle = f.replace(/\u00A0/g, " ").trim(); // word to be changed 
+    let needle = f; // word to be changed 
     let indexToChangeObj; // index to be changed 
     let indexToChange = 0; // index to be changed 
     let occurrenceToChange = 1;
@@ -1501,25 +1566,46 @@ export const replace_nth = function (s, f, r, n) {
     // Tag is wrapped around more than 1 text (including correction text)
     // there are multiple text in tagdata.text (it should not be the case-check it)
     if (wordIndex === -1 && wordSplit.length > 1) {
+
         for (let i = 0; i < wordSplit.length; i++) {
             r = prevR;
-            console.log(wordSplit);
+            // console.log(wordSplit);
 
             // Removing the extra word from replacement string (only the word to be corrected remains)
             for (let j = 0; j < wordSplit.length; j++) {
                 if (i !== j) {
-                    console.log(i);
-                    console.log(j);
+                    // console.log(i);
+                    // console.log(j);
                     r = r.replace(wordSplit[j], "");
-                    console.log(r);
+                    // console.log(r);
                 }
             }
 
             needle = wordSplit[i];
             r = r.replaceAll(' ', '');
             console.log(r);
-            indexToChangeObj = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
-            console.log(indexToChange);
+            let occurenceToSend=n;
+            // console.log(needle);
+            // console.log(addedText);
+
+            // For the newly added text to tagData's text, finding its occurence in innerText of the current html
+            if(addedText!=='' && needle===addedText)
+            {
+                // console.log('-if-');
+                let presentedText=f.replace(addedText,'').trim();
+                // console.log(presentedText);
+                // console.log(document.querySelectorAll('.ce-block__content')[0]);
+                let htmlInnerText=document.querySelectorAll('.ce-block__content')[0].children[0].innerText;
+                // console.log(htmlInnerText);
+                let presentedTextIndex=getWordIndex(n, htmlInnerText, presentedText);
+                // console.log(presentedTextIndex);
+                htmlInnerText=htmlInnerText.slice(0, presentedTextIndex);
+                occurenceToSend = (htmlInnerText.match(new RegExp(addedText, "g")) || []).length;
+            }
+            console.log(occurenceToSend);
+
+            indexToChangeObj = replace_nth_util(occurenceToSend, needle, occurrenceToChange, s, indexToChange);
+            // console.log(indexToChange);
             indexToChange = indexToChangeObj.indexToChange;
 
             if (indexToChangeObj.needleFlag) {
@@ -1533,7 +1619,7 @@ export const replace_nth = function (s, f, r, n) {
     }
 
     indexToChangeObj = replace_nth_util(n, needle, occurrenceToChange, s, indexToChange);
-    console.log(indexToChangeObj);
+    // console.log(indexToChangeObj);
 
     indexToChange = indexToChangeObj.indexToChange;
 
@@ -1558,15 +1644,22 @@ export const replace_nth = function (s, f, r, n) {
 };
 
 // if correction text contains tags, then do operations acc. to it
-const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag) => {
+const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition) => {
+    let isProcessed = false;
     for (let i of card01) {
-        console.log(i);
+        if (isProcessed) {
+            break;
+        }
+
+        // console.log(i);
         if (i?.tagName !== 'SPAN' && (i.parentNode?.tagName === 'SPAN' || i.parentNode?.tagName === 'DIV')) {
-            console.log(i.innerText);
-            console.log(matchText);
-            console.log(replacement_text);
+            // console.log(i.innerText);
+            // console.log(matchText);
+            // console.log(tagUtilFlag);
+            // console.log(replacement_text);
             let tagInnerText = i.innerText;
-            let correctionText = matchText;
+            let correctionText = matchText.trim();
+            replacement_text=replacement_text.trim();
 
             // Removing extra spaced if needed
             if (tagInnerText !== correctionText && !tagUtilFlag) {
@@ -1581,42 +1674,118 @@ const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUti
 
             // if correction text containing HTML tags
             if (tagInnerText === correctionText || tagUtilFlag) {
-                console.log(i.id.slice(4,));
-                console.log(tagData1);
+                // console.log(i.id.slice(4,));
+                // console.log(tagData1);
 
-                // To find index of the tag word to be manupilated
-                let tagArrIndex = tagData1.findIndex(x => x.index === Number(i.id.slice(4,)));
-                console.log(tagArrIndex);
+                if (correctionText !== ' ') {
+                    // To find index of the tag word to be manupilated
+                    let tagArrIndex = tagData1.findIndex(x => x.index === Number(i.id.slice(4,)));
+                    // console.log(tagArrIndex);
 
-                if (tagData.length > 0 && tagArrIndex !== -1) {
+                    if (tagData.length > 0 && tagArrIndex !== -1) {
 
-                    console.log(tagData);
-                    console.log(replacement_text);
-                    console.log(correctionText);
+                        console.log(tagData);
+                        console.log(`'${correctionText}'`);
+                        console.log(`'${replacement_text}'`);
 
-                    // replacing replacement to replacement with bold and text to corrected text
-                    tagData[tagArrIndex].replacement = tagData[tagArrIndex].replacement.replace(/\u00A0/g, " ").replaceAll('&nbsp;', ' ').replaceAll(correctionText, replacement_text).replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-                    // tagData[tagArrIndex].text = replacement_text.replaceAll('&nbsp;', ' ');
-                    // console.log(tagData[tagArrIndex].text);
-                    // console.log(tagData[tagArrIndex].text.replaceAll(correctionText, replacement_text));
-                    tagData[tagArrIndex].text = tagData[tagArrIndex].text.replace(/\u00A0/g, " ").replaceAll('&nbsp;', ' ').replaceAll(correctionText, replacement_text).replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+                        const prevText=tagData[tagArrIndex].text;
 
-                    console.log(tagData);
+                        // replacing replacement to replacement with bold and text to corrected text / insert at position
+                        if (blankTextFlag) {
+                            console.log('if');
+                            tagData[tagArrIndex].text = tagData[tagArrIndex].text.slice(0, insertPosition) + replacement_text+ " " + tagData[tagArrIndex].text.slice(insertPosition,);
+                        }
+                        else {
+                            console.log('else');
+                            tagData[tagArrIndex].text = tagData[tagArrIndex].text.replaceAll(correctionText, replacement_text);
+                        }
 
-                    // if text being corrected is different then replacement text and it is not the last element of tagData array
-                    if (correctionText !== replacement_text && tagArrIndex + 1 <= tagData.length) {
-                        for (let j = tagArrIndex + 1; j < tagData.length; j++) {
+                        // If some new text is adding, storing the new text to calculate its occurence in previous string and work according to that
+                        let addedText='';
+                        if(tagData[tagArrIndex].text.split(' ').length>1)
+                        {
+                            addedText=tagData[tagArrIndex].text.replace(prevText, '').trim();
+                            // console.log(addedText);
+                            // console.log(prevText);
 
-                            // Decrement occurance of further tagged words only if their text is equal to the word which is corrected above
-                            if (tagData[j].text === correctionText) {
-                                tagData[j].occurrance -= 1;
+                            // if the added text matches some further tagData's text, then increase tagData's text occurence by 1
+                            if(tagArrIndex<tagData.length-1 && addedText!=='')
+                            {
+                                for(let b=tagArrIndex+1;b<tagData.length;b++)
+                                {
+                                    // console.log(tagData[b].text, addedText);
+                                    if(tagData[b].text===addedText)
+                                    {
+                                        // console.log(tagData[b]);
+                                        tagData[b].occurrance+=1;
+                                    }
+                                }
                             }
                         }
+                        tagData[tagArrIndex].addedText=addedText;
+
+                        // Removing the empty texts in tagData
+                        tagData=tagData.filter((e)=>{
+                            return e.text!=="";
+                        });
+                        console.log(tagData);
+
+                        // if the changed tagData's text matches some further tagData's text, then increase/decrease further tagData's text occurence by 1 (add/remove)
+                        if(tagArrIndex<tagData.length-1)
+                        {
+                            for(let b=tagArrIndex+1;b<tagData.length;b++)
+                            {
+                                if(tagData[b].text===tagData[tagArrIndex].text)
+                                {
+                                    console.log('yes');
+                                    console.log(tagData[b]);
+                                    tagData[b].occurrance+=1;
+                                }
+                            }
+                        }
+
+                        // Injecting into tagData's replacement text
+                        let nc = document.createElement('div');
+                        // console.log(tagData[tagArrIndex].replacement);
+                        nc.innerHTML = tagData[tagArrIndex].replacement;
+                        // console.log(nc.children[0]);
+                        // nc.children[0].innerText=tagData[tagArrIndex].text;
+                        let tnc = nc.children[0];
+                        let ncTagCount = nc.getElementsByTagName('*').length;
+                        // console.log(ncTagCount);
+
+                        // Getting down till last child in order to change its innerText
+                        for (let i = 0; i < ncTagCount - 1; i++) {
+                            tnc = tnc.children[0];
+                            // console.log(tnc);
+                        }
+
+                        // console.log(tnc);
+                        tnc.innerText = tagData[tagArrIndex].text;
+                        // console.log(nc);
+                        tagData[tagArrIndex].replacement = nc.children[0].outerHTML;
+                        // tagData[tagArrIndex].replacement = tagData[tagArrIndex].replacement.replaceAll(correctionText, replacement_text);
+
+                        // console.log(tagData);
+
+                        // if text being corrected is different then replacement text and it is not the last element of tagData array
+                        if (correctionText !== replacement_text && tagArrIndex + 1 <= tagData.length) {
+                            for (let j = tagArrIndex + 1; j < tagData.length; j++) {
+
+                                // Decrement occurance of further tagged words only if their text is equal to the word which is corrected above
+                                if (tagData[j].text === correctionText) {
+                                    tagData[j].occurrance -= 1;
+                                }
+                            }
+                        }
+                        isProcessed = true;
                     }
                 }
             }
         }
     }
+
+    console.log(tagData);
 
     return tagData;
 };
@@ -1638,6 +1807,7 @@ const removeCards = (mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, sh
         }
     }
 
+    // Shifting
     for (let i = ind1 + 1; i < mainData[ind].alerts.length; i++) {
         mainData[ind].alerts[i].begin += (shift);
         mainData[ind].alerts[i].end += (shift);
@@ -1653,7 +1823,7 @@ const replaceTags = (tagData, ind) => {
         let replacedString = document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML;
 
         for (let i = tagData.length - 1; i >= 0; i--) {
-            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+            replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance, tagData[i].addedText);
         }
 
         // console.log(replacedString);
@@ -1723,7 +1893,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             repeatFlag = true;
         }
     }
-    console.log(idNum[id]);
+    // console.log(idNum[id]);
 
     // Dealing with cards whose highlight index are changed in order to prevent inter collision (overlap)
     // if the card is manipulated in backend to prevent collision, then handle that card here
@@ -1760,23 +1930,35 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         // if correction text contains tags, then do operations acc. to it
         let tagUtilFlag = false;
 
+        // if matchText and tag innerText does not match (see in below function)
         if (mainData[ind].alerts[ind1].text === matchText) {
             tagUtilFlag = true;
         }
-        tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
+
+        // if matchText is empty string, then send position and insert it
+        let blankTextFlag = false;
+        let insertPosition = 0;
+        if (matchText === '') {
+            blankTextFlag = true;
+            insertPosition = mainData[ind].alerts[ind1].begin - mainData[ind].alerts[ind1].highlightBegin;
+        }
+
+        tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
         // Saving the data
         localStorage.setItem("stnTagData", JSON.stringify(tagData));
 
+        console.log("======= ========= ======== ====== ========");
         // console.log(startInd + (77 * (ind1 + 1)) + (7 * ind2), endInd + (77 * (ind1 + 1)) + (7 * ind2));
         // console.log(changeStr1);
         if (changeStr1 !== matchText) {
+            console.log('if if');
             let matchText1 = `</span>${matchText}`;
             // changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind1 + 1)) + (7 * ind2), endInd + (77 * (ind1 + 1)) + (7 * ind2) + 7);
             changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2), endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2) + 7);
 
             if (changeStr1 === matchText1) {
-                console.log('yes 2');
+                console.log('if if if');
 
                 let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2)) + blockDetails[ind].text.slice(startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2), endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2) + 7 - (endInd - startInd)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2) + 7,);
                 // console.log(changeStr);
@@ -1798,7 +1980,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 toBeRemovedArr = removeCards(mainData, startIndS, endIndS, toBeRemovedArr, ind, ind1, shift);
             }
             else {
-                console.log('yes 2 1');
+                console.log('if if else');
                 let matchText2 = blockDetails[ind].text.slice(startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2), endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2) + 7 + 77 - (endInd - startInd)) + matchText;
                 // console.log(blockDetails[ind].text.slice(startInd + (77 * (ind1 + 1)) + (7 * ind2), endInd + (77 * (ind1 + 1)) + (7 * ind2) + 7 + 77 - (endInd - startInd)));
                 // console.log(startInd, endInd);
@@ -1839,7 +2021,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             }
         }
         else {
-            console.log('yes 3');
+            console.log('if else');
             // console.log(replacement_text);
             let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2),);
 
@@ -1850,6 +2032,8 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 shift,
                 mainIndex: ind1
             };
+
+            // console.log(changeStr);
 
             document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = changeStr;
 
@@ -1919,7 +2103,9 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (ind4 + 1)) + (7 * ind2)) + replacement_text + text.repeat(spanCount) + blockDetails[ind].text.slice(endInd + (77 * (ind4 + 1)) + (7 * ind2) + spanCount * 7,);
             // console.log(changeStr);
 
+            /* Check it -v */
             let shift = (replacement_text.length + text.repeat(spanCount).length) - (matchText.length);
+            console.log(shift);
 
             // Insert html tags here
             let tagData = JSON.parse(localStorage.getItem("stnTagData"));
@@ -1935,11 +2121,21 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
             // if correction text contains tags, then do operations acc. to it
             let tagUtilFlag = false;
-
             if (mainData[ind].alerts[ind1].text === matchText) {
                 tagUtilFlag = true;
             }
-            tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
+
+            // if matchText is empty string, then send position and insert it
+            let blankTextFlag = false;
+            let insertPosition = 0;
+            if (matchText === '') {
+                blankTextFlag = true;
+                insertPosition = mainData[ind].alerts[ind1].begin - mainData[ind].alerts[ind1].highlightBegin;
+            }
+
+            console.log(matchText);
+            console.log(replacement_text);
+            tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
             // Saving the data
             localStorage.setItem("stnTagData", JSON.stringify(tagData));
@@ -2006,7 +2202,8 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     // {
                     //     tagUtilFlag=true;
                     // }
-                    tagData = tagUtil1(card01, document.getElementById(id).textContent, tagData1, tagData, replacement_text + strSpace + document.getElementById(id).textContent, false);
+
+                    tagData = tagUtil1(card01, document.getElementById(id).textContent, tagData1, tagData, replacement_text + strSpace + document.getElementById(id).textContent, false, false, 0);
 
                     // Saving the data
                     localStorage.setItem("stnTagData", JSON.stringify(tagData));
@@ -2084,7 +2281,16 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     if (mainData[ind].alerts[ind1].text === matchText) {
                         tagUtilFlag = true;
                     }
-                    tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
+
+                    // if matchText is empty string, then send position and insert it
+                    let blankTextFlag = false;
+                    let insertPosition = 0;
+                    if (matchText === '') {
+                        blankTextFlag = true;
+                        insertPosition = mainData[ind].alerts[ind1].begin - mainData[ind].alerts[ind1].highlightBegin;
+                    }
+
+                    tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
                     // Saving the data
                     localStorage.setItem("stnTagData", JSON.stringify(tagData));
@@ -2113,7 +2319,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 }
             }
             else {
-                console.log('else else if else else');
+                console.log('else else else');
                 console.log(Number(idNum[id]));
                 var ind2 = Number(idNum[id]); // card index
                 var ind3 = Number(idNum[id]); // card index
@@ -2139,7 +2345,16 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 if (mainData[ind].alerts[ind1].text === matchText) {
                     tagUtilFlag = true;
                 }
-                tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag);
+
+                // if matchText is empty string, then send position and insert it
+                let blankTextFlag = false;
+                let insertPosition = 0;
+                if (matchText === '') {
+                    blankTextFlag = true;
+                    insertPosition = mainData[ind].alerts[ind1].begin - mainData[ind].alerts[ind1].highlightBegin;
+                }
+
+                tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
                 // Saving the data
                 localStorage.setItem("stnTagData", JSON.stringify(tagData));
@@ -2150,14 +2365,21 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 console.log(blockDetails[ind].text);
 
                 // checking correction card's correction index, increasing card's checking index count if not found
+                // For the nested spans
+                let tagIndexLength= tagIndexLengthUtil(blockDetails[ind].text);
+                
                 for (let h = ind1; h < (mainData[ind].alerts.length); h++) {
                     var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
                     console.log(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
                     // console.log(blockDetails[ind].text);
-                    console.log(ind5, ind2);
-                    console.log(changeStr1, matchText);
+                    // console.log(ind5, ind2);
+                    // console.log(changeStr1, matchText);
 
-                    if (changeStr1 === matchText) {
+                    let isInTags1=isInTags(startInd + (77 * (ind5 + 1)) + (7 * ind2), tagIndexLength);
+                    let isInTags2=isInTags(endInd + (77 * (ind5 + 1)) + (7 * ind2), tagIndexLength);
+                    // console.log(isInTags1, isInTags2);
+
+                    if (changeStr1 === matchText && (isInTags1===0 && isInTags2===0)) {
                         break;
                     }
                     ++ind5;
@@ -2191,7 +2413,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     console.log((blockDetails[ind].text.slice(startInd + (77 * (ind3 + 1)) + (7 * ind2), endInd + (77 * (ind3 + 1)) + (7 * ind2))));
                     console.log(matchText);
                     if (blockDetails[ind].text.slice(startInd + (77 * (ind3 + 1)) + (7 * ind2), endInd + (77 * (ind3 + 1)) + (7 * ind2)) === matchText) {
-                        console.log('else else if else else if');
+                        console.log('else else else if if');
                         // console.log(ind3, ind2);
                         // console.log(startInd + (77 * (ind3 + 1)) + (7 * ind2), endInd + (77 * (ind3 + 1)) + (7 * ind2));
                         let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (ind3 + 1)) + (7 * ind2)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (ind3 + 1)) + (7 * ind2),);
@@ -2208,7 +2430,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                         setBlockDetails(blockDetails);
                     }
                     else {
-                        console.log('else else if else else else');
+                        console.log('else else else if else');
                         // console.log(ind4);
                         // console.log(blockDetails[ind].text.slice(startInd + (77 * (ind4 + 1)) + (7 * ind4), endInd + (77 * (ind4 + 1)) + (7 * ind4)).length);
                         // console.log(matchText.trim().length);
@@ -2251,12 +2473,11 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     // console.log(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
                     // console.log(blockDetails[ind].text);
                     let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (ind5 + 1)) + (7 * ind2)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (ind5 + 1)) + (7 * ind2),);
+                    console.log(blockDetails[ind].text.slice(0, startInd + (77 * (ind5 + 1)) + (7 * ind2)));
                     // console.log(changeStr);
+                    console.log(replacement_text);
+                    console.log(blockDetails[ind].text.slice(endInd + (77 * (ind5 + 1)) + (7 * ind2),));
                     // console.log(blockDetails);
-                    // console.log(ind);
-
-                    // console.log(mainIndex);
-                    // console.log(ind1);
 
                     undoObj = {
                         ...undoObj,

@@ -491,8 +491,11 @@ const EditorMain = (props) => {
 
     // Clear Selection
     const handleClearRows = () => {
-        document.querySelector('.cEMZEX').style.overflow = 'hidden';
-        setToggleClearRows(!toggledClearRows);
+        if(document.querySelector('.cEMZEX'))
+        {
+            document.querySelector('.cEMZEX').style.overflow = 'hidden';
+            setToggleClearRows(!toggledClearRows);
+        }
     };
 
     // Handeling the article selection
