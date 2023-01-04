@@ -2,14 +2,14 @@ import React, { useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import DisconnectAlert from '../Alert/DisconnectAlert';
-import MainContext from '../context/MainContext';
+import EditorContext from '../context/EditorContext';
 
 var client1;
 // const baseUrl='http://stacknexo-backend-app.herokuapp.com';
 const baseUrl = 'stacknexo-backend-app.herokuapp.com';
 const WebSocketHandler = (props) => {
     const navigate = useNavigate();
-    const context = useContext(MainContext);
+    const context = useContext(EditorContext);
 
     // Constantly check for web socket connection
     useEffect(() => {

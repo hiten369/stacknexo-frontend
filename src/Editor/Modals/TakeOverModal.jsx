@@ -19,7 +19,7 @@ const TakeOverModal = (props) => {
                                 <button onClick={()=>{
                                     window.location.href="/editor2";
                                 }} data-bs-dismiss="modal" href="/editor2" className="btn btn-outline btn-outline-info btn-active-light-info">Exit the editor</button>
-                                <button data-bs-dismiss="modal" onClick={()=>{props.func1(true, props.editorContext, props.onEditorStateChange2)}} className="btn mx-3 btn-active-info">Preview</button>
+                                <button data-bs-dismiss="modal" onClick={()=>{props.func1(true, props.editorContext)}} className="btn mx-3 btn-active-info">Preview</button>
                                 <button onClick={(e)=>{
                                     props.takeOver(e,props.takeOverFlag);
                                 }} className="btn btn-info">Take Over</button>

@@ -18,7 +18,7 @@ import TextVariantTune from '@editorjs/text-variant-tune';
 import { publicIpv4 } from 'public-ip';
 
 // Toggling the read - only mode
-export const func1 = async (flag = false, editorContext, onEditorStateChange2) => {
+export const func1 = async (flag = false, editorContext) => {
     const { readOnlyFlag, checkGr, setReadOnlyFlag, setMainData, editorS } = editorContext;
     var { setTc } = editorContext;
 
@@ -29,7 +29,7 @@ export const func1 = async (flag = false, editorContext, onEditorStateChange2) =
     await editorS.readOnly.toggle();
 
     if (readOnlyFlag) {
-        checkGr(true, onEditorStateChange2);
+        checkGr(true);
     }
     setReadOnlyFlag(!readOnlyFlag);
     setTc(0);
@@ -37,14 +37,14 @@ export const func1 = async (flag = false, editorContext, onEditorStateChange2) =
 };
 
 // Save the article when click on save button
-export const func = async (context, articleId, onEditorStateChange1, editorContext) => {
-    const { setAlert, bottomBar, editorS } = editorContext;
+export const func = async (context, articleId, editorContext) => {
+    const { setAlert, bottomBar, editorS, onEditorStateChange1, client } = editorContext;
 
     let userIp = await publicIpv4();
     console.log(bottomBar);
     let words = bottomBar.words;
     let savedData = await editorS.save();
-    onEditorStateChange1(savedData.blocks, { words, grade: 'A-' });
+    onEditorStateChange1(savedData.blocks, { words, grade: 'A-' }, client);
 
     let ans = await context.putArticle(articleId, savedData.blocks, userIp);
     if (ans.success) {
@@ -87,8 +87,8 @@ export const editor_head_change = (e, editorContext) => {
 };
 
 // Intializiong the editor
-export const initializeEditor = async (context, articleId, onEditorStateChange, onEditorStateChange1, getVersionHistory, editorContext) => {
-    const { setEditor_head, setData, setUpdateTime, setPublishTime, setDataMatch, strData, setStrData, setEditorS } = editorContext;
+export const initializeEditor = async (context, articleId, getVersionHistory, editorContext) => {
+    const { setEditor_head, setData, setUpdateTime, setPublishTime, setDataMatch, strData, setStrData, setEditorS, onEditorStateChange, onEditorStateChange1, client } = editorContext;
     var { editor, setBottomBar } = editorContext;
 
     // Fetching the article details by article id
@@ -611,12 +611,12 @@ export const initializeEditor = async (context, articleId, onEditorStateChange, 
                     let tempPrevZ = JSON.parse(localStorage.getItem('stnPrevZ'));
                     ++tempPrevZ[`h${articleId}`];
                     localStorage.setItem('stnPrevZ', JSON.stringify(tempPrevZ));
-                    onEditorStateChange1(savedData.blocks, { words, grade: 'A-' });
+                    onEditorStateChange1(savedData.blocks, { words, grade: 'A-' }, client);
                 }
 
                 // Save on real-time
                 else {
-                    onEditorStateChange(savedData.blocks);
+                    onEditorStateChange(savedData.blocks, client);
                 }
 
             });

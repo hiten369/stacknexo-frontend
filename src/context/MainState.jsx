@@ -501,9 +501,6 @@ const MainState = (props) => {
         return data;
     };
 
-    // Declearing variable to use globally for web socket
-    var client;
-
     // Fetch all article categories
     const getArticleCategories = async () => {
         props.setLoad1(false);
@@ -661,7 +658,7 @@ const MainState = (props) => {
 
     return (
         <>
-            <MainContext.Provider value={{ login, signin, email2fa, verifyOtp, verifyOtp1, userDetail, userData, genQr, verify2, remove2fa, getCountryData, countryData, verifyReft, ua, verifyJwt, verifySession, logout, removeSession, removeAllSessionByUser, getCurrentSession, heartBeat, putArticle, getArticle, article, updateArticleHead, newArticle, fetchUserArticles, userArciles, getArticleGoals, deleteArticle, getArticleBySlug, updateArticleBySlug, lastHeartBeat, client, getArticleCategories, postArticleCategory, putArticleCategory, deleteArticleCategory, updateArticleCat, removeArticleCat, updateActiveUser, getArticleInfo, getVersionHistory, analyzeLinks, getUserSessions }}>
+            <MainContext.Provider value={{ login, signin, email2fa, verifyOtp, verifyOtp1, userDetail, userData, genQr, verify2, remove2fa, getCountryData, countryData, verifyReft, ua, verifyJwt, verifySession, logout, removeSession, removeAllSessionByUser, getCurrentSession, heartBeat, putArticle, getArticle, article, updateArticleHead, newArticle, fetchUserArticles, userArciles, getArticleGoals, deleteArticle, getArticleBySlug, updateArticleBySlug, lastHeartBeat, getArticleCategories, postArticleCategory, putArticleCategory, deleteArticleCategory, updateArticleCat, removeArticleCat, updateActiveUser, getArticleInfo, getVersionHistory, analyzeLinks, getUserSessions }}>
                 {props.children}
             </MainContext.Provider>
         </>

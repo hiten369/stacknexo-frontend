@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import EditorContext from './EditorContext';
 import Tooltip1 from 'codex-tooltip';
+import { publicIpv4 } from 'public-ip';
 
 const EditorState = (props) => {
     const [data, setData] = useState({});
@@ -70,8 +71,81 @@ const EditorState = (props) => {
     let blockNum = 0;
     var editor = null;
 
+    // Declearing variable to use globally for web socket
+    var client;
+
     const [editorS, setEditorS] = useState(editor);
     const [undoFlag, setUndoFlag] = useState(false);
+
+        // Start later
+    // Update the article real time
+    const onEditorStateChange = (text, client2) => {
+        client2.send(JSON.stringify({
+            type: "realTime",
+            content: text,
+            type1: "ARTICLE",
+            articleId: localStorage.getItem('stnArticleId')
+        }));
+    };
+
+    // Update the article goals (Editor wise)
+    const onEditorStateChange3 = (goalsObj, client2) => {
+        client2.send(JSON.stringify({
+            type: "update",
+            type1: "GOALS",
+            articleId: localStorage.getItem('stnArticleId'),
+            goalsObj
+        }));
+    };
+
+    // Update the article goals (User wise - Universal)
+    const onEditorStateChange4 = (goalsObj, name, flag, client2) => {
+        client2.send(JSON.stringify({
+            type: "update",
+            type1: "GOALSUSER",
+            name: name,
+            flag: flag,
+            articleId: localStorage.getItem('stnArticleId'),
+            goalsObj
+        }));
+    };
+
+    // Update the dictionary (User)
+    const onEditorStateChange5 = async (dictWord, client2) => {
+        const userIp = await publicIpv4();
+        client2.send(JSON.stringify({
+            type: "update",
+            type1: "USERDICT",
+            articleId: localStorage.getItem('stnArticleId'),
+            dictWord,
+            userIp
+        }));
+    };
+
+    // Save the article instances (every 50 characters)
+    const onEditorStateChange1 = (text, data, client2) => {
+        client2.send(JSON.stringify({
+            type: "onDemand",
+            content: text,
+            data,
+            type1: "ARTICLE",
+            articleId: localStorage.getItem('stnArticleId')
+        }));
+    };
+
+    // Check for grammarly
+    const onEditorStateChange2 = (text, str, flag, goalsObj, client2) => {
+        // console.log(text, str);
+        client2.send(JSON.stringify({
+            type: "fetch",
+            content: text,
+            type1: "GRAMMAR",
+            articleId: localStorage.getItem('stnArticleId'),
+            text: str,
+            flag: flag,
+            goalsObj
+        }));
+    };
 
     // The html which is sent here does not contains multiple tags and contains spaces
     const textWithSpaceUtil = (wordSplit, tagIndex, html, z, tagData) => {
@@ -101,7 +175,7 @@ const EditorState = (props) => {
                 tagData.push({
                     index: tagIndex++,
                     text: html.innerText.trim(),
-                    replacement: replacementText.replaceAll(' ',''),
+                    replacement: replacementText.replaceAll(' ', ''),
                     occurrance: textOccuranceBefore + 1
                 });
             }
@@ -144,7 +218,7 @@ const EditorState = (props) => {
             tagData.push({
                 index: tagIndex++,
                 text: html.innerText.trim(),
-                replacement: replacementText.replaceAll(' ',''),
+                replacement: replacementText.replaceAll(' ', ''),
                 occurrance: textOccuranceBefore + 1
             });
         }
@@ -167,7 +241,7 @@ const EditorState = (props) => {
             occurranceArr: stores the words which has been checked, add those word's count to manipulate occurance,
             tempOccuranceArr: to manipulate text arr
         */
-        
+
         // Setting the maximum index appears in this function
         let tempIndex = tagIndex;
         if (tempIndex > maxIndex) {
@@ -320,7 +394,7 @@ const EditorState = (props) => {
     };
 
     // Check for the grammar
-    const checkGr = async (flag, onEditorStateChange2) => {
+    const checkGr = async (flag) => {
         // Checking if the current editor data is equal to previous saved data 
         let savedData = await editorS.save();
         let currentData = savedData.blocks;
@@ -439,7 +513,7 @@ const EditorState = (props) => {
                             tagData.push({
                                 index: q.index,
                                 occurrance: q.occurrance,
-                                replacement: htmlStr.replaceAll(' ',''),
+                                replacement: htmlStr.replaceAll(' ', ''),
                                 text: q.text.trim()
                             });
                         }
@@ -465,12 +539,12 @@ const EditorState = (props) => {
         localStorage.setItem("stnTagData", JSON.stringify(tagData));
 
         // Sending data to grammar (Web Socket)
-        onEditorStateChange2(savedData.blocks, strData, flag, goals);
+        onEditorStateChange2(savedData.blocks, strData, flag, goals, client);
     };
 
     return (
         <>
-            <EditorContext.Provider value={{ data, setData, flag1, setFlag1, updateTime, setUpdateTime, publishTime, setPublishTime, readOnlyFlag, setReadOnlyFlag, editor_head, setEditor_head, mainData, setMainData, flag2, setFlag2, flag4, setFlag4, dataMatch, setDataMatch, textList, setTextList, strData, setStrData, mainType, setMainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, setAlertMsg, alertUndoMsg, setAlertUndoMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, idNum, setIdNum, goals, setGoals, sideUtils, setSideUtils, dictWords, setDictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, intialCardNum, tc, setTc, blockNum, editor, checkGr, editorS, setEditorS, setBottomBar, bottomBar, undoFlag, setUndoFlag }}>
+            <EditorContext.Provider value={{ data, setData, flag1, setFlag1, updateTime, setUpdateTime, publishTime, setPublishTime, readOnlyFlag, setReadOnlyFlag, editor_head, setEditor_head, mainData, setMainData, flag2, setFlag2, flag4, setFlag4, dataMatch, setDataMatch, textList, setTextList, strData, setStrData, mainType, setMainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, setAlertMsg, alertUndoMsg, setAlertUndoMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, idNum, setIdNum, goals, setGoals, sideUtils, setSideUtils, dictWords, setDictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, intialCardNum, tc, setTc, blockNum, editor, checkGr, editorS, setEditorS, setBottomBar, bottomBar, undoFlag, setUndoFlag, client, onEditorStateChange, onEditorStateChange1, onEditorStateChange2, onEditorStateChange3, onEditorStateChange4, onEditorStateChange5 }}>
                 {props.children}
             </EditorContext.Provider>
         </>
