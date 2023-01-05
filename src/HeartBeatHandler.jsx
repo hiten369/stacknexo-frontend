@@ -2,30 +2,32 @@ import React, { useContext, useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom';
 import MainContext from './context/MainContext';
 import { publicIpv4 } from 'public-ip';
+import EditorContext from './context/EditorContext';
 
-var client1;
 const HeartBeatHandler = (props) => {
     const context = useContext(MainContext);
+    const editorContext = useContext(EditorContext);
+    const { update_noti, client } = editorContext;
     const navigate = useNavigate();
     var flag = true;
     var temp = 'idle';
 
     // Get notification
     const get_noti = () => {
-        context.client.send(JSON.stringify({
+        client.send(JSON.stringify({
             type: "get",
             type1: "NOTIFICATION",
         }));
     };
 
-    // Update notification
-    const update_noti = (data) => {
-        context.client.send(JSON.stringify({
-            type: "put",
-            type1: "NOTIFICATION",
-            data: data
-        }));
-    };
+    // // Update notification
+    // const update_noti = (data) => {
+    //     client.send(JSON.stringify({
+    //         type: "put",
+    //         type1: "NOTIFICATION",
+    //         data: data
+    //     }));
+    // };
 
     // detect user event
     const idleLogout = () => {
@@ -75,15 +77,14 @@ const HeartBeatHandler = (props) => {
         getData();
     }, []);
 
-    const checkForNotifications=()=>{
+    const checkForNotifications = () => {
         setInterval(() => {
             get_noti();
         }, 4000);
     };
 
-    const getMessages=()=>{
-        client1 = context.client;
-        context.client.onmessage = async (message) => {
+    const getMessages = () => {
+        client.onmessage = async (message) => {
             const dataFromServer = JSON.parse(message.data);
             // console.log(dataFromServer);
             if (dataFromServer.type1 === 'NOTIFICATION') {
@@ -94,7 +95,7 @@ const HeartBeatHandler = (props) => {
                             console.log('this is heartbeat page noti');
                             props.notify({ id: i._id, title: i.notiTitle, desc: i.notiDesc, type: i.notiType });
                             setTimeout(() => {
-                                update_noti({ notiId: i._id, notiFlag: false });
+                                update_noti({ notiId: i._id, notiFlag: false }, client);
                             }, 1000);
                         }
                     }
@@ -361,7 +362,6 @@ const HeartBeatHandler = (props) => {
         }
 
     }, [window.location.href]);
-
 
     return (
         <>

@@ -46,7 +46,7 @@ const Editor2 = (props) => {
   const context = useContext(MainContext);
   const editorContext = useContext(EditorContext);
 
-  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData, undoFlag } = editorContext;
+  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData, undoFlag, getVersionHistory, post_noti } = editorContext;
   var { intialCardNum, blockNum, tc, setTc } = editorContext;
 
   const navigate = useNavigate();
@@ -78,66 +78,11 @@ const Editor2 = (props) => {
   // const onEditorStateChange4 = (goalsObj, name, flag) => editorContext.onEditorStateChange4(goalsObj, name, flag, articleId);
   // const onEditorStateChange5 = (dictWord) => editorContext.onEditorStateChange5(dictWord, articleId);
 
-  // Start later
-  // Get article revisions (version history)
-  const getVersionHistory = () => {
-    client1.send(JSON.stringify({
-      type: "versionHistory",
-      type1: "ARTICLE",
-      articleId: articleId,
-    }));
-  };
-
-  // Post new notification
-  const post_noti = (data) => {
-    client1.send(JSON.stringify({
-      type: "post",
-      type1: "NOTIFICATION",
-      data: data
-    }));
-  };
-
-  // Update notification
-  const update_noti = (data) => {
-    editorContext.client.send(JSON.stringify({
-      type: "put",
-      type1: "NOTIFICATION",
-      data: data
-    }));
-  };
-
-  // Get new message
-  const get_msg = () => {
-    client1.send(JSON.stringify({
-      type: "get",
-      type1: "MESSAGE",
-    }));
-  };
-
-  // Delete all messages
-  const delete_msg = () => {
-    client1.send(JSON.stringify({
-      type: "delete",
-      type1: "MESSAGE",
-    }));
-  };
-
-  // *** target user will be different for this ***
-  const sendMsg = ({ msgDesc, msgFlag }) => {
-    modalClickFlag = true;
-    // console.log(senderUserId);
-    client1.send(JSON.stringify({
-      type: "post",
-      type1: "MESSAGE",
-      data: { msgDesc, msgFlag, msgUser: senderUserId }
-    }));
-  };
-
   // Take Over functionality if multiple users are trying to access same article
   const takeOver = async (e, flag) => {
     if (!flag) {
       // send request to the user who is currently accessing the article.
-      post_noti({ notiTitle: "demo title", notiDesc: "demo desc", notiType: "info", notiFlag1: true, notiURL: articleId, notiUser: targetUserId });
+      post_noti({ notiTitle: "demo title", notiDesc: "demo desc", notiType: "info", notiFlag1: true, notiURL: articleId, notiUser: targetUserId }, client1);
 
       // Setting the timer; disable the button (n seconds)
       let n = 5;
@@ -148,9 +93,9 @@ const Editor2 = (props) => {
       // Clear the previous intervals
       clearInterval(int);
 
-      // Constantly check for the action from user who is currently accessing the article (every 2 seconds).
+      // Constantly check for the action from user who is currently accessing the article (every 3 seconds).
       int = setInterval(() => {
-        get_msg();
+        get_msg(client1);
       }, 3000);
 
       // Countdown timer.
@@ -167,8 +112,9 @@ const Editor2 = (props) => {
     }
     else {
       const userIp = await publicIpv4();
+
       // Direct access to article
-      post_noti({ notiTitle: "demo title", notiDesc: "demo desc", notiType: "info", notiFlag1: true, notiURL: articleId, notiUser: targetUserId, notiFlag2: true });
+      post_noti({ notiTitle: "demo title", notiDesc: "demo desc", notiType: "info", notiFlag1: true, notiURL: articleId, notiUser: targetUserId, notiFlag2: true }, client1);
       await context.updateActiveUser(articleId, JSON.parse(localStorage.getItem('stackNUser')).designationName, userIp);
       document.getElementById('takeOverModalBtn').click();
     }
@@ -363,7 +309,7 @@ const Editor2 = (props) => {
   const getEditorData = async () => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
       let ans = await initializeEditor(context, articleId, getVersionHistory, editorContext);
-      getVersionHistory();
+      getVersionHistory(client1);
       editorG = ans;
     }
     else {
@@ -454,7 +400,7 @@ const Editor2 = (props) => {
               let ans = dataFromServer.data;
               if (ans.success) {
                 saveAlert(editorContext);
-                getVersionHistory();
+                getVersionHistory(client1);
               }
               else {
                 props.setAlert('danger', ans.message);
@@ -728,7 +674,7 @@ const Editor2 = (props) => {
                   settakeOverMsg(<p className="text-danger">{i.msgDesc}</p>);
                 }
                 setTimeout(() => {
-                  delete_msg();
+                  delete_msg(client1);
                 }, 600);
               }
             }
@@ -753,7 +699,7 @@ const Editor2 = (props) => {
                       }
 
                       setTimeout(() => {
-                        update_noti({ notiId: i._id, notiFlag: false, notiFlag1: false, notiFlag2: false });
+                        update_noti({ notiId: i._id, notiFlag: false, notiFlag1: false, notiFlag2: false }, client1);
                       }, 1000);
                       modalClickFlag = false;
                     }
@@ -1011,7 +957,7 @@ const Editor2 = (props) => {
 
   // For testing purpose
   const rand = async () => {
-    // post_noti({notiTitle:"demo title",notiDesc:"demo desc",notiType:"info",notiFlag1:true});
+    // post_noti({notiTitle:"demo title",notiDesc:"demo desc",notiType:"info",notiFlag1:true}, , client1);
     // trigger_takeover();
     // document.getElementById('takeOverModalBtn').click();
     // setTargetUserId('62bdf7971c5a067251a8e715');
@@ -1134,12 +1080,12 @@ const Editor2 = (props) => {
       <TakeOverModal takeOverFlag={takeOverFlag} takeOver={takeOver} takeOverMsg={takeOverMsg} editorContext={editorContext} func1={func1} />
       <button id="takeOverModalBtn" data-bs-toggle="modal" data-bs-target="#takeOverModal"></button>
 
-      {/* Take Over Modal for respond to a take over request */}
-      <TakeOverModal1 sendMsg={sendMsg} targetUserId={targetUserId} />
+      {/* Asking permission to take over current article */}
+      <TakeOverModal1 />
       <button id="takeOverModalBtn1" data-bs-toggle="modal" data-bs-target="#takeOverModal1"></button>
 
-      {/* Take Over Modal for respond to a take over request */}
-      <TakeOverModal2 sendMsg={sendMsg} targetUserId={targetUserId} />
+      {/* Admin/Editor take over the article, asking to retakeover request or go back */}
+      <TakeOverModal2 />
       <button id="takeOverModalBtn2" data-bs-toggle="modal" data-bs-target="#takeOverModal2"></button>
 
       {/* Dictionary Modal */}
@@ -1149,13 +1095,7 @@ const Editor2 = (props) => {
       <SetPerformanceModal mainData={mainData} />
 
       {/* Set Goals Modal */}
-      <SetGoalModal toggle_goals={toggle_goals} toggle_intent={toggle_intent} dis_goals={dis_goals} setGoals1={(e) => {
-        setGoals1(e, editorContext, onEditorStateChange3, onEditorStateChange4);
-      }} goalsReset={() => {
-        goalsReset(editorContext, onEditorStateChange3);
-      }} toggleGoalsUniversal={() => {
-        toggleGoalsUniversal(onEditorStateChange4);
-      }} />
+      <SetGoalModal />
 
       {/* Custom Topic Modal */}
       <AddCustomTopicModal addCustomTopic={addCustomTopic} />
@@ -1164,14 +1104,14 @@ const Editor2 = (props) => {
       <Header articleId={articleId} />
 
       {/* Revision confirmation popup */}
-      {revisionFlag ? <RevisionPopup setRevisionStats={setRevisionStats} revisionStats={revisionStats} editorG={editorG} onEditorStateChange={onEditorStateChange} currentData={currentData} setRevisionFlag={setRevisionFlag} /> : null}
+      {revisionFlag ? <RevisionPopup setRevisionStats={setRevisionStats} revisionStats={revisionStats} editorG={editorG} currentData={currentData} setRevisionFlag={setRevisionFlag} /> : null}
 
       {/* Grammar box with Editor */}
       <div className="editor-main">
         {flag2 ? <Alert2 message={alertMsg} closeAlert={() => {
           closeAlert(editorContext);
         }} alertUndo={() => {
-          alertUndo(editorContext, onEditorStateChange5);
+          alertUndo(editorContext);
         }} /> : null}
 
         <div className="editor-main1">
@@ -1193,7 +1133,7 @@ const Editor2 = (props) => {
                 <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Published: ${publishTime}`} ><img src="/assets/media/editor/publish.png" alt="Last Published" /><p>{publishTime}</p></div>
               </div>
               <WordsBar />
-              <RevisionBar revisionStats={revisionStats} setRevisionStats={setRevisionStats} setCurrentData={setCurrentData} setRevisionFlag={setRevisionFlag} getVersionHistory={getVersionHistory} instances={instances} setInstances={setInstances} editorG={editorG} onEditorStateChange={onEditorStateChange} articleId={articleId} />
+              <RevisionBar revisionStats={revisionStats} setRevisionStats={setRevisionStats} setCurrentData={setCurrentData} setRevisionFlag={setRevisionFlag} instances={instances} setInstances={setInstances} editorG={editorG} />
             </> : <h4 className="mt-5 mx-5">Loading...</h4>}
             <div id="editorjs"></div>
             <div className="editor-menu">

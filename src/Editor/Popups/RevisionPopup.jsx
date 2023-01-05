@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import EditorContext from '../../context/EditorContext';
 
 const RevisionPopup = (props) => {
+    const editorContext = useContext(EditorContext);
+    const { onEditorStateChange, client } = editorContext;
+    
     const approve=()=>{
         let newId = props.revisionStats.new;
         props.setRevisionStats({
@@ -34,7 +38,8 @@ const RevisionPopup = (props) => {
             blocks:props.currentData
         });
         
-        props.onEditorStateChange(props.currentData);
+        // Saving the current text
+        onEditorStateChange(props.currentData, client);
         props.setRevisionFlag(false);
     };
 

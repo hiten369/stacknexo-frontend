@@ -1,16 +1,19 @@
 import { publicIpv4 } from 'public-ip';
 import React, { useContext, useEffect, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
+import EditorContext from '../../context/EditorContext';
 import MainContext from '../../context/MainContext';
 
 const RevisionBar = (props) => {
     const context = useContext(MainContext);
+    const editorContext = useContext(EditorContext);
+    const { onEditorStateChange, getVersionHistory, client } = editorContext;
     const [insFlag, setInsFlag] = useState(false);
 
     const getData = async () => {
         const userIp = await publicIpv4();
-        props.getVersionHistory();
-        const data = await context.getVersionHistory(props.articleId, userIp);
+        getVersionHistory(client);
+        const data = await context.getVersionHistory(userIp);
         if (data.data.articleData.length > 0) {
             setInsFlag(true);
         }
@@ -83,12 +86,12 @@ const RevisionBar = (props) => {
             blocks: data
         });
 
-        props.onEditorStateChange(data);
+        onEditorStateChange(data, client);
         props.setRevisionFlag(true);
 
         let oldId = props.revisionStats.old;
         let newId = e.target.id;
-      
+
         let b = document.querySelectorAll('.revision-btn');
 
         for (let i of b) {

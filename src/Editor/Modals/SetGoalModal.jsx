@@ -1,6 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import EditorContext from '../../context/EditorContext';
+import { dis_goals, goalsReset, setGoals1, toggleGoalsUniversal, toggle_goals, toggle_intent } from '../Utils/GoalsUtils';
 
 const SetGoalModal = (props) => {
+    const editorContext = useContext(EditorContext);
+
     return (
         <>
             <div className="modal fade" tabIndex="-1" id="kt_modal_2">
@@ -21,38 +25,38 @@ const SetGoalModal = (props) => {
                                         <ul className="nav nav-pills mb-3" id="pills-tab1" role="tablist">
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    toggle_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-home0-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_domain0" type="button" role="tab" aria-controls="kt_tab_domain0" aria-selected="true">Academic</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    toggle_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_domain1" type="button" role="tab" aria-controls="kt_tab_domain1" aria-selected="true">Business</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    toggle_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_domain2" type="button" role="tab" aria-controls="kt_tab_domain2" aria-selected="false">General</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    toggle_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-email-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_domain3" type="button" role="tab" aria-controls="kt_tab_domain3" aria-selected="false">Email</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    toggle_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-casual-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_domain4" type="button" role="tab" aria-controls="kt_tab_domain4" aria-selected="false">Casual</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    toggle_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-creative-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_domain5" type="button" role="tab" aria-controls="kt_tab_domain5" aria-selected="false">Creative</button>
                                             </li>
                                         </ul>
@@ -72,26 +76,26 @@ const SetGoalModal = (props) => {
                                         <ul className="nav nav-pills mb-3" id="pills-tab4" role="tablist">
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_intent(e);
-                                                    props.setGoals1(e);
+                                                    toggle_intent(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link">Inform</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_intent(e);
-                                                    props.setGoals1(e);
+                                                    toggle_intent(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link">Describe</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_intent(e);
-                                                    props.setGoals1(e);
+                                                    toggle_intent(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link">Convince</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.toggle_intent(e);
-                                                    props.setGoals1(e);
+                                                    toggle_intent(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link">Tell A Story</button>
                                             </li>
                                         </ul>
@@ -104,13 +108,19 @@ const SetGoalModal = (props) => {
                                     <div className="m-goal11">
                                         <ul className="nav nav-pills mb-3" id="pills-tab5" role="tablist">
                                             <li className="nav-item" role="presentation">
-                                                <button onClick={props.setGoals1} className="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience1" type="button" role="tab" aria-controls="kt_tab_audience1" aria-selected="true">General</button>
+                                                <button onClick={(e)=>{
+                                                    setGoals1(e, editorContext);
+                                                }} className="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience1" type="button" role="tab" aria-controls="kt_tab_audience1" aria-selected="true">General</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
-                                                <button onClick={props.setGoals1} className="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience2" type="button" role="tab" aria-controls="kt_tab_audience2" aria-selected="false">Knowledgeable</button>
+                                                <button onClick={(e)=>{
+                                                    setGoals1(e, editorContext);
+                                                }} className="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience2" type="button" role="tab" aria-controls="kt_tab_audience2" aria-selected="false">Knowledgeable</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
-                                                <button onClick={props.setGoals1} className="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience3" type="button" role="tab" aria-controls="kt_tab_audience3" aria-selected="false">Expert</button>
+                                                <button onClick={(e)=>{
+                                                    setGoals1(e, editorContext);
+                                                }} className="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience3" type="button" role="tab" aria-controls="kt_tab_audience3" aria-selected="false">Expert</button>
                                             </li>
                                         </ul>
                                         <div className="tab-content" id="pills-tabContent5">
@@ -126,20 +136,20 @@ const SetGoalModal = (props) => {
                                         <ul className="nav nav-pills mb-3" id="pills-tab6" role="tablist">
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.dis_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    dis_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-informal-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_formality1" type="button" role="tab" aria-controls="kt_tab_formality1" aria-selected="true">Informal</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.dis_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    dis_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-neutral-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_formality2" type="button" role="tab" aria-controls="kt_tab_formality2" aria-selected="false">Nuetral</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.dis_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    dis_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-formal-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_formality3" type="button" role="tab" aria-controls="kt_tab_formality3" aria-selected="false">Formal</button>
                                             </li>
                                         </ul>
@@ -156,23 +166,23 @@ const SetGoalModal = (props) => {
                                         <ul className="nav nav-pills mb-3" id="pills-tab7" role="tablist">
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.setGoals1(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-american-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_dialect1" type="button" role="tab" aria-controls="kt_tab_dialect1" aria-selected="true">American English</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.setGoals1(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-british-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_dialect2" type="button" role="tab" aria-controls="kt_tab_dialect2" aria-selected="true">British English</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.setGoals1(e);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-canadian-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_dialect3" type="button" role="tab" aria-controls="kt_tab_dialect3" aria-selected="true">Canadian English</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
                                                 <button onClick={(e) => {
-                                                    props.dis_goals(e, false);
-                                                    props.setGoals1(e);
+                                                    dis_goals(e, false);
+                                                    setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-australian-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_dialect4" type="button" role="tab" aria-controls="kt_tab_dialect4" aria-selected="true">Australian English</button>
                                             </li>
                                         </ul>
@@ -181,14 +191,18 @@ const SetGoalModal = (props) => {
                             </div>
                         </div>
                         <div className="modal-footer goals-modal-footer">
-                            <div onClick={props.toggleGoalsUniversal} className="form-check form-check-custom form-check-solid">
+                            <div onClick={()=>{
+                                toggleGoalsUniversal(editorContext);
+                            }} className="form-check form-check-custom form-check-solid">
                                 <input className="form-check-input" type="checkbox" value="" id="goals-check" />
                                 <label className="form-check-label" htmlFor="goals-check">
                                     Show Set Goals when i start a new document
                                 </label>
                             </div>
                             <div>
-                                <b onClick={props.goalsReset} style={{ cursor: 'pointer' }} className="text-primary me-3">Reset to default</b>
+                                <b onClick={()=>{
+                                    goalsReset(editorContext);
+                                }} style={{ cursor: 'pointer' }} className="text-primary me-3">Reset to default</b>
                                 <button type="button" className="btn btn-info" data-bs-dismiss="modal">Done</button>
                             </div>
                         </div>

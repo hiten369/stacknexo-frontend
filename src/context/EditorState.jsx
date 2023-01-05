@@ -77,7 +77,7 @@ const EditorState = (props) => {
     const [editorS, setEditorS] = useState(editor);
     const [undoFlag, setUndoFlag] = useState(false);
 
-        // Start later
+    // Start later
     // Update the article real time
     const onEditorStateChange = (text, client2) => {
         client2.send(JSON.stringify({
@@ -85,6 +85,31 @@ const EditorState = (props) => {
             content: text,
             type1: "ARTICLE",
             articleId: localStorage.getItem('stnArticleId')
+        }));
+    };
+
+    // Save the article instances (every 50 characters)
+    const onEditorStateChange1 = (text, data, client2) => {
+        client2.send(JSON.stringify({
+            type: "onDemand",
+            content: text,
+            data,
+            type1: "ARTICLE",
+            articleId: localStorage.getItem('stnArticleId')
+        }));
+    };
+
+    // Check for grammarly
+    const onEditorStateChange2 = (text, str, flag, goalsObj, client2) => {
+        // console.log(text, str);
+        client2.send(JSON.stringify({
+            type: "fetch",
+            content: text,
+            type1: "GRAMMAR",
+            articleId: localStorage.getItem('stnArticleId'),
+            text: str,
+            flag,
+            goalsObj
         }));
     };
 
@@ -122,28 +147,58 @@ const EditorState = (props) => {
         }));
     };
 
-    // Save the article instances (every 50 characters)
-    const onEditorStateChange1 = (text, data, client2) => {
+    // Start later
+    // Get article revisions (version history)
+    const getVersionHistory = (client2) => {
         client2.send(JSON.stringify({
-            type: "onDemand",
-            content: text,
-            data,
+            type: "versionHistory",
             type1: "ARTICLE",
-            articleId: localStorage.getItem('stnArticleId')
+            articleId: localStorage.getItem('stnArticleId'),
         }));
     };
 
-    // Check for grammarly
-    const onEditorStateChange2 = (text, str, flag, goalsObj, client2) => {
-        // console.log(text, str);
+    // Post new notification
+    const post_noti = (data, client2) => {
         client2.send(JSON.stringify({
-            type: "fetch",
-            content: text,
-            type1: "GRAMMAR",
-            articleId: localStorage.getItem('stnArticleId'),
-            text: str,
-            flag: flag,
-            goalsObj
+            type: "post",
+            type1: "NOTIFICATION",
+            data
+        }));
+    };
+
+    // Update notification
+    const update_noti = (data, client2) => {
+        client2.send(JSON.stringify({
+            type: "put",
+            type1: "NOTIFICATION",
+            data
+        }));
+    };
+
+    // Get new message
+    const get_msg = (client2) => {
+        client2.send(JSON.stringify({
+            type: "get",
+            type1: "MESSAGE",
+        }));
+    };
+
+    // Delete all messages
+    const delete_msg = (client2) => {
+        client2.send(JSON.stringify({
+            type: "delete",
+            type1: "MESSAGE",
+        }));
+    };
+
+    // *** target user will be different for this ***
+    const sendMsg = ({ msgDesc, msgFlag, senderUserId, client2 }) => {
+        modalClickFlag = true;
+        // console.log(senderUserId);
+        client2.send(JSON.stringify({
+            type: "post",
+            type1: "MESSAGE",
+            data: { msgDesc, msgFlag, msgUser: senderUserId }
         }));
     };
 
@@ -544,7 +599,7 @@ const EditorState = (props) => {
 
     return (
         <>
-            <EditorContext.Provider value={{ data, setData, flag1, setFlag1, updateTime, setUpdateTime, publishTime, setPublishTime, readOnlyFlag, setReadOnlyFlag, editor_head, setEditor_head, mainData, setMainData, flag2, setFlag2, flag4, setFlag4, dataMatch, setDataMatch, textList, setTextList, strData, setStrData, mainType, setMainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, setAlertMsg, alertUndoMsg, setAlertUndoMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, idNum, setIdNum, goals, setGoals, sideUtils, setSideUtils, dictWords, setDictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, intialCardNum, tc, setTc, blockNum, editor, checkGr, editorS, setEditorS, setBottomBar, bottomBar, undoFlag, setUndoFlag, client, onEditorStateChange, onEditorStateChange1, onEditorStateChange2, onEditorStateChange3, onEditorStateChange4, onEditorStateChange5 }}>
+            <EditorContext.Provider value={{ data, setData, flag1, setFlag1, updateTime, setUpdateTime, publishTime, setPublishTime, readOnlyFlag, setReadOnlyFlag, editor_head, setEditor_head, mainData, setMainData, flag2, setFlag2, flag4, setFlag4, dataMatch, setDataMatch, textList, setTextList, strData, setStrData, mainType, setMainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, setAlertMsg, alertUndoMsg, setAlertUndoMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, idNum, setIdNum, goals, setGoals, sideUtils, setSideUtils, dictWords, setDictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, intialCardNum, tc, setTc, blockNum, editor, checkGr, editorS, setEditorS, setBottomBar, bottomBar, undoFlag, setUndoFlag, client, onEditorStateChange, onEditorStateChange1, onEditorStateChange2, onEditorStateChange3, onEditorStateChange4, onEditorStateChange5, getVersionHistory, post_noti, update_noti, get_msg, delete_msg, sendMsg }}>
                 {props.children}
             </EditorContext.Provider>
         </>
