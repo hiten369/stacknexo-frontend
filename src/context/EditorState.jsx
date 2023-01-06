@@ -73,6 +73,7 @@ const EditorState = (props) => {
 
     // Declearing variable to use globally for web socket
     var client;
+    const [gclient, setGclient] = useState(client);
 
     const [editorS, setEditorS] = useState(editor);
     const [undoFlag, setUndoFlag] = useState(false);
@@ -115,6 +116,7 @@ const EditorState = (props) => {
 
     // Update the article goals (Editor wise)
     const onEditorStateChange3 = (goalsObj, client2) => {
+        // console.log(client2);
         client2.send(JSON.stringify({
             type: "update",
             type1: "GOALS",
@@ -150,6 +152,7 @@ const EditorState = (props) => {
     // Start later
     // Get article revisions (version history)
     const getVersionHistory = (client2) => {
+        // console.log(client2);
         client2.send(JSON.stringify({
             type: "versionHistory",
             type1: "ARTICLE",
@@ -193,7 +196,7 @@ const EditorState = (props) => {
 
     // *** target user will be different for this ***
     const sendMsg = ({ msgDesc, msgFlag, senderUserId, client2 }) => {
-        modalClickFlag = true;
+        // modalClickFlag = true;
         // console.log(senderUserId);
         client2.send(JSON.stringify({
             type: "post",
@@ -594,12 +597,12 @@ const EditorState = (props) => {
         localStorage.setItem("stnTagData", JSON.stringify(tagData));
 
         // Sending data to grammar (Web Socket)
-        onEditorStateChange2(savedData.blocks, strData, flag, goals, client);
+        onEditorStateChange2(savedData.blocks, strData, flag, goals, gclient);
     };
 
     return (
         <>
-            <EditorContext.Provider value={{ data, setData, flag1, setFlag1, updateTime, setUpdateTime, publishTime, setPublishTime, readOnlyFlag, setReadOnlyFlag, editor_head, setEditor_head, mainData, setMainData, flag2, setFlag2, flag4, setFlag4, dataMatch, setDataMatch, textList, setTextList, strData, setStrData, mainType, setMainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, setAlertMsg, alertUndoMsg, setAlertUndoMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, idNum, setIdNum, goals, setGoals, sideUtils, setSideUtils, dictWords, setDictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, intialCardNum, tc, setTc, blockNum, editor, checkGr, editorS, setEditorS, setBottomBar, bottomBar, undoFlag, setUndoFlag, client, onEditorStateChange, onEditorStateChange1, onEditorStateChange2, onEditorStateChange3, onEditorStateChange4, onEditorStateChange5, getVersionHistory, post_noti, update_noti, get_msg, delete_msg, sendMsg }}>
+            <EditorContext.Provider value={{ data, setData, flag1, setFlag1, updateTime, setUpdateTime, publishTime, setPublishTime, readOnlyFlag, setReadOnlyFlag, editor_head, setEditor_head, mainData, setMainData, flag2, setFlag2, flag4, setFlag4, dataMatch, setDataMatch, textList, setTextList, strData, setStrData, mainType, setMainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, setAlertMsg, alertUndoMsg, setAlertUndoMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, idNum, setIdNum, goals, setGoals, sideUtils, setSideUtils, dictWords, setDictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, intialCardNum, tc, setTc, blockNum, editor, checkGr, editorS, setEditorS, setBottomBar, bottomBar, undoFlag, setUndoFlag, client, onEditorStateChange, onEditorStateChange1, onEditorStateChange2, onEditorStateChange3, onEditorStateChange4, onEditorStateChange5, getVersionHistory, post_noti, update_noti, get_msg, delete_msg, sendMsg, setGclient, gclient }}>
                 {props.children}
             </EditorContext.Provider>
         </>

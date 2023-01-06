@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import EditorContext from '../../context/EditorContext';
 
-const TakeOverModal1 = () => {
+const TakeOverModal1 = (props) => {
     const editorContext = useContext(EditorContext);
     const { sendMsg, client }=editorContext;
     return (
@@ -19,10 +19,12 @@ const TakeOverModal1 = () => {
                             <p className="mb-4">User wants to take access of this article.</p>
                             <div className="row2 mt-5 row4 row6">
                                 <button onClick={() => {
+                                    props.setModalClickFlag(true);
                                     sendMsg({ msgDesc: 'Take over request granted', msgFlag: true, client2: client});
                                     window.location.href="/editor2";
                                 }} data-bs-dismiss="modal" className="btn me-2 btn-outline btn-outline-info btn-active-light-info">Grant Access</button>
                                 <button onClick={() => {
+                                    props.setModalClickFlag(true);
                                     sendMsg({ msgDesc: 'Take over request denied', msgFlag: false, client2: client });
                                     document.getElementById('takeOverModal1').click();
                                 }} data-bs-dismiss="modal" className="btn ms-2 btn-info">Deny Access</button>

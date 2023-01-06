@@ -7,13 +7,13 @@ import MainContext from '../../context/MainContext';
 const RevisionBar = (props) => {
     const context = useContext(MainContext);
     const editorContext = useContext(EditorContext);
-    const { onEditorStateChange, getVersionHistory, client } = editorContext;
+    const { onEditorStateChange, getVersionHistory } = editorContext;
     const [insFlag, setInsFlag] = useState(false);
 
     const getData = async () => {
         const userIp = await publicIpv4();
-        getVersionHistory(client);
-        const data = await context.getVersionHistory(userIp);
+        getVersionHistory(props.client);
+        const data = await context.getVersionHistory(props.articleId, userIp);
         if (data.data.articleData.length > 0) {
             setInsFlag(true);
         }
@@ -86,7 +86,7 @@ const RevisionBar = (props) => {
             blocks: data
         });
 
-        onEditorStateChange(data, client);
+        onEditorStateChange(data, props.client);
         props.setRevisionFlag(true);
 
         let oldId = props.revisionStats.old;

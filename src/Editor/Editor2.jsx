@@ -37,7 +37,7 @@ import CorrectionCard from './Cards/CorrectionCard';
 // import useScript from '../CustomScripts/UseScript';
 
 var client1;
-var modalClickFlag = true;
+// var modalClickFlag = true;
 var editorG;
 var int;
 
@@ -46,7 +46,7 @@ const Editor2 = (props) => {
   const context = useContext(MainContext);
   const editorContext = useContext(EditorContext);
 
-  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData, undoFlag, getVersionHistory, post_noti } = editorContext;
+  const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData, undoFlag, getVersionHistory, post_noti, get_msg, delete_msg, update_noti } = editorContext;
   var { intialCardNum, blockNum, tc, setTc } = editorContext;
 
   const navigate = useNavigate();
@@ -68,6 +68,7 @@ const Editor2 = (props) => {
   const [ignoredTopics, setIgnoredTopics] = useState([]);
   const [isTcExpanded, setIsTcExpanded] = useState(false);
   const [customTopic, setCustomTopic] = useState([]);
+  const [modalClickFlag, setModalClickFlag] = useState(true);
 
   // const onEditorStateChange = (text) => {
   //   editorContext.onEditorStateChange(text, articleId, client1);
@@ -308,7 +309,8 @@ const Editor2 = (props) => {
   // Managing date time, article heading, page title and editor js
   const getEditorData = async () => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
-      let ans = await initializeEditor(context, articleId, getVersionHistory, editorContext);
+      let ans = await initializeEditor(context, articleId, editorContext);
+      editorContext.setGclient(client1);
       getVersionHistory(client1);
       editorG = ans;
     }
@@ -701,7 +703,8 @@ const Editor2 = (props) => {
                       setTimeout(() => {
                         update_noti({ notiId: i._id, notiFlag: false, notiFlag1: false, notiFlag2: false }, client1);
                       }, 1000);
-                      modalClickFlag = false;
+                      // modalClickFlag = false;
+                      setModalClickFlag(false);
                     }
                   }
                 }
@@ -1067,87 +1070,88 @@ const Editor2 = (props) => {
 
   return (
     <>
-      {/* Testing */}
-      <button style={{ position: "absolute", top: "4rem", left: "3rem", zIndex: "99999" }} onClick={rand}>Test</button>
+      { client1 ? <>
+        {/* Testing */}
+        <button style={{ position: "absolute", top: "4rem", left: "3rem", zIndex: "99999" }} onClick={rand}>Test</button>
 
-      {/* Heartbeat api handler */}
-      {/* <HeartBeatHandler notify={props.notify} setAlert={props.setAlert} encrypt={props.encrypt} /> */}
+        {/* Heartbeat api handler */}
+        {/* <HeartBeatHandler notify={props.notify} setAlert={props.setAlert} encrypt={props.encrypt} /> */}
 
-      {/* Side Bar */}
-      <Sidebar key={articleId} articleId={articleId} />
+        {/* Side Bar */}
+        <Sidebar key={articleId} articleId={articleId} />
 
-      {/* Take Over Modal for take over request */}
-      <TakeOverModal takeOverFlag={takeOverFlag} takeOver={takeOver} takeOverMsg={takeOverMsg} editorContext={editorContext} func1={func1} />
-      <button id="takeOverModalBtn" data-bs-toggle="modal" data-bs-target="#takeOverModal"></button>
+        {/* Take Over Modal for take over request */}
+        <TakeOverModal takeOverFlag={takeOverFlag} takeOver={takeOver} takeOverMsg={takeOverMsg} editorContext={editorContext} func1={func1} />
+        <button id="takeOverModalBtn" data-bs-toggle="modal" data-bs-target="#takeOverModal"></button>
 
-      {/* Asking permission to take over current article */}
-      <TakeOverModal1 />
-      <button id="takeOverModalBtn1" data-bs-toggle="modal" data-bs-target="#takeOverModal1"></button>
+        {/* Asking permission to take over current article */}
+        <TakeOverModal1 setModalClickFlag={setModalClickFlag} />
+        <button id="takeOverModalBtn1" data-bs-toggle="modal" data-bs-target="#takeOverModal1"></button>
 
-      {/* Admin/Editor take over the article, asking to retakeover request or go back */}
-      <TakeOverModal2 />
-      <button id="takeOverModalBtn2" data-bs-toggle="modal" data-bs-target="#takeOverModal2"></button>
+        {/* Admin/Editor take over the article, asking to retakeover request or go back */}
+        <TakeOverModal2 />
+        <button id="takeOverModalBtn2" data-bs-toggle="modal" data-bs-target="#takeOverModal2"></button>
 
-      {/* Dictionary Modal */}
-      <DictionaryModal editorContext={editorContext} updateDictModal={updateDictModal} dictWords={dictWords} />
+        {/* Dictionary Modal */}
+        <DictionaryModal editorContext={editorContext} updateDictModal={updateDictModal} dictWords={dictWords} />
 
-      {/* Performance Modal */}
-      <SetPerformanceModal mainData={mainData} />
+        {/* Performance Modal */}
+        <SetPerformanceModal mainData={mainData} />
 
-      {/* Set Goals Modal */}
-      <SetGoalModal />
+        {/* Set Goals Modal */}
+        <SetGoalModal />
 
-      {/* Custom Topic Modal */}
-      <AddCustomTopicModal addCustomTopic={addCustomTopic} />
+        {/* Custom Topic Modal */}
+        <AddCustomTopicModal addCustomTopic={addCustomTopic} />
 
-      {/* Header */}
-      <Header articleId={articleId} />
+        {/* Header */}
+        <Header articleId={articleId} />
 
-      {/* Revision confirmation popup */}
-      {revisionFlag ? <RevisionPopup setRevisionStats={setRevisionStats} revisionStats={revisionStats} editorG={editorG} currentData={currentData} setRevisionFlag={setRevisionFlag} /> : null}
+        {/* Revision confirmation popup */}
+        {revisionFlag ? <RevisionPopup setRevisionStats={setRevisionStats} revisionStats={revisionStats} editorG={editorG} currentData={currentData} setRevisionFlag={setRevisionFlag} /> : null}
 
-      {/* Grammar box with Editor */}
-      <div className="editor-main">
-        {flag2 ? <Alert2 message={alertMsg} closeAlert={() => {
-          closeAlert(editorContext);
-        }} alertUndo={() => {
-          alertUndo(editorContext);
-        }} /> : null}
+        {/* Grammar box with Editor */}
+        <div className="editor-main">
+          {flag2 ? <Alert2 message={alertMsg} closeAlert={() => {
+            closeAlert(editorContext);
+          }} alertUndo={() => {
+            alertUndo(editorContext);
+          }} /> : null}
 
-        <div className="editor-main1">
+          <div className="editor-main1">
 
-          {/* Editor with Words-Bar, Revision-Bar */}
-          <div className="editor-main11">
-            {props.load ? <>
-              <div className="row1">
-                <input className="me-3" id="editor_head" name="editor_title" onChange={(e) => {
-                  editor_head_change(e, editorContext);
-                }} onBlur={() => {
-                  editor_head_save(context, articleId, editorContext);
-                }} value={editor_head} data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="right" title="Rename" type="text" placeholder="Untitled Document" />
-                {flag1 ? <Alert1 /> : null}
+            {/* Editor with Words-Bar, Revision-Bar */}
+            <div className="editor-main11">
+              {props.load ? <>
+                <div className="row1">
+                  <input className="me-3" id="editor_head" name="editor_title" onChange={(e) => {
+                    editor_head_change(e, editorContext);
+                  }} onBlur={() => {
+                    editor_head_save(context, articleId, editorContext);
+                  }} value={editor_head} data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="right" title="Rename" type="text" placeholder="Untitled Document" />
+                  {flag1 ? <Alert1 /> : null}
+                </div>
+                <div className="articleStatus">{data.data ? data.data.articleStatus : null}</div>
+                <div className="updateTs">
+                  <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Updated: ${updateTime}`}><img src="/assets/media/editor/updated.png" alt="Last Updated" /><p>{updateTime === 'Invalid Date' ? 'Loading ..' : updateTime}</p></div>
+                  <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Published: ${publishTime}`} ><img src="/assets/media/editor/publish.png" alt="Last Published" /><p>{publishTime}</p></div>
+                </div>
+                <WordsBar />
+                <RevisionBar revisionStats={revisionStats} setRevisionStats={setRevisionStats} setCurrentData={setCurrentData} setRevisionFlag={setRevisionFlag} instances={instances} setInstances={setInstances} editorG={editorG} client={client1} articleId={articleId} />
+              </> : <h4 className="mt-5 mx-5">Loading...</h4>}
+              <div id="editorjs"></div>
+              <div className="editor-menu">
+                <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Read only mode." onClick={() => {
+                  func1(false, editorContext);
+                }} src="/assets/media/editor/readOnly.svg" alt="Read only" />
+                <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Save article." onClick={() => {
+                  func(context, articleId, editorContext);
+                }} src="/assets/media/editor/save.svg" alt="Save" />
               </div>
-              <div className="articleStatus">{data.data ? data.data.articleStatus : null}</div>
-              <div className="updateTs">
-                <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Updated: ${updateTime}`}><img src="/assets/media/editor/updated.png" alt="Last Updated" /><p>{updateTime === 'Invalid Date' ? 'Loading ..' : updateTime}</p></div>
-                <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Published: ${publishTime}`} ><img src="/assets/media/editor/publish.png" alt="Last Published" /><p>{publishTime}</p></div>
-              </div>
-              <WordsBar />
-              <RevisionBar revisionStats={revisionStats} setRevisionStats={setRevisionStats} setCurrentData={setCurrentData} setRevisionFlag={setRevisionFlag} instances={instances} setInstances={setInstances} editorG={editorG} />
-            </> : <h4 className="mt-5 mx-5">Loading...</h4>}
-            <div id="editorjs"></div>
-            <div className="editor-menu">
-              <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Read only mode." onClick={() => {
-                func1(false, editorContext);
-              }} src="/assets/media/editor/readOnly.svg" alt="Read only" />
-              <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Save article." onClick={() => {
-                func(context, articleId, editorContext);
-              }} src="/assets/media/editor/save.svg" alt="Save" />
             </div>
-          </div>
 
-          {/* Topics Cards */}
-          {/* <div className="editor-tc">
+            {/* Topics Cards */}
+            {/* <div className="editor-tc">
             <div className="editor-tc1">
               <div className="editor-tc11 px-3 text-center">
                 <p>Current Grade</p>
@@ -1414,294 +1418,68 @@ const Editor2 = (props) => {
             </div>
           </div> */}
 
-          {/* Grammar cards with side grammar panel */}
-          <div className="editor-main12">
-            {/* Side Grammar Panel */}
-            <div className="editor-main121">
-              <div className="em0">{mainData.length !== 0 ? <><span className={`badge me-3 badge-circle badge-${mainType === 'all' ? 'secondary' : mainType === 'Correctness' ? 'danger' : mainType === 'Clarity' ? 'info' : mainType === 'Engagement' ? 'primary' : mainType === 'Tone' ? 'success' : 'dark'}`}>{tc}</span><b>{mainType === 'all' ? 'All Suggestions' : mainType}</b></> : null}</div>
-              {mainType !== 'all' ? <div onClick={(e) => {
-                trigger_active(e, editorContext);
-              }} className="editor-main1210">
-                <p>Back to all suggestions X</p>
-              </div> : null}
-              {flag3 ? <div className="em1">
-                <img src="/assets/media/editor/i1.svg" alt="Nothing" />
-                <h5 className="my-2">Nothing to check yet</h5>
-                <p>Start writing or upload a document to see feedback</p>
-              </div> : null}
+            {/* Grammar cards with side grammar panel */}
+            <div className="editor-main12">
+              {/* Side Grammar Panel */}
+              <div className="editor-main121">
+                <div className="em0">{mainData.length !== 0 ? <><span className={`badge me-3 badge-circle badge-${mainType === 'all' ? 'secondary' : mainType === 'Correctness' ? 'danger' : mainType === 'Clarity' ? 'info' : mainType === 'Engagement' ? 'primary' : mainType === 'Tone' ? 'success' : 'dark'}`}>{tc}</span><b>{mainType === 'all' ? 'All Suggestions' : mainType}</b></> : null}</div>
+                {mainType !== 'all' ? <div onClick={(e) => {
+                  trigger_active(e, editorContext);
+                }} className="editor-main1210">
+                  <p>Back to all suggestions X</p>
+                </div> : null}
+                {flag3 ? <div className="em1">
+                  <img src="/assets/media/editor/i1.svg" alt="Nothing" />
+                  <h5 className="my-2">Nothing to check yet</h5>
+                  <p>Start writing or upload a document to see feedback</p>
+                </div> : null}
 
-              {/* Grammar cards */}
-              {mainData.length !== 0 ? <div className="em2">
-                {mainData.map((g, ind) => {
-                  if (blockDetails[ind]) {
-                    if (mainType === 'all') {
-                      return g.alerts.map((e, index) => {
+                {/* Grammar cards */}
+                {mainData.length !== 0 ? <div className="em2">
+                  {mainData.map((g, ind) => {
+                    if (blockDetails[ind]) {
+                      if (mainType === 'all') {
+                        return g.alerts.map((e, index) => {
 
-                        if (localStorage.getItem('localMainData')) {
-                          if (dictWords.includes(e.highlightText)) {
-                            dltCard(blockIds[ind][index], ind, index, '', false, '', true, editorContext);
+                          if (localStorage.getItem('localMainData')) {
+                            if (dictWords.includes(e.highlightText)) {
+                              dltCard(blockIds[ind][index], ind, index, '', false, '', true, editorContext);
+                            }
                           }
-                        }
 
-                        return (
-
-                          // <CorrectionCard />
-                          <div onClick={(f) => {
-                            expand1(f, blockIds[ind][index]);
-                          }} key={index} id={`${blockIds[ind][index]}1`} className={`em2-box px-4 py-4 ${blockDetails[ind].id}`}>
-                            <div className="em2-box1">
-                              {e.cardLayout.outcome === 'Clarity' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#B3D1FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd" opacity="0.6"></path><path fill="#548AFF" d="M16.1 9.9c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-.6.1-1.2.3-1.8 1.7-.8 3.9-.5 5.2 1l.1.1c1.5 1.8 4.2 2 6 .5l.4-.4v.6z"></path></svg> : e.cardLayout.outcome === 'Correctness' ? <svg width="24" viewBox="0 0 24 24" className="holder_f19n375c" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="m6.75 6.926 5.113-1.676 5.113 1.676v3.45a8.64 8.64 0 0 1-3.164 6.684l-1.949 1.597-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926Z" fill="#FFC8D2"></path><g filter="url(#a)"><path fillRule="evenodd" clipRule="evenodd" d="M11.863 5.25v13.407l-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926l5.113-1.676Z" fill="#EE445F"></path></g><defs><filter id="a" x="1.75" y=".25" width="15.113" height="23.407" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"><feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="2.5"></feGaussianBlur><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"></feColorMatrix><feBlend in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg> : e.cardLayout.outcome === 'Engagement' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#B9F9EA" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#0FDCAC" fillRule="evenodd" d="M10.1 11.4c2.1 0 3.8-1.7 3.8-3.7s-1.7-3.8-3.8-3.8-3.7 1.7-3.7 3.7 1.6 3.8 3.7 3.8zm0 4.5c2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8-3.8 1.7-3.8 3.8 1.7 3.8 3.8 3.8z" clipRule="evenodd"></path><path fill="#C0F9EC" fillRule="evenodd" d="M13.1 9.9c-.7.9-1.8 1.5-3 1.5s-2.3-.6-3-1.5c.7-.9 1.8-1.5 3-1.5s2.3.6 3 1.5z" clipRule="evenodd"></path></svg> : e.cardLayout.outcome === 'Tone' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#E8C7FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#D29CFA" fillRule="evenodd" d="M10.1 15.9c2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5-4.5 2-4.5 4.5 2 4.5 4.5 4.5z" clipRule="evenodd"></path><path fill="#BC78ED" fillRule="evenodd" d="M10.1 15.9c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" clipRule="evenodd"></path></svg> : null}
-                              <p className="ms-2">{`${e.highlightText.slice(0, 27)}...`}</p>
-                              <p className="text-gray ms-3">{e.todo}</p>
-                              <div className="baseMiniActivateBtnSelector f1758bz9"><i className="icon_f1r6abcu activeTopIcon_ficds8d" data-role="icon"><svg width="10" viewBox="0 0 10 10" className="holder_f19n375c"><path d="M5 4.3L.85.14c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7L5 5.7 9.85.87c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7 0L5 4.28z" stroke="none" transform="translate(0 3) rotate(0)"></path></svg></i><i className="icon_f1r6abcu activeBottomIcon_f1tqo8o3" data-role="icon"><svg width="10" viewBox="0 0 10 10" className="holder_f19n375c"><path d="M5 4.3L.85.14c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7L5 5.7 9.85.87c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7 0L5 4.28z" stroke="none" transform="translate(0 3) rotate(0)"></path></svg></i></div>
-                            </div>
-                            <div className="em2-box2">
-                              <div className="em2-box11 mb-3">
-                                {e.cardLayout.outcome === 'Clarity' ?
-                          
-                                  <div className="em2-box111 mt-2 mb-5">
-                                    <svg width="20" viewBox="0 0 20 20" className="">
-                                      <path fill="#B3D1FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd" opacity="0.6"></path>
-                                      <path fill="#548AFF" d="M16.1 9.9c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-.6.1-1.2.3-1.8 1.7-.8 3.9-.5 5.2 1l.1.1c1.5 1.8 4.2 2 6 .5l.4-.4v.6z"></path>
-                                    </svg>
-                                    <p className="text-gray">{e.cardLayout.group}</p>
-                                  </div> :
-                          
-                                  e.cardLayout.outcome === 'Correctness' ?
-                                    <div className="em2-box111 mt-2 mb-5">
-                                      <svg width="24" viewBox="0 0 24 24" className="holder_f19n375c" fill="none">
-                                        <path fillRule="evenodd" clipRule="evenodd" d="m6.75 6.926 5.113-1.676 5.113 1.676v3.45a8.64 8.64 0 0 1-3.164 6.684l-1.949 1.597-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926Z" fill="#FFC8D2"></path>
-                                        <g filter="url(#a)">
-                                          <path fillRule="evenodd" clipRule="evenodd" d="M11.863 5.25v13.407l-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926l5.113-1.676Z" fill="#EE445F"></path>
-                                        </g>
-                                        <defs>
-                                          <filter id="a" x="1.75" y=".25" width="15.113" height="23.407" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"><feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="2.5"></feGaussianBlur><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"></feColorMatrix><feBlend in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter>
-                                        </defs>
-                                      </svg>
-                                      <p className="text-gray">{e.cardLayout.group}</p>
-                                    </div> :
-                          
-                                    e.cardLayout.outcome === 'Engagement' ?
-                                      <div className="em2-box111 mt-2 mb-5">
-                                        <svg width="20" viewBox="0 0 20 20">
-                                          <path fill="#B9F9EA" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path>
-                                          <path fill="#0FDCAC" fillRule="evenodd" d="M10.1 11.4c2.1 0 3.8-1.7 3.8-3.7s-1.7-3.8-3.8-3.8-3.7 1.7-3.7 3.7 1.6 3.8 3.7 3.8zm0 4.5c2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8-3.8 1.7-3.8 3.8 1.7 3.8 3.8 3.8z" clipRule="evenodd"></path>
-                                          <path fill="#C0F9EC" fillRule="evenodd" d="M13.1 9.9c-.7.9-1.8 1.5-3 1.5s-2.3-.6-3-1.5c.7-.9 1.8-1.5 3-1.5s2.3.6 3 1.5z" clipRule="evenodd"></path>
-                                        </svg>
-                                        <p className="text-gray">{e.cardLayout.group}</p>
-                                      </div> :
-                          
-                                      e.cardLayout.outcome === 'Tone' ?
-                                        <div className="em2-box111 mt-2 mb-5">
-                                          <svg width="20" viewBox="0 0 20 20" className="">
-                                            <path fill="#E8C7FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path>
-                                            <path fill="#D29CFA" fillRule="evenodd" d="M10.1 15.9c2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5-4.5 2-4.5 4.5 2 4.5 4.5 4.5z" clipRule="evenodd"></path>
-                                            <path fill="#BC78ED" fillRule="evenodd" d="M10.1 15.9c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" clipRule="evenodd"></path>
-                                          </svg>
-                                          <p className="text-gray">{e.cardLayout.group}</p>
-                                        </div> : null}
-                          
-                                <div>
-                                  {e.transforms ? e.transforms.length > 1 ?
-                                    <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
-                                      {e.transforms.map((f, index2) => {
-                                        return (
-                                          textChangeUtil(blockIds, ind, index, e, true, f, index2)
-                                        );
-                                      })}
-                                    </p> :
-                          
-                                    e.group === 'Spelling' ?
-                                      e.category === 'Unknown' ?
-                                        <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
-                                          <b>Unknown word: </b>
-                                          <i className="text-danger fw-bolder">{e.text}</i>
-                                        </p> :
-                          
-                                        <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
-                                          {textChangeUtil(blockIds, ind, index, e)}
-                                        </p> :
-                          
-                                      <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className={e.cardLayout.outcome === 'Correctness' ? 'cpar cpar_correct' : 'cpar'}>
-                                        {textChangeUtil(blockIds, ind, index, e)}
-                                      </p> :
-                          
-                                    <b>{e.title}</b>}
-                                </div>
-                              </div>
-                              <div className="em2-box12 mb-4">
-                                <p dangerouslySetInnerHTML={{ __html: e.explanation.slice(3,) }}></p>
-                              </div>
-                              {e.examples !== '' ?
-                                <>
-                                  <div className="em2-box14 mb-4">
-                                    <div className="em-box141 mb-3">
-                                      <p dangerouslySetInnerHTML={{ __html: e.details.slice(3,) }}></p>
-                                    </div>
-                          
-                                    <div className="em-box142">
-                                      {e.examples.split('<br/>')[0] ? <div className="em-box1421 my-2">
-                                        <div className="em-box-incorrect my-1">
-                                          <h5 className="text-red mb-0">Incorrect</h5>
-                                          <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[0].split(':')[1] ? e.examples.split('<br/>')[0].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[0].slice(3,) }}></p>
-                                        </div>
-                                        <div className="em-box-correct my-1">
-                                          <h5 className="text-green mb-0">correct</h5>
-                                          <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[1].split(':')[1] ? e.examples.split('<br/>')[1].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[1].slice(3,) }}></p>
-                                        </div>
-                                      </div> : null}
-                          
-                                      {e.examples.split('<br/>')[2] ?
-                                        <div className="em-box1421 my-2">
-                                          <div className="em-box-incorrect my-1">
-                                            <h5 className="text-red mb-0">Incorrect</h5>
-                                            <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[2].split(':')[1] ? e.examples.split('<br/>')[2].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[2].slice(3,) }}></p>
-                                          </div>
-                                          <div className="em-box-correct my-1">
-                                            <h5 className="text-green mb-0">correct</h5>
-                                            <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[3].split(':')[1] ? e.examples.split('<br/>')[3].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[3].slice(3,) }}></p>
-                                          </div>
-                                        </div>
-                                        : null}
-                          
-                                    </div>
-                                  </div>
-                          
-                                  <div className="em2-box13 mb-3">
-                                    <div onClick={expand2} className="em2-box131">
-                                      <p className="text-gray learnMore">Learn more</p>
-                                    </div>
-                          
-                                    <div onClick={() => {
-                                      dltCard(blockIds[ind][index], ind, index, 'Dismissed', false, '', false, editorContext);
-                                    }} className="em2-box132">
-                                      <img src="/assets/media/editor/delete.svg" alt="Delete" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Dismiss" />
-                                    </div>
-                          
-                                  </div>
-                                </> :
-                                <>
-                                  <div className="em2-box13 mb-3">
-                                    <div className="em2-box131">
-                                      <p onClick={() => {
-                                        updateDict(blockIds[ind][index], ind, e.highlightText, editorContext);
-                                      }} className="text-gray learnMore dictionary">Add to dictionary</p>
-                                    </div>
-                                    <div onClick={() => {
-                                      dltCard(blockIds[ind][index], ind, index, 'Dismissed', false, '', false, editorContext);
-                                    }} className="em2-box132">
-                                      <img src="/assets/media/editor/delete.svg" alt="Delete" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Dismiss" />
-                                    </div>
-                                  </div>
-                                </>
-                              }
-                            </div>
-                          </div> 
-
-                        );
-
-                      });
-                    }
-                    else {
-                      return g.alerts.map((e, index1) => {
-
-                        if (localStorage.getItem('localMainData')) {
-                          if (dictWords.includes(e.highlightText)) {
-                            dltCard(blockIds[ind][index1], ind, index1, '', false, '', true, editorContext);
-                          }
-                        }
-
-                        if (mainType === e.cardLayout.outcome) {
                           return (
-                            <div onClick={(f) => { expand1(f, blockIds[ind][index1]) }} key={index1} id={`${blockIds[ind][index1]}1`} className={`em2-box px-4 py-4 ${blockDetails[ind].id}`}>
-                              <div className="em2-box1">
-                                {e.cardLayout.outcome === 'Clarity' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#B3D1FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd" opacity="0.6"></path><path fill="#548AFF" d="M16.1 9.9c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-.6.1-1.2.3-1.8 1.7-.8 3.9-.5 5.2 1l.1.1c1.5 1.8 4.2 2 6 .5l.4-.4v.6z"></path></svg> : e.cardLayout.outcome === 'Correctness' ? <svg width="24" viewBox="0 0 24 24" className="holder_f19n375c" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="m6.75 6.926 5.113-1.676 5.113 1.676v3.45a8.64 8.64 0 0 1-3.164 6.684l-1.949 1.597-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926Z" fill="#FFC8D2"></path><g filter="url(#a)"><path fillRule="evenodd" clipRule="evenodd" d="M11.863 5.25v13.407l-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926l5.113-1.676Z" fill="#EE445F"></path></g><defs><filter id="a" x="1.75" y=".25" width="15.113" height="23.407" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"><feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="2.5"></feGaussianBlur><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"></feColorMatrix><feBlend in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg> : e.cardLayout.outcome === 'Engagement' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#B9F9EA" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#0FDCAC" fillRule="evenodd" d="M10.1 11.4c2.1 0 3.8-1.7 3.8-3.7s-1.7-3.8-3.8-3.8-3.7 1.7-3.7 3.7 1.6 3.8 3.7 3.8zm0 4.5c2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8-3.8 1.7-3.8 3.8 1.7 3.8 3.8 3.8z" clipRule="evenodd"></path><path fill="#C0F9EC" fillRule="evenodd" d="M13.1 9.9c-.7.9-1.8 1.5-3 1.5s-2.3-.6-3-1.5c.7-.9 1.8-1.5 3-1.5s2.3.6 3 1.5z" clipRule="evenodd"></path></svg> : e.cardLayout.outcome === 'Tone' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#E8C7FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#D29CFA" fillRule="evenodd" d="M10.1 15.9c2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5-4.5 2-4.5 4.5 2 4.5 4.5 4.5z" clipRule="evenodd"></path><path fill="#BC78ED" fillRule="evenodd" d="M10.1 15.9c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" clipRule="evenodd"></path></svg> : null}
-                                <p className="ms-2">{`${e.highlightText.slice(0, 27)}...`}</p>
-                                <p className="text-gray ms-3">{e.todo}</p>
-                                <div className="baseMiniActivateBtnSelector f1758bz9"><i className="icon_f1r6abcu activeTopIcon_ficds8d" data-role="icon"><svg width="10" viewBox="0 0 10 10" className="holder_f19n375c"><path d="M5 4.3L.85.14c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7L5 5.7 9.85.87c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7 0L5 4.28z" stroke="none" transform="translate(0 3) rotate(0)"></path></svg></i><i className="icon_f1r6abcu activeBottomIcon_f1tqo8o3" data-role="icon"><svg width="10" viewBox="0 0 10 10" className="holder_f19n375c"><path d="M5 4.3L.85.14c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7L5 5.7 9.85.87c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7 0L5 4.28z" stroke="none" transform="translate(0 3) rotate(0)"></path></svg></i></div>
-                              </div>
-                              <div className="em2-box2">
-                                <div className="em2-box11 mb-3">
-                                  {e.cardLayout.outcome === 'Clarity' ? <div className="em2-box111 mt-2 mb-5"><svg width="20" viewBox="0 0 20 20" className=""><path fill="#B3D1FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd" opacity="0.6"></path><path fill="#548AFF" d="M16.1 9.9c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-.6.1-1.2.3-1.8 1.7-.8 3.9-.5 5.2 1l.1.1c1.5 1.8 4.2 2 6 .5l.4-.4v.6z"></path></svg><p className="text-gray">{e.cardLayout.group}</p></div> : e.cardLayout.outcome === 'Correctness' ? <div className="em2-box111 mt-2 mb-5"><svg width="24" viewBox="0 0 24 24" className="holder_f19n375c" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="m6.75 6.926 5.113-1.676 5.113 1.676v3.45a8.64 8.64 0 0 1-3.164 6.684l-1.949 1.597-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926Z" fill="#FFC8D2"></path><g filter="url(#a)"><path fillRule="evenodd" clipRule="evenodd" d="M11.863 5.25v13.407l-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926l5.113-1.676Z" fill="#EE445F"></path></g><defs><filter id="a" x="1.75" y=".25" width="15.113" height="23.407" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"><feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="2.5"></feGaussianBlur><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"></feColorMatrix><feBlend in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg><p className="text-gray">{e.cardLayout.group}</p></div> : e.cardLayout.outcome === 'Engagement' ? <div className="em2-box111 mt-2 mb-5"><svg width="20" viewBox="0 0 20 20"><path fill="#B9F9EA" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#0FDCAC" fillRule="evenodd" d="M10.1 11.4c2.1 0 3.8-1.7 3.8-3.7s-1.7-3.8-3.8-3.8-3.7 1.7-3.7 3.7 1.6 3.8 3.7 3.8zm0 4.5c2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8-3.8 1.7-3.8 3.8 1.7 3.8 3.8 3.8z" clipRule="evenodd"></path><path fill="#C0F9EC" fillRule="evenodd" d="M13.1 9.9c-.7.9-1.8 1.5-3 1.5s-2.3-.6-3-1.5c.7-.9 1.8-1.5 3-1.5s2.3.6 3 1.5z" clipRule="evenodd"></path></svg><p className="text-gray">{e.cardLayout.group}</p></div> : e.cardLayout.outcome === 'Tone' ? <div className="em2-box111 mt-2 mb-5"><svg width="20" viewBox="0 0 20 20" className=""><path fill="#E8C7FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#D29CFA" fillRule="evenodd" d="M10.1 15.9c2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5-4.5 2-4.5 4.5 2 4.5 4.5 4.5z" clipRule="evenodd"></path><path fill="#BC78ED" fillRule="evenodd" d="M10.1 15.9c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" clipRule="evenodd"></path></svg><p className="text-gray">{e.cardLayout.group}</p></div> : null}
-                                  <div>
-                                    {e.transforms ? e.transforms.length > 1 ? <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>{e.transforms.map((f, index) => {
-                                      return (
-                                        textChangeUtil(blockIds, ind, index1, e, true, f, index)
-                                      );
-                                    })}</p> : e.group === 'Spelling' ? e.category === 'Unknown' ? <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'><b>Unknown word: </b><i className="text-danger fw-bolder">{e.text}</i></p> : <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
-                                      {textChangeUtil(blockIds, ind, index1, e)}
-                                    </p> : <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className={e.cardLayout.outcome === 'Correctness' ? 'cpar cpar_correct' : 'cpar'}>
-                                      {textChangeUtil(blockIds, ind, index1, e)}
-                                    </p> : <b>{e.title}</b>}
-                                  </div>
-                                </div>
-                                <div className="em2-box12 mb-4">
-                                  <p dangerouslySetInnerHTML={{ __html: e.explanation.slice(3,) }}></p>
-                                </div>
-                                {e.examples !== '' ? <><div className="em2-box14 mb-4">
-                                  <div className="em-box141 mb-3">
-                                    <p dangerouslySetInnerHTML={{ __html: e.details.slice(3,) }}></p>
-                                  </div>
-                                  <div className="em-box142">
-                                    <div className="em-box1421 my-2">
-                                      <div className="em-box-incorrect my-1">
-                                        <h5 className="text-red mb-0">Incorrect</h5>
-                                        <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[0].split(':')[1] ? e.examples.split('<br/>')[0].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[0].slice(3,) }}></p>
-                                      </div>
-                                      <div className="em-box-correct my-1">
-                                        <h5 className="text-green mb-0">correct</h5>
-                                        <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[1].split(':')[1] ? e.examples.split('<br/>')[1].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[1].slice(3,) }}></p>
-                                      </div>
-                                    </div>
-                                    <div className="em-box1421 my-2">
-                                      <div className="em-box-incorrect my-1">
-                                        <h5 className="text-red mb-0">Incorrect</h5>
-                                        <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[2].split(':')[1] ? e.examples.split('<br/>')[2].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[2].slice(3,) }}></p>
-                                      </div>
-                                      <div className="em-box-correct my-1">
-                                        <h5 className="text-green mb-0">correct</h5>
-                                        <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[3].split(':')[1] ? e.examples.split('<br/>')[3].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[3].slice(3,) }}></p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                  <div className="em2-box13 mb-3">
-                                    <div onClick={expand2} className="em2-box131">
-                                      <p className="text-gray learnMore">Learn more</p>
-                                    </div>
-                                    <div onClick={() => {
-                                      dltCard(blockIds[ind][index1], ind, index1, 'Dismissed', false, '', false, editorContext);
-                                    }} className="em2-box132">
-                                      <img src="/assets/media/editor/delete.svg" alt="Delete" data-bs-toggle="tooltip" data-bs-dismiss="click" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Dismiss" />
-                                    </div>
-                                  </div></> : <div className="em2-box13 mb-3">
-                                  <div className="em2-box131">
-                                    <p onClick={() => {
-                                      updateDict(blockIds[ind][index1], ind, e.highlightText, editorContext);
-                                    }} className="text-gray learnMore dictionary">Add to dictionary</p>
-                                  </div>
-                                  <div onClick={() => {
-                                    dltCard(blockIds[ind][index1], ind, index1, 'Dismissed', false, '', false, editorContext);
-                                  }} className="em2-box132">
-                                    <img src="/assets/media/editor/delete.svg" alt="Delete" data-bs-toggle="tooltip" data-bs-dismiss="click" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Dismiss" />
-                                  </div>
-                                </div>}
-                              </div>
-                            </div>
-                          )
-                        }
-                      });
-                    }
-                  }
-                })}
-              </div> : null}
-            </div>
+                            <CorrectionCard key={index} ind={ind} index={index} e={e} />
+                          );
 
-            {/* <GrammarPanel mainData={mainData} sideUtils={sideUtils} grammarFlag={grammarFlag} grammarFlag1={grammarFlag1} dataMatch={dataMatch} tc={tc} /> */}
-            <GrammarPanel />
+                        });
+                      }
+                      else {
+                        return g.alerts.map((e, index1) => {
+
+                          if (localStorage.getItem('localMainData')) {
+                            if (dictWords.includes(e.highlightText)) {
+                              dltCard(blockIds[ind][index1], ind, index1, '', false, '', true, editorContext);
+                            }
+                          }
+
+                          if (mainType === e.cardLayout.outcome) {
+                            return (
+                              <CorrectionCard key={index1} ind={ind} index={index1} e={e} />
+                            )
+                          }
+                        });
+                      }
+                    }
+                  })}
+                </div> : null}
+              </div>
+
+              {/* <GrammarPanel mainData={mainData} sideUtils={sideUtils} grammarFlag={grammarFlag} grammarFlag1={grammarFlag1} dataMatch={dataMatch} tc={tc} /> */}
+              <GrammarPanel />
+            </div>
           </div>
         </div>
-      </div>
+      </> : <>{"Loading ..."}</>}
     </>
   );
 };
@@ -1860,3 +1638,84 @@ export default Editor2;
     }
   </div>
 </div>  */}
+
+
+/* 
+
+<div onClick={(f) => { expand1(f, blockIds[ind][index1]) }} key={index1} id={`${blockIds[ind][index1]}1`} className={`em2-box px-4 py-4 ${blockDetails[ind].id}`}>
+                                <div className="em2-box1">
+                                  {e.cardLayout.outcome === 'Clarity' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#B3D1FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd" opacity="0.6"></path><path fill="#548AFF" d="M16.1 9.9c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-.6.1-1.2.3-1.8 1.7-.8 3.9-.5 5.2 1l.1.1c1.5 1.8 4.2 2 6 .5l.4-.4v.6z"></path></svg> : e.cardLayout.outcome === 'Correctness' ? <svg width="24" viewBox="0 0 24 24" className="holder_f19n375c" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="m6.75 6.926 5.113-1.676 5.113 1.676v3.45a8.64 8.64 0 0 1-3.164 6.684l-1.949 1.597-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926Z" fill="#FFC8D2"></path><g filter="url(#a)"><path fillRule="evenodd" clipRule="evenodd" d="M11.863 5.25v13.407l-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926l5.113-1.676Z" fill="#EE445F"></path></g><defs><filter id="a" x="1.75" y=".25" width="15.113" height="23.407" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"><feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="2.5"></feGaussianBlur><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"></feColorMatrix><feBlend in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg> : e.cardLayout.outcome === 'Engagement' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#B9F9EA" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#0FDCAC" fillRule="evenodd" d="M10.1 11.4c2.1 0 3.8-1.7 3.8-3.7s-1.7-3.8-3.8-3.8-3.7 1.7-3.7 3.7 1.6 3.8 3.7 3.8zm0 4.5c2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8-3.8 1.7-3.8 3.8 1.7 3.8 3.8 3.8z" clipRule="evenodd"></path><path fill="#C0F9EC" fillRule="evenodd" d="M13.1 9.9c-.7.9-1.8 1.5-3 1.5s-2.3-.6-3-1.5c.7-.9 1.8-1.5 3-1.5s2.3.6 3 1.5z" clipRule="evenodd"></path></svg> : e.cardLayout.outcome === 'Tone' ? <svg width="20" viewBox="0 0 20 20" className=""><path fill="#E8C7FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#D29CFA" fillRule="evenodd" d="M10.1 15.9c2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5-4.5 2-4.5 4.5 2 4.5 4.5 4.5z" clipRule="evenodd"></path><path fill="#BC78ED" fillRule="evenodd" d="M10.1 15.9c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" clipRule="evenodd"></path></svg> : null}
+                                  <p className="ms-2">{`${e.highlightText.slice(0, 27)}...`}</p>
+                                  <p className="text-gray ms-3">{e.todo}</p>
+                                  <div className="baseMiniActivateBtnSelector f1758bz9"><i className="icon_f1r6abcu activeTopIcon_ficds8d" data-role="icon"><svg width="10" viewBox="0 0 10 10" className="holder_f19n375c"><path d="M5 4.3L.85.14c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7L5 5.7 9.85.87c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7 0L5 4.28z" stroke="none" transform="translate(0 3) rotate(0)"></path></svg></i><i className="icon_f1r6abcu activeBottomIcon_f1tqo8o3" data-role="icon"><svg width="10" viewBox="0 0 10 10" className="holder_f19n375c"><path d="M5 4.3L.85.14c-.2-.2-.5-.2-.7 0-.2.2-.2.5 0 .7L5 5.7 9.85.87c.2-.2.2-.5 0-.7-.2-.2-.5-.2-.7 0L5 4.28z" stroke="none" transform="translate(0 3) rotate(0)"></path></svg></i></div>
+                                </div>
+                                <div className="em2-box2">
+                                  <div className="em2-box11 mb-3">
+                                    {e.cardLayout.outcome === 'Clarity' ? <div className="em2-box111 mt-2 mb-5"><svg width="20" viewBox="0 0 20 20" className=""><path fill="#B3D1FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd" opacity="0.6"></path><path fill="#548AFF" d="M16.1 9.9c0 3.3-2.7 6-6 6s-6-2.7-6-6c0-.6.1-1.2.3-1.8 1.7-.8 3.9-.5 5.2 1l.1.1c1.5 1.8 4.2 2 6 .5l.4-.4v.6z"></path></svg><p className="text-gray">{e.cardLayout.group}</p></div> : e.cardLayout.outcome === 'Correctness' ? <div className="em2-box111 mt-2 mb-5"><svg width="24" viewBox="0 0 24 24" className="holder_f19n375c" fill="none"><path fillRule="evenodd" clipRule="evenodd" d="m6.75 6.926 5.113-1.676 5.113 1.676v3.45a8.64 8.64 0 0 1-3.164 6.684l-1.949 1.597-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926Z" fill="#FFC8D2"></path><g filter="url(#a)"><path fillRule="evenodd" clipRule="evenodd" d="M11.863 5.25v13.407l-1.95-1.597a8.64 8.64 0 0 1-3.163-6.683V6.926l5.113-1.676Z" fill="#EE445F"></path></g><defs><filter id="a" x="1.75" y=".25" width="15.113" height="23.407" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"><feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix><feOffset></feOffset><feGaussianBlur stdDeviation="2.5"></feGaussianBlur><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"></feColorMatrix><feBlend in2="BackgroundImageFix" result="effect1_dropShadow"></feBlend><feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"></feBlend></filter></defs></svg><p className="text-gray">{e.cardLayout.group}</p></div> : e.cardLayout.outcome === 'Engagement' ? <div className="em2-box111 mt-2 mb-5"><svg width="20" viewBox="0 0 20 20"><path fill="#B9F9EA" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#0FDCAC" fillRule="evenodd" d="M10.1 11.4c2.1 0 3.8-1.7 3.8-3.7s-1.7-3.8-3.8-3.8-3.7 1.7-3.7 3.7 1.6 3.8 3.7 3.8zm0 4.5c2.1 0 3.8-1.7 3.8-3.8s-1.7-3.8-3.8-3.8-3.8 1.7-3.8 3.8 1.7 3.8 3.8 3.8z" clipRule="evenodd"></path><path fill="#C0F9EC" fillRule="evenodd" d="M13.1 9.9c-.7.9-1.8 1.5-3 1.5s-2.3-.6-3-1.5c.7-.9 1.8-1.5 3-1.5s2.3.6 3 1.5z" clipRule="evenodd"></path></svg><p className="text-gray">{e.cardLayout.group}</p></div> : e.cardLayout.outcome === 'Tone' ? <div className="em2-box111 mt-2 mb-5"><svg width="20" viewBox="0 0 20 20" className=""><path fill="#E8C7FF" fillRule="evenodd" d="M10.1 15.9c3.3 0 6-2.7 6-6s-2.7-6-6-6-6 2.7-6 6 2.7 6 6 6z" clipRule="evenodd"></path><path fill="#D29CFA" fillRule="evenodd" d="M10.1 15.9c2.5 0 4.5-2 4.5-4.5s-2-4.5-4.5-4.5-4.5 2-4.5 4.5 2 4.5 4.5 4.5z" clipRule="evenodd"></path><path fill="#BC78ED" fillRule="evenodd" d="M10.1 15.9c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3z" clipRule="evenodd"></path></svg><p className="text-gray">{e.cardLayout.group}</p></div> : null}
+                                    <div>
+                                      {e.transforms ? e.transforms.length > 1 ? <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>{e.transforms.map((f, index) => {
+                                        return (
+                                          textChangeUtil(blockIds, ind, index1, e, true, f, index)
+                                        );
+                                      })}</p> : e.group === 'Spelling' ? e.category === 'Unknown' ? <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'><b>Unknown word: </b><i className="text-danger fw-bolder">{e.text}</i></p> : <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
+                                        {textChangeUtil(blockIds, ind, index1, e)}
+                                      </p> : <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className={e.cardLayout.outcome === 'Correctness' ? 'cpar cpar_correct' : 'cpar'}>
+                                        {textChangeUtil(blockIds, ind, index1, e)}
+                                      </p> : <b>{e.title}</b>}
+                                    </div>
+                                  </div>
+                                  <div className="em2-box12 mb-4">
+                                    <p dangerouslySetInnerHTML={{ __html: e.explanation.slice(3,) }}></p>
+                                  </div>
+                                  {e.examples !== '' ? <><div className="em2-box14 mb-4">
+                                    <div className="em-box141 mb-3">
+                                      <p dangerouslySetInnerHTML={{ __html: e.details.slice(3,) }}></p>
+                                    </div>
+                                    <div className="em-box142">
+                                      <div className="em-box1421 my-2">
+                                        <div className="em-box-incorrect my-1">
+                                          <h5 className="text-red mb-0">Incorrect</h5>
+                                          <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[0].split(':')[1] ? e.examples.split('<br/>')[0].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[0].slice(3,) }}></p>
+                                        </div>
+                                        <div className="em-box-correct my-1">
+                                          <h5 className="text-green mb-0">correct</h5>
+                                          <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[1].split(':')[1] ? e.examples.split('<br/>')[1].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[1].slice(3,) }}></p>
+                                        </div>
+                                      </div>
+                                      <div className="em-box1421 my-2">
+                                        <div className="em-box-incorrect my-1">
+                                          <h5 className="text-red mb-0">Incorrect</h5>
+                                          <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[2].split(':')[1] ? e.examples.split('<br/>')[2].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[2].slice(3,) }}></p>
+                                        </div>
+                                        <div className="em-box-correct my-1">
+                                          <h5 className="text-green mb-0">correct</h5>
+                                          <p className="text-gray" dangerouslySetInnerHTML={{ __html: e.examples.split('<br/>')[3].split(':')[1] ? e.examples.split('<br/>')[3].split(':')[1].slice(0, -7) : e.examples.split('<br/>')[3].slice(3,) }}></p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                    <div className="em2-box13 mb-3">
+                                      <div onClick={expand2} className="em2-box131">
+                                        <p className="text-gray learnMore">Learn more</p>
+                                      </div>
+                                      <div onClick={() => {
+                                        dltCard(blockIds[ind][index1], ind, index1, 'Dismissed', false, '', false, editorContext);
+                                      }} className="em2-box132">
+                                        <img src="/assets/media/editor/delete.svg" alt="Delete" data-bs-toggle="tooltip" data-bs-dismiss="click" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Dismiss" />
+                                      </div>
+                                    </div></> : <div className="em2-box13 mb-3">
+                                    <div className="em2-box131">
+                                      <p onClick={() => {
+                                        updateDict(blockIds[ind][index1], ind, e.highlightText, editorContext);
+                                      }} className="text-gray learnMore dictionary">Add to dictionary</p>
+                                    </div>
+                                    <div onClick={() => {
+                                      dltCard(blockIds[ind][index1], ind, index1, 'Dismissed', false, '', false, editorContext);
+                                    }} className="em2-box132">
+                                      <img src="/assets/media/editor/delete.svg" alt="Delete" data-bs-toggle="tooltip" data-bs-dismiss="click" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Dismiss" />
+                                    </div>
+                                  </div>}
+                                </div>
+                              </div>
+
+*/

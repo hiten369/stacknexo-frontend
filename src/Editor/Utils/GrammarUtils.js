@@ -1823,7 +1823,7 @@ const replaceTags = (tagData, ind) => {
 
 // Correcting the text mistake on click
 export const textChange = async (id, text, replacement_text, isNum, ind, ind1, startInd, endInd, matchText, overFlowText, beginFlag, beginInc, editorContext, highlightBegin, highlightEnd) => {
-    const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails, undoFlag, setUndoFlag, onEditorStateChange, client } = editorContext;
+    const { mainData, setMainData, setFlag4, setFlag3, flag3, setAlertUndoMsg, blockDetails, blockIds, setBlockIds, idNum, sideUtils, setSideUtils, checkGr, setBlockDetails, undoFlag, setUndoFlag, onEditorStateChange, gclient } = editorContext;
     var { editorS, tc, setTc } = editorContext;
 
     setUndoFlag(!undoFlag);
@@ -2620,7 +2620,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
     // Saving the editor data after change
     let savedData = await editorS.save();
-    onEditorStateChange(savedData.blocks, client);
+    onEditorStateChange(savedData.blocks, gclient);
 
     // If cards count are 0, then hide the card showing display.
     if (tc === 0) {
@@ -2643,7 +2643,7 @@ export const closeAlert = (editorContext) => {
 
 // Undo the changes in text/deletion and alerts
 export const alertUndo = (editorContext) => {
-    const { mainData, setMainData, setFlag2, setFlag3, alertUndoMsg, blockIds, setBlockIds, sideUtils, setSideUtils, dictWords, setDictWords, blockDetails, setBlockDetails, undoFlag, setUndoFlag, onEditorStateChange5, client } = editorContext;
+    const { mainData, setMainData, setFlag2, setFlag3, alertUndoMsg, blockIds, setBlockIds, sideUtils, setSideUtils, dictWords, setDictWords, blockDetails, setBlockDetails, undoFlag, setUndoFlag, onEditorStateChange5, gclient } = editorContext;
     var { tc, setTc } = editorContext;
 
     // If undo a correction
@@ -2723,7 +2723,7 @@ export const alertUndo = (editorContext) => {
                     return e !== alertUndoMsg.undoText;
                 });
             });
-            onEditorStateChange5(alertUndoMsg.undoText, client);
+            onEditorStateChange5(alertUndoMsg.undoText, gclient);
         }
 
         setTc(++tc);

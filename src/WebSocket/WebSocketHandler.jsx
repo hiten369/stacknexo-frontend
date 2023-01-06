@@ -4,7 +4,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import DisconnectAlert from '../Alert/DisconnectAlert';
 import EditorContext from '../context/EditorContext';
 
-var client1;
+var tq;
 // const baseUrl='http://stacknexo-backend-app.herokuapp.com';
 const baseUrl = 'stacknexo-backend-app.herokuapp.com';
 const WebSocketHandler = (props) => {
@@ -23,18 +23,26 @@ const WebSocketHandler = (props) => {
             };
 
             // context.client = new ReconnectingWebSocket(`ws://127.0.0.1:5001/socketServer/${token}/${url}`, [], options);
-            context.client = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
             // context.client = new ReconnectingWebSocket(`wss://${baseUrl}/socketServer/${token}/${url}`, [], options);
-            client1 = context.client;
+
+            // context.client = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options); <-
+            tq = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
+            // console.log(tq);
+
+            context.client=tq;
+            // console.log(context.client);
             window.addEventListener('offline', () => {
                 console.log('offline');
-                context.client.close();
+                /* context.client.close(); */
+                tq.close();
             });
-            context.client.addEventListener('close', () => {
+            // context.client.addEventListener('close', () => {
+            tq.addEventListener('close', () => {
                 console.log('close');
                 document.getElementById('dis_modal').style.display = 'block';
             });
-            context.client.addEventListener('open', () => {
+            // context.client.addEventListener('open', () => {
+            tq.addEventListener('open', () => {
                 console.log('open');
                 document.getElementById('dis_modal').style.display = 'none';
             });
@@ -48,8 +56,10 @@ const WebSocketHandler = (props) => {
     // Reconnection of web socket 
     function reconnect() {
         // console.log(context.client);
-        context.client.close();
-        context.client.reconnect();
+        // context.client.close();
+        // context.client.reconnect();
+        tq.close();
+        tq.reconnect();
         document.getElementById('dis_modal').style.display = 'none';
     }
 

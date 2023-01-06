@@ -196,7 +196,7 @@ const setGoals1Util=(setGoals, goals, goal, e, flag=false)=>{
 
 // Setting goals to localstorage, hooks and backend.
 export const setGoals1 = (e, editorContext) => {
-    const { goals, setGoals, onEditorStateChange3, onEditorStateChange4, client } = editorContext;
+    const { goals, setGoals, onEditorStateChange3, onEditorStateChange4, gclient } = editorContext;
     const id = e.target.parentNode.parentNode.id;
 
     let goal;
@@ -261,11 +261,10 @@ export const setGoals1 = (e, editorContext) => {
         goal='dialect';
         setGoals1Util(setGoals, goals, goal, e, true);
     }
-    
-    onEditorStateChange3(JSON.parse(localStorage.getItem('local_goals_sn')), client);
+    onEditorStateChange3(JSON.parse(localStorage.getItem('local_goals_sn')), gclient);
 
     if (document.getElementById('goals-check').checked) {
-        onEditorStateChange4(JSON.parse(localStorage.getItem('local_goals_sn')), 'defaultGoals', true, client);
+        onEditorStateChange4(JSON.parse(localStorage.getItem('local_goals_sn')), 'defaultGoals', true, gclient);
     }
 };
 
@@ -281,7 +280,7 @@ const goalsResetUtil=(element, flag=false)=>{
 
 // Reset button logic
 export const goalsReset = (editorContext) => {
-    const { setGoals, onEditorStateChange3 } = editorContext;
+    const { setGoals, onEditorStateChange3, gclient } = editorContext;
     setGoals({
         audience: 'knowledgeable',
         dialect: 'american',
@@ -309,13 +308,13 @@ export const goalsReset = (editorContext) => {
     goalsResetUtil(b5);
     goalsResetUtil(b6);
     goalsResetUtil(b7);
-
-    onEditorStateChange3(JSON.parse(localStorage.getItem('local_goals_sn')), client);
+console.log('yes2');
+    onEditorStateChange3(JSON.parse(localStorage.getItem('local_goals_sn')), gclient);
 };
 
 // Set universal goals logic
 export const toggleGoalsUniversal = (editorContext) => {
-    const { onEditorStateChange4 } = editorContext;
+    const { onEditorStateChange4, gclient } = editorContext;
     let goals_check = document.getElementById('goals-check').checked;
-    onEditorStateChange4(JSON.parse(localStorage.getItem('local_goals_sn')), "defaultGoals", goals_check, client);
+    onEditorStateChange4(JSON.parse(localStorage.getItem('local_goals_sn')), "defaultGoals", goals_check, gclient);
 };
