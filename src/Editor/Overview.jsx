@@ -238,12 +238,10 @@ const Overview = (props) => {
       const userIp = await publicIpv4();
       data = await context.analyzeLinks(urls, topicsArr, userIp, articleId, flag);
       console.log(data);
-      if(data.success)
-      {
+      if (data.success) {
         localStorage.setItem('stnOverviewApiData', JSON.stringify(data));
       }
-      else
-      {
+      else {
         props.setAlert("danger", data.message);
       }
     }

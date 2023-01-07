@@ -9,7 +9,7 @@ const Vertical = () => {
                     {/*begin::Wrapper*/}
                     <div className="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
                         {/*begin::Content wrapper*/}
-                        <div className="d-flex flex-column-fluid">                   
+                        <div className="d-flex flex-column-fluid">
                             {/*begin::Container*/}
                             <div className="d-flex flex-column flex-column-fluid container-fluid">
                                 {/*begin::Toolbar*/}

@@ -12,18 +12,18 @@ const Login = (props) => {
     });
     const [rememberMe, setRememberMe] = useState(false);
 
-    const toggleRemeber=()=> {
+    const toggleRemeber = () => {
         setRememberMe(!rememberMe);
     };
 
-    const onChange=(e)=> {
+    const onChange = (e) => {
         setValue({ ...value, [e.target.name]: e.target.value });
     };
 
-    const submit=async(e)=> {
+    const submit = async (e) => {
         e.preventDefault();
-        let userIp=await publicIpv4();
-        let ans = await context.login(value.email, value.password,userIp);
+        let userIp = await publicIpv4();
+        let ans = await context.login(value.email, value.password, userIp);
         console.log(ans);
         if (ans.success) {
             localStorage.setItem('stackNUser', JSON.stringify({

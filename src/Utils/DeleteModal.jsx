@@ -18,13 +18,11 @@ const DeleteModal = (props) => {
                             <p>Do you really want to delete these records? This process cannot be undone.</p>
                         </div>
                         <div className="modal-footer justify-content-center">
-                            <button type="button" onClick={()=>{
-                                if(props.id)
-                                {
+                            <button type="button" onClick={() => {
+                                if (props.id) {
                                     props.deleteFunc(props.id);
                                 }
-                                else
-                                {
+                                else {
                                     props.deleteFunc();
                                 }
                             }} className="btn btn-danger" data-bs-dismiss="modal">Delete</button>

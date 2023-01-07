@@ -11,7 +11,7 @@ import { NavLink } from 'react-router-dom';
 import HeartBeatHandler from '../HeartBeatHandler';
 import SetFeaturedModal from './Modals/SetFeaturedImageModal';
 import Select from 'react-select';
-import ReactTooltip  from 'react-tooltip' 
+import ReactTooltip from 'react-tooltip'
 import EditArticleModal from './Modals/EditArticleModal';
 import { publicIpv4 } from 'public-ip';
 
@@ -214,8 +214,8 @@ const EditorMain = (props) => {
 
     // Switching in between the pages
     const handlePageChange = page => {
-        setMainFlag(!mainFlag);
         setPage(page);
+        setMainFlag(!mainFlag);
     };
 
     // Handeling the total number of articles in a page to show
@@ -491,8 +491,7 @@ const EditorMain = (props) => {
 
     // Clear Selection
     const handleClearRows = () => {
-        if(document.querySelector('.cEMZEX'))
-        {
+        if (document.querySelector('.cEMZEX')) {
             document.querySelector('.cEMZEX').style.overflow = 'hidden';
             setToggleClearRows(!toggledClearRows);
         }
@@ -842,7 +841,8 @@ const EditorMain = (props) => {
                                             <div className="eidtor2-main0">
                                                 <DataTable
                                                     // expandableRows
-                                                    progressPending={!props.load}
+                                                    // progressPending={!props.load}
+                                                    progressPending={!loadFlag}
                                                     // conditionalRowStyles={conditionalRowStyles}
                                                     // dense
                                                     title="Articles"

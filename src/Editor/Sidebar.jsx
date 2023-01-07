@@ -144,8 +144,8 @@ const DrawerChat = (props) => {
         getData();
     }, [mainFlag]);
 
-    const getData=async()=>{
-        let userIp=await publicIpv4();
+    const getData = async () => {
+        let userIp = await publicIpv4();
         let data3 = await context.fetchUserArticles(page, perPage, sortValues.key, sortValues.order, query, '', 'all', 'all', JSON.parse(localStorage.getItem('stackNUser')).designationName, userIp);
         setTotalRows(data3.total);
         mainData1 = data3.data;
@@ -502,7 +502,7 @@ const DrawerChat = (props) => {
             </div>
 
             {AlertFlag ? <EditorHomeAlert msg={AlertMsg} undoArticle={undoArticle} closeAlert={closeAlert} /> : null}
-            
+
             <div id="kt_drawer_chat" className='bg-body' data-kt-drawer="true" data-kt-drawer-name="chat" data-kt-drawer-activate="true" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'300px', 'md': '1000px'}" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_drawer_chat_toggle1" data-kt-drawer-close="#kt_drawer_chat_close">
                 {/*begin::Messenger*/}
                 <div className="card edit-box w-100 rounded-0 border-0" id="kt_drawer_chat_messenger">

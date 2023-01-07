@@ -8,13 +8,13 @@ const Alert2 = (props) => {
                     <img src="/assets/media/editor/green.png" alt="green_tick" />
                 </div>
                 <div className="alert21 alert22">
-                    <p style={{color:"white"}}>{props.message}</p>
+                    <p style={{ color: "white" }}>{props.message}</p>
                 </div>
                 <div onClick={props.alertUndo} className="alert21">
                     <button className="btn btn-sm btn-secondary">UNDO</button>
                 </div>
                 <div onClick={props.closeAlert} className="alert21">
-                    <img style={{width:'20px',cursor:'pointer'}} src="/assets/media/editor/close.svg" alt="close" />
+                    <img style={{ width: '20px', cursor: 'pointer' }} src="/assets/media/editor/close.svg" alt="close" />
                 </div>
             </div>
         </>

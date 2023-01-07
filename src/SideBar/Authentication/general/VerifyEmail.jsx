@@ -19,7 +19,7 @@ const VerifyEmail = (props) => {
         getData();
     }, []);
 
-    const getData=async()=>{
+    const getData = async () => {
         document.getElementById('auth1').style.display = 'none';
         if (localStorage.getItem('923hufweh8934rbuf3489h348ryc34ry890xcr348efq3we90y')) {
             let userIp = await publicIpv4();
@@ -107,7 +107,7 @@ const VerifyEmail = (props) => {
         }
     };
 
-    const setWithExpiry=(key, value, ttl) => {
+    const setWithExpiry = (key, value, ttl) => {
         const now = new Date();
         const item = {
             token: value,
@@ -116,12 +116,12 @@ const VerifyEmail = (props) => {
         localStorage.setItem(key, JSON.stringify(item))
     };
 
-    const onChange=(e)=> {
+    const onChange = (e) => {
         setValue(e.target.value);
     };
 
     // Resend the email verification code
-    const submit=async(e) => {
+    const submit = async (e) => {
         let userIp = await publicIpv4();
         context.email2fa(props.decrypt(email, userIp));
         e.preventDefault();
@@ -145,7 +145,7 @@ const VerifyEmail = (props) => {
         }
     };
 
-    const submit2=async (e) =>{
+    const submit2 = async (e) => {
         e.preventDefault();
         let userIp = await publicIpv4();
         let ans = await context.verifyOtp(value, userIp, props.decrypt(email));
@@ -160,11 +160,11 @@ const VerifyEmail = (props) => {
         }
     };
 
-    const onChange1=(e)=> {
+    const onChange1 = (e) => {
         setvalue1(e.target.value);
     };
 
-    const submit1=async (e) => {
+    const submit1 = async (e) => {
         e.preventDefault();
         let userIp = await publicIpv4();
         let ans = await context.verify2(value1, userIp);
@@ -178,7 +178,7 @@ const VerifyEmail = (props) => {
             props.setAlert('danger', ans.message);
         }
     };
-    
+
     return (
         <>
             <div className="d-flex flex-column flex-root">

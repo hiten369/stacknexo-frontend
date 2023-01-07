@@ -4911,7 +4911,7 @@ const Targets = () => {
 				{/*end::Page*/}
 			</div>
 			<NewTargetModal />
-            <ViewUserModal />
+			<ViewUserModal />
 		</div>
 	)
 }

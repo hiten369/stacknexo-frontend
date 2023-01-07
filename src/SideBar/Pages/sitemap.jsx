@@ -16,7 +16,7 @@ const sitemap = () => {
 				{/*begin::Page*/}
 				<div className="page d-flex flex-row flex-column-fluid">
 					{/*begin::Wrapper*/}
-					<div className="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">	
+					<div className="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
 						{/*begin::Content wrapper*/}
 						<div className="d-flex flex-column-fluid">
 							{/*begin::Container*/}

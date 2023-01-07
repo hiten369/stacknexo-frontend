@@ -607,6 +607,6 @@ const EditorState = (props) => {
             </EditorContext.Provider>
         </>
     )
-}
+};
 
 export default EditorState;

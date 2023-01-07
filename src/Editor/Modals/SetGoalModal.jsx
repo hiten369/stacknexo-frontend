@@ -108,17 +108,17 @@ const SetGoalModal = (props) => {
                                     <div className="m-goal11">
                                         <ul className="nav nav-pills mb-3" id="pills-tab5" role="tablist">
                                             <li className="nav-item" role="presentation">
-                                                <button onClick={(e)=>{
+                                                <button onClick={(e) => {
                                                     setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience1" type="button" role="tab" aria-controls="kt_tab_audience1" aria-selected="true">General</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
-                                                <button onClick={(e)=>{
+                                                <button onClick={(e) => {
                                                     setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience2" type="button" role="tab" aria-controls="kt_tab_audience2" aria-selected="false">Knowledgeable</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
-                                                <button onClick={(e)=>{
+                                                <button onClick={(e) => {
                                                     setGoals1(e, editorContext);
                                                 }} className="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#kt_tab_audience3" type="button" role="tab" aria-controls="kt_tab_audience3" aria-selected="false">Expert</button>
                                             </li>
@@ -191,7 +191,7 @@ const SetGoalModal = (props) => {
                             </div>
                         </div>
                         <div className="modal-footer goals-modal-footer">
-                            <div onClick={()=>{
+                            <div onClick={() => {
                                 toggleGoalsUniversal(editorContext);
                             }} className="form-check form-check-custom form-check-solid">
                                 <input className="form-check-input" type="checkbox" value="" id="goals-check" />
@@ -200,7 +200,7 @@ const SetGoalModal = (props) => {
                                 </label>
                             </div>
                             <div>
-                                <b onClick={()=>{
+                                <b onClick={() => {
                                     goalsReset(editorContext);
                                 }} style={{ cursor: 'pointer' }} className="text-primary me-3">Reset to default</b>
                                 <button type="button" className="btn btn-info" data-bs-dismiss="modal">Done</button>

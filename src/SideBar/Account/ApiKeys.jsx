@@ -1900,7 +1900,7 @@ const ApiKeys = () => {
                 </div>
                 {/*end::Page*/}
             </div>
-            <OfferADealModal />                       
+            <OfferADealModal />
             <UpgradePlanModal />
         </div>
     )

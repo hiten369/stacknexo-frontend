@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import MainContext from './MainContext'
 
 // const baseUrl="https://stacknexo-backend-app.herokuapp.com";
-const baseUrl="http://localhost:5001";
+const baseUrl = "http://localhost:5001";
 
 const MainState = (props) => {
     const [userData, setUserData] = useState({});
@@ -663,6 +663,6 @@ const MainState = (props) => {
             </MainContext.Provider>
         </>
     )
-}
+};
 
 export default MainState;

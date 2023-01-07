@@ -692,7 +692,7 @@ export const toggleAssistant = () => {
 export const toggleText = async (editorContext) => {
     const { setMainData, setSideUtils, setBlockIds, setFlag3, idNum } = editorContext;
     var { setTc, mainData, blockIds, textList } = editorContext;
-   
+
     if (mainData.length !== 0) {
         // Toggle between highlighted texts
         let b1 = document.querySelectorAll('.gr0am0');
@@ -759,8 +759,7 @@ export const toggleText = async (editorContext) => {
                     var tt2 = {};
 
                     for (let i = 0; i < b10.length; i++) {
-                        for(let j=0;j<b10[i].children[0].querySelectorAll('.gr0am0').length;j++)
-                        {
+                        for (let j = 0; j < b10[i].children[0].querySelectorAll('.gr0am0').length; j++) {
                             if (tt1[i]) {
                                 tt1[i].push(b10[i].children[0].querySelectorAll('.gr0am0')[j].innerText);
                                 tt2[i].push(b10[i].children[0].querySelectorAll('.gr0am0')[j].innerText);
@@ -774,7 +773,7 @@ export const toggleText = async (editorContext) => {
 
                     var ttFlag = false;
 
-                    textList=JSON.parse(localStorage.getItem('localMainData')).textList;
+                    textList = JSON.parse(localStorage.getItem('localMainData')).textList;
                     for (let j of Object.keys(tt1)) {
                         for (let k = 0; k < tt1[j].length; k++) {
                             if (textList[j][k] !== tt1[j][k]) {
@@ -831,14 +830,13 @@ export const toggleText = async (editorContext) => {
                                 b10[j].children[0].querySelectorAll('.gr0am0')[k].className = "";
                                 tt1[j].splice(k, 1);
                                 textList[j].splice(k, 1);
-                                let tempTc=0;
+                                let tempTc = 0;
 
                                 // localStorage.setItem('localMainData', JSON.stringify({ ...JSON.parse(localStorage.getItem('localMainData')), 'sideUtils': tempUtils }));
-                                localStorage.setItem('localMainData', JSON.stringify({...JSON.parse(localStorage.getItem('localMainData')), mainData, textList, sideUtils: tempUtils}));
+                                localStorage.setItem('localMainData', JSON.stringify({ ...JSON.parse(localStorage.getItem('localMainData')), mainData, textList, sideUtils: tempUtils }));
 
-                                for(let i of Object.keys(textList))
-                                {
-                                    tempTc+=textList[i].length;
+                                for (let i of Object.keys(textList)) {
+                                    tempTc += textList[i].length;
                                 }
 
                                 setTc(tempTc);

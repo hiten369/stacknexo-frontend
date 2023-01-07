@@ -3,22 +3,20 @@ import { useNavigate } from 'react-router-dom';
 
 var t;
 const Header = (props) => {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
 
-    useEffect(()=>{
-        const add=window.location.pathname.split('/')[window.location.pathname.split('/').length-1];
-        if(add==='overview')
-        {
+    useEffect(() => {
+        const add = window.location.pathname.split('/')[window.location.pathname.split('/').length - 1];
+        if (add === 'overview') {
             document.getElementById('research').classList.add('e-header-active');
-            document.body.style.fontFamily=`'Inter', sans-serif`;
-            document.body.style.fontFamily=`'Montserrat', sans-serif`;
+            document.body.style.fontFamily = `'Inter', sans-serif`;
+            document.body.style.fontFamily = `'Montserrat', sans-serif`;
         }
-        else
-        {
+        else {
             document.getElementById('grader').classList.add('e-header-active');
-            document.body.style.fontFamily=`'Inter', sans-serif`;
+            document.body.style.fontFamily = `'Inter', sans-serif`;
         }
-    },[]);
+    }, []);
 
     const func = (e) => {
         if (e === 'op1') {
@@ -39,14 +37,14 @@ const Header = (props) => {
         }
     };
 
-    const copyToClipboard=()=> {
+    const copyToClipboard = () => {
         var target = `${window.location.host}/editor2/${props.articleId}`;
         navigator.clipboard.writeText(target).then(function () {
             // Setting the message for bottom right alert box
             clearTimeout(t);
-            document.getElementById('e-text-copy').style.display='block';
-            t=setTimeout(() => {
-                document.getElementById('e-text-copy').style.display='none';
+            document.getElementById('e-text-copy').style.display = 'block';
+            t = setTimeout(() => {
+                document.getElementById('e-text-copy').style.display = 'none';
             }, 4000);
         }, function (err) {
             console.error('Async: Could not copy text: ', err);
@@ -91,8 +89,8 @@ const Header = (props) => {
                 <h5>Only those who has the permission to view and edit the article can access.</h5>
                 <b id="e-text-copy" className="text-success mt-2">Copied to clipboard</b>
                 <div className="e-share1">
-                    <input type="text" className="form-control" onChange={(e)=>{
-                        e.target.value=e.target.value;
+                    <input type="text" className="form-control" onChange={(e) => {
+                        e.target.value = e.target.value;
                     }} value={`${window.location.host}/editor2/${props.articleId}`} />
                     <button onClick={copyToClipboard} className="btn ms-2 btn-icon btn-dark">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-clipboard-check-fill" viewBox="0 0 16 16">

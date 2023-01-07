@@ -4,40 +4,39 @@ import EditorContext from '../../context/EditorContext';
 const RevisionPopup = (props) => {
     const editorContext = useContext(EditorContext);
     const { onEditorStateChange, client } = editorContext;
-    
-    const approve=()=>{
+
+    const approve = () => {
         let newId = props.revisionStats.new;
         props.setRevisionStats({
-            old:newId,
-            new:''
+            old: newId,
+            new: ''
         });
         props.setRevisionFlag(false);
     };
 
-    const disApprove=()=>{
+    const disApprove = () => {
         let oldId = props.revisionStats.old;
         let newId = props.revisionStats.new;
         // console.log(old);
 
-        if(oldId!=='')
-        {
+        if (oldId !== '') {
             document.getElementById(oldId).classList.add('btn-success');
             document.getElementById(oldId).classList.remove('btn-secondary');
-            document.getElementById(oldId).innerText='Selected';
+            document.getElementById(oldId).innerText = 'Selected';
         }
 
         document.getElementById(newId).classList.remove('btn-success');
         document.getElementById(newId).classList.add('btn-secondary');
-        document.getElementById(newId).innerText='Preview';
+        document.getElementById(newId).innerText = 'Preview';
         props.setRevisionStats({
-            old:oldId,
-            new:''
+            old: oldId,
+            new: ''
         });
 
         props.editorG.render({
-            blocks:props.currentData
+            blocks: props.currentData
         });
-        
+
         // Saving the current text
         onEditorStateChange(props.currentData, client);
         props.setRevisionFlag(false);

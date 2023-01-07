@@ -14,8 +14,8 @@ const SetFeaturedModal = () => {
                             </div>
                         </div>
                         <div className="modal-body">
-                            
-                            
+
+
                         </div>
                     </div>
                 </div>

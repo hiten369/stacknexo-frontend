@@ -16,12 +16,12 @@ const TakeOverModal = (props) => {
                             <p className="mb-2">User is currently working on this article, which means you cannot make changes, unless you take over.</p>
                             <b className="mb-4">{props.takeOverMsg}</b>
                             <div className="row2 mt-5 row4 row6">
-                                <button onClick={()=>{
-                                    window.location.href="/editor2";
+                                <button onClick={() => {
+                                    window.location.href = "/editor2";
                                 }} data-bs-dismiss="modal" href="/editor2" className="btn btn-outline btn-outline-info btn-active-light-info">Exit the editor</button>
-                                <button data-bs-dismiss="modal" onClick={()=>{props.func1(true, props.editorContext)}} className="btn mx-3 btn-active-info">Preview</button>
-                                <button onClick={(e)=>{
-                                    props.takeOver(e,props.takeOverFlag);
+                                <button data-bs-dismiss="modal" onClick={() => { props.func1(true, props.editorContext) }} className="btn mx-3 btn-active-info">Preview</button>
+                                <button onClick={(e) => {
+                                    props.takeOver(e, props.takeOverFlag);
                                 }} className="btn btn-info">Take Over</button>
                             </div>
                         </div>

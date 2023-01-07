@@ -16,7 +16,7 @@ const TakeOverModal2 = () => {
                             <p className="mb-4">Admin/Editor has take over this article.</p>
                             <div className="row2 mt-5 row4 row6">
                                 <button onClick={() => {
-                                    window.location.href="/editor2";
+                                    window.location.href = "/editor2";
                                 }} data-bs-dismiss="modal" className="btn me-2 btn-outline btn-outline-info btn-active-light-info">Go back</button>
                                 <button onClick={() => {
                                     window.location.reload();

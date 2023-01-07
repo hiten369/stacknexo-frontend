@@ -317,7 +317,7 @@ const SelectUsers = () => {
 				</div>
 				{/*end::Page*/}
 			</div>
-			<SelectUsersModal /> 
+			<SelectUsersModal />
 		</div>
 	)
 }

@@ -6,7 +6,7 @@ import { dltCard, expand1, expand2, textChange } from '../Utils/GrammarUtils';
 
 const CorrectionCard = ({ ind, index, index2, e }) => {
     const editorContext = useContext(EditorContext);
-    const { blockIds, blockDetails, flag4, grammarFlag, grammarFlag1 }=editorContext;
+    const { blockIds, blockDetails, flag4, grammarFlag, grammarFlag1 } = editorContext;
 
     // Contains the function which corrects text on click
     const textChangeUtil = (blockIds, ind, index, e, flag = false, f = 0, index1 = 0) => {

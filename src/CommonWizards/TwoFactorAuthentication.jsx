@@ -11,7 +11,7 @@ const TwoFactorAuthentication = (props) => {
         getData();
     }, []);
 
-    const getData=async()=>{
+    const getData = async () => {
         let userIp = await publicIpv4();
         context.userDetail(userIp);
     };
@@ -19,7 +19,7 @@ const TwoFactorAuthentication = (props) => {
     let data = context.userData;
 
     const remove = async () => {
-        let userIp=await publicIpv4();
+        let userIp = await publicIpv4();
         let ans = await context.remove2fa(userIp);
         console.log(ans);
         if (ans.success) {

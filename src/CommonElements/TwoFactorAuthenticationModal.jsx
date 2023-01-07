@@ -4,50 +4,41 @@ import MainContext from '../context/MainContext';
 
 const TwoFactorAuthenticationModal = (props) => {
     const context = useContext(MainContext);
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const [val, setVal] = useState('apps');
     const [qrCode, setQrCode] = useState('');
     const [otp, setOtp] = useState('');
-    function onChange(e)
-    {
+    function onChange(e) {
         setOtp(e.target.value);
     }
-    async function submit(e)
-    {
+    async function submit(e) {
         e.preventDefault();
-        let ans=await context.verify2(otp);
-        if(ans.success)
-        {
+        let ans = await context.verify2(otp);
+        if (ans.success) {
             console.log('yes');
-            props.setAlert('success',ans.message);
+            props.setAlert('success', ans.message);
             navigate('/');
         }
-        else
-        {
-            props.setAlert('danger',ans.message);
+        else {
+            props.setAlert('danger', ans.message);
         }
     }
-    function slt(e)
-    {
+    function slt(e) {
         setVal(e.target.value);
     }
-    async function btnclk(e)
-    {
-        if(val==='apps')
-        {
-            let ans=await context.genQr();
-            if(ans.success)
-            {
+    async function btnclk(e) {
+        if (val === 'apps') {
+            let ans = await context.genQr();
+            if (ans.success) {
                 setQrCode(ans.data);
             }
         }
-        document.getElementById('opt21s').style.display='none';
-        document.getElementById(val).className='';
+        document.getElementById('opt21s').style.display = 'none';
+        document.getElementById(val).className = '';
     }
-    function btnclk1(e)
-    {
-        document.getElementById('opt21s').style.display='block';
-        document.getElementById(val).className='d-none';
+    function btnclk1(e) {
+        document.getElementById('opt21s').style.display = 'block';
+        document.getElementById(val).className = 'd-none';
     }
     return (
         <>

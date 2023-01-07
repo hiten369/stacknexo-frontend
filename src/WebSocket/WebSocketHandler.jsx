@@ -29,7 +29,7 @@ const WebSocketHandler = (props) => {
             tq = new ReconnectingWebSocket(`ws://localhost:5001/socketServer/${token}/${url}`, [], options);
             // console.log(tq);
 
-            context.client=tq;
+            context.client = tq;
             // console.log(context.client);
             window.addEventListener('offline', () => {
                 console.log('offline');

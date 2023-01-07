@@ -74,19 +74,19 @@ const Chart2 = () => {
                 width="100%"
                 height="400px"
                 data={data}
-                // options={
-                //     {
-                //         // region: "IT", // Africa
-                //         // colorAxis: { colors: ["#00853f", "black", "#e31b23"] },
-                //         backgroundColor: "#81a1fa",
-                //         displayMode: 'regions',
-                //         displayMode: 'markers' ,
-                //         colorAxis: {colors: ['green', 'blue']},
-                //         resolution: 'provinces',
-                //         // datalessRegionColor: "#c1bbd0",
-                //         defaultColor: "#f5f5f5"
-                //     }
-                // }
+            // options={
+            //     {
+            //         // region: "IT", // Africa
+            //         // colorAxis: { colors: ["#00853f", "black", "#e31b23"] },
+            //         backgroundColor: "#81a1fa",
+            //         displayMode: 'regions',
+            //         displayMode: 'markers' ,
+            //         colorAxis: {colors: ['green', 'blue']},
+            //         resolution: 'provinces',
+            //         // datalessRegionColor: "#c1bbd0",
+            //         defaultColor: "#f5f5f5"
+            //     }
+            // }
             />
         </>
     )

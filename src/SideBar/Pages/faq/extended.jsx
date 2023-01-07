@@ -1876,7 +1876,7 @@ const extended = () => {
                 </div>
                 {/*end::Page*/}
             </div>
-        
+
         </div>
     )
 }

@@ -11,63 +11,46 @@ const EditArticleModal = (props) => {
     const [select2, setSelect2] = useState([]);
     const [select21, setSelect21] = useState([]);
 
-    useEffect(()=>{
+    useEffect(() => {
         setSlug(props.articleDetails.articleSlug);
     }, [props]);
 
-    const onChangeSelect1=(e)=>{
+    const onChangeSelect1 = (e) => {
         setSelect11(e);
-        let tempData=[];
+        let tempData = [];
 
-        for(let i of e)
-        {
+        for (let i of e) {
             tempData.push(i.value);
         }
 
         setSelect1(tempData);
     };
 
-    const onChangeSelect2=(e)=>{
+    const onChangeSelect2 = (e) => {
         setSelect21(e);
-        let tempData=[];
+        let tempData = [];
 
-        for(let i of e)
-        {
+        for (let i of e) {
             tempData.push({
-                catName:i.label.props.children,
-                catId:i.value
+                catName: i.label.props.children,
+                catId: i.value
             });
         }
 
         setSelect2(tempData);
     };
 
-    const onChange=(e)=>{
+    const onChange = (e) => {
         setSlug(e.target.value);
     };
 
-    const onClick=async ()=>{
-        const userIp=await publicIpv4();
-        let ans = await context.updateArticleBySlug(props.articleDetails._id,slug,userIp);
+    const onClick = async () => {
+        const userIp = await publicIpv4();
+        let ans = await context.updateArticleBySlug(props.articleDetails._id, slug, userIp);
         if (ans.success) {
             setSlug('');
-            let index=props.mainData.findIndex(x=>x._id===ans.data._id);
-            props.mainData[index]=ans.data;
-            props.setMainData(props.mainData);
-            props.setAlert('success', ans.message);
-        }
-        else {
-            props.setAlert('danger', ans.message);
-        }
-    };
-    
-    const handleDlt=async ()=>{
-        const userIp=await publicIpv4();
-        let ans = await context.removeArticleCat(props.articleDetails._id,select1, userIp);
-        if (ans.success) {
-            setSelect11([]);
-            let index=props.mainData.findIndex(x=>x._id===ans.data._id);
-            props.mainData[index]=ans.data;
+            let index = props.mainData.findIndex(x => x._id === ans.data._id);
+            props.mainData[index] = ans.data;
             props.setMainData(props.mainData);
             props.setAlert('success', ans.message);
         }
@@ -76,13 +59,28 @@ const EditArticleModal = (props) => {
         }
     };
 
-    const handleAdd=async ()=>{
-        const userIp=await publicIpv4();
-        let ans = await context.updateArticleCat(props.articleDetails._id,select2, userIp);
+    const handleDlt = async () => {
+        const userIp = await publicIpv4();
+        let ans = await context.removeArticleCat(props.articleDetails._id, select1, userIp);
+        if (ans.success) {
+            setSelect11([]);
+            let index = props.mainData.findIndex(x => x._id === ans.data._id);
+            props.mainData[index] = ans.data;
+            props.setMainData(props.mainData);
+            props.setAlert('success', ans.message);
+        }
+        else {
+            props.setAlert('danger', ans.message);
+        }
+    };
+
+    const handleAdd = async () => {
+        const userIp = await publicIpv4();
+        let ans = await context.updateArticleCat(props.articleDetails._id, select2, userIp);
         if (ans.success) {
             setSelect21([]);
-            let index=props.mainData.findIndex(x=>x._id===ans.data._id);
-            props.mainData[index]=ans.data;
+            let index = props.mainData.findIndex(x => x._id === ans.data._id);
+            props.mainData[index] = ans.data;
             props.setMainData(props.mainData);
             props.setAlert('success', ans.message);
         }
@@ -142,7 +140,7 @@ const EditArticleModal = (props) => {
                                 <div>
                                     <h4 className="mb-2">Update Article Slug</h4>
                                     <div>
-                                        <input type="text" className="form-control mb-2" onChange={onChange} value={slug ? slug : ''}  />
+                                        <input type="text" className="form-control mb-2" onChange={onChange} value={slug ? slug : ''} />
                                         <button onClick={onClick} className="btn btn-info py-2 px-4" data-bs-dismiss="modal" aria-label="Close">Set</button>
                                     </div>
                                 </div>

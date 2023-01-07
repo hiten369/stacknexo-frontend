@@ -128,7 +128,7 @@ export const toggle_intent = (e) => {
     }
 };
 
-const dis_goals_util=(element)=>{
+const dis_goals_util = (element) => {
     element.removeAttribute('disabled');
     if (element.classList.contains('active')) {
         element.className = 'nav-link active';
@@ -142,14 +142,14 @@ const dis_goals_util=(element)=>{
 export const dis_goals = (e, flag) => {
     let x;
     if (flag) {
-        x=e.id;
+        x = e.id;
     }
     else {
-        x=e.target.id;
+        x = e.target.id;
     }
 
-    let e1=document.getElementById('pills-creative-tab');
-    let e2=document.getElementById('pills-casual-tab');
+    let e1 = document.getElementById('pills-creative-tab');
+    let e2 = document.getElementById('pills-casual-tab');
 
     if (x === 'pills-formal-tab') {
         e1.setAttribute('disabled', true);
@@ -167,15 +167,13 @@ export const dis_goals = (e, flag) => {
     }
 };
 
-const setGoals1Util=(setGoals, goals, goal, e, flag=false)=>{
-    if(!flag)
-    {
+const setGoals1Util = (setGoals, goals, goal, e, flag = false) => {
+    if (!flag) {
         setGoals({
             ...goals, [goal]: e.target.innerText
         });
     }
-    else
-    {
+    else {
         setGoals({
             ...goals, [goal]: e.target.id.split('-')[1]
         });
@@ -202,15 +200,15 @@ export const setGoals1 = (e, editorContext) => {
     let goal;
 
     if (id === 'pills-tab1') {
-        goal='domain';
+        goal = 'domain';
         setGoals1Util(setGoals, goals, goal, e);
     }
     else if (id === 'pills-tab2') {
-        goal='type';
+        goal = 'type';
         setGoals1Util(setGoals, goals, goal, e);
     }
     else if (id === 'pills-tab3') {
-        goal='citation';
+        goal = 'citation';
         setGoals1Util(setGoals, goals, goal, e);
     }
     else if (id === 'pills-tab4') {
@@ -250,15 +248,15 @@ export const setGoals1 = (e, editorContext) => {
         });
     }
     else if (id === 'pills-tab5') {
-        goal='audience';
+        goal = 'audience';
         setGoals1Util(setGoals, goals, goal, e);
     }
     else if (id === 'pills-tab6') {
-        goal='style';
+        goal = 'style';
         setGoals1Util(setGoals, goals, goal, e);
     }
     else if (id === 'pills-tab7') {
-        goal='dialect';
+        goal = 'dialect';
         setGoals1Util(setGoals, goals, goal, e, true);
     }
     onEditorStateChange3(JSON.parse(localStorage.getItem('local_goals_sn')), gclient);
@@ -268,12 +266,11 @@ export const setGoals1 = (e, editorContext) => {
     }
 };
 
-const goalsResetUtil=(element, flag=false)=>{
+const goalsResetUtil = (element, flag = false) => {
     for (let i of element.children) {
         i.children[0].classList.remove('active');
     }
-    if(!flag)
-    {
+    if (!flag) {
         element.children[2].children[0].classList.add('active');
     }
 };
@@ -302,13 +299,13 @@ export const goalsReset = (editorContext) => {
     let b5 = document.getElementById('pills-tab5');
     let b6 = document.getElementById('pills-tab6');
     let b7 = document.getElementById('pills-tab7');
-    
+
     goalsResetUtil(b1);
     goalsResetUtil(b4, true);
     goalsResetUtil(b5);
     goalsResetUtil(b6);
     goalsResetUtil(b7);
-console.log('yes2');
+    console.log('yes2');
     onEditorStateChange3(JSON.parse(localStorage.getItem('local_goals_sn')), gclient);
 };
 

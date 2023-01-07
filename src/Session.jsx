@@ -13,11 +13,11 @@ const Session = (props) => {
         getData();
     }, []);
 
-    const getData=async ()=>{
+    const getData = async () => {
         props.setLoad1(false);
         let userIp = await publicIpv4();
         context.userDetail(userIp);
-        let currentIndex=await context.getCurrentSession(userIp);
+        let currentIndex = await context.getCurrentSession(userIp);
         setIndex1(currentIndex.data);
         let ans = await context.getUserSessions();
         console.log(ans);
@@ -25,15 +25,14 @@ const Session = (props) => {
         props.setLoad1(true);
     };
 
-    const removeSession=async(index)=> {
+    const removeSession = async (index) => {
         console.log(index1, index);
         let userIp = await publicIpv4();
         let ans = await context.removeSession(index, userIp);
         if (ans.success) {
             console.log(ans.message);
-            if(index===index1)
-            {
-                window.location.href="/login";
+            if (index === index1) {
+                window.location.href = "/login";
             }
         }
         else {
@@ -42,12 +41,12 @@ const Session = (props) => {
     };
 
     // Remove all sessions of logged in user
-    const removeAllSession=async()=> {
+    const removeAllSession = async () => {
         let userIp = await publicIpv4();
         let ans = await context.removeAllSessionByUser(userIp);
         if (ans.success) {
             console.log(ans.message);
-            window.location.href="/login";
+            window.location.href = "/login";
         }
         else {
             console.log(ans.message);
@@ -57,8 +56,8 @@ const Session = (props) => {
     return (
         <>
             <Navbar setAlert={props.setAlert} encrypt={props.encrypt} />
-			<Aside />
-            <div style={{paddingTop:"5rem", paddingLeft:"2rem"}} className="d-flex flex-column flex-root">
+            <Aside />
+            <div style={{ paddingTop: "5rem", paddingLeft: "2rem" }} className="d-flex flex-column flex-root">
                 {/*begin::Page*/}
                 <div className="page d-flex flex-row flex-column-fluid">
                     {/*begin::Wrapper*/}

@@ -70,7 +70,7 @@ const CreateAppModal = (props) => {
 
     const submit = async (e) => {
         e.preventDefault();
-        let ip=await publicIpv4();
+        let ip = await publicIpv4();
         let ans = await context.signin(value.firstName, value.lastName, value.email, value.password, value.cpassword, value.dob, value.designationName, value.forced2FA, value.userGroup, ip);
         if (ans.success) {
             props.setAlert('success', 'User has been created successfully! ');

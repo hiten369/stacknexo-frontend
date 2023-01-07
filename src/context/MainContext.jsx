@@ -1,5 +1,5 @@
 const { createContext } = require("react");
 
-const MainContext=createContext();
+const MainContext = createContext();
 
 export default MainContext;

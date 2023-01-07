@@ -1058,7 +1058,7 @@ const Settings = () => {
 				{/*end::Page*/}
 			</div>
 			<NewTargetModal />
-            <ViewUserModal />
+			<ViewUserModal />
 		</div>
 	)
 }

@@ -3,7 +3,7 @@ import EditorContext from '../../context/EditorContext';
 
 const TakeOverModal1 = (props) => {
     const editorContext = useContext(EditorContext);
-    const { sendMsg, client }=editorContext;
+    const { sendMsg, client } = editorContext;
     return (
         <>
             <div className="modal fade" tabIndex="-1" id="takeOverModal1" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -20,8 +20,8 @@ const TakeOverModal1 = (props) => {
                             <div className="row2 mt-5 row4 row6">
                                 <button onClick={() => {
                                     props.setModalClickFlag(true);
-                                    sendMsg({ msgDesc: 'Take over request granted', msgFlag: true, client2: client});
-                                    window.location.href="/editor2";
+                                    sendMsg({ msgDesc: 'Take over request granted', msgFlag: true, client2: client });
+                                    window.location.href = "/editor2";
                                 }} data-bs-dismiss="modal" className="btn me-2 btn-outline btn-outline-info btn-active-light-info">Grant Access</button>
                                 <button onClick={() => {
                                     props.setModalClickFlag(true);

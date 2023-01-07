@@ -1,39 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter&family=Montserrat:wght@500&display=swap');
 
-body{
+body {
     /* font-family: 'Inter', sans-serif !important;
     font-family: 'Montserrat', sans-serif !important; */
-    font-family: 'Inter', sans-serif ;
-    font-family: 'Montserrat', sans-serif ;
+    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
-p{
+
+p {
     color: #2c353f;
 }
-H1{
+
+H1 {
     color: #2c353f;
 }
-H2{
+
+H2 {
     color: #2c353f;
 }
-H3{
+
+H3 {
     color: #2c353f;
 }
-H4{
+
+H4 {
     color: #2c353f;
 }
-H5{
+
+H5 {
     color: #2c353f;
 }
-H6{
+
+H6 {
     color: #2c353f;
 }
-li{
+
+li {
     color: #2c353f;
 }
-.jzGaAN{
+
+.jzGaAN {
     padding-left: 6px !important;
     padding-right: 6px !important;
 }
-.table1-head{
+
+.table1-head {
     font-size: 11px;
 }

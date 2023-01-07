@@ -42,7 +42,6 @@ const App = () => {
   const [message, setMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [load, setLoad] = useState(false);
-  var client = null;
 
   const dismissNoti = async (id) => {
     const response = await fetch(`/notification/putNotification/${id}`, {
@@ -114,15 +113,14 @@ const App = () => {
   };
 
   // Authenticating the user
-  const checkUser=()=>{
-    if(window.location.pathname!=="/login")
-    {
+  const checkUser = () => {
+    if (window.location.pathname !== "/login") {
       const itemStr = localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
       if (!itemStr) {
         localStorage.removeItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8');
         window.location.href = '/login';
       }
-  
+
       const item = JSON.parse(itemStr);
       const now = new Date();
       if (now.getTime() > item.expiry) {
@@ -172,7 +170,7 @@ const App = () => {
         <EditorState>
 
           {/* Handle Web Socket */}
-          <WebSocketHandler client={client} setAlert={setAlert} />
+          <WebSocketHandler setAlert={setAlert} />
 
           {/* Alert Bar */}
           {showAlert ? <Alert color={color} message={message} /> : null}
