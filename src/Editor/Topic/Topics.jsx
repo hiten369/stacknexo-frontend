@@ -1,9 +1,18 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import AddCustomTopicModal from '../Modals/AddCustomTopicModal';
 import Mark from 'mark.js';
 import ProgressBar from "@ramonak/react-progress-bar";
+import EditorContext from '../../context/EditorContext';
 
 const Topics = () => {
+    const editorContext = useContext(EditorContext);
+    const { strData }=editorContext;
+    const [showOverviewFlag, setShowOverviewFlag] = useState(false);
+    const [topics, setTopics] = useState({});
+    const [ignoredTopics, setIgnoredTopics] = useState([]);
+    const [isTcExpanded, setIsTcExpanded] = useState(false);
+    const [customTopic, setCustomTopic] = useState([]);
+
     // Handling mark js.
     useEffect(() => {
         setTimeout(() => {
@@ -29,6 +38,44 @@ const Topics = () => {
             });
         }, 2000);
     }, [strData]);
+
+    useEffect(()=>{
+        getOverviewApiData();
+    },[]);
+
+    // Handling topic's data, ignored data & custom topic
+    const getOverviewApiData=()=>{
+        let data = null;
+        let stnOverviewApiData = localStorage.getItem('stnOverviewApiData');
+    
+        if (stnOverviewApiData) {
+          setShowOverviewFlag(true);
+          // props.setLoad(true);
+          stnOverviewApiData = JSON.parse(stnOverviewApiData);
+          data = stnOverviewApiData;
+          let topicsTemp = data.data.topics;
+          setTopics(topicsTemp);
+          let stnIgnoredTopics = localStorage.getItem('stnIgnoredTopics');
+    
+          if (stnIgnoredTopics) {
+            stnIgnoredTopics = JSON.parse(stnIgnoredTopics);
+            for (let i of stnIgnoredTopics) {
+              delete topicsTemp[Object.keys(i)[0]];
+            }
+            setIgnoredTopics(stnIgnoredTopics);
+          }
+    
+          let stnCustomTopic = localStorage.getItem('stnCustomTopic');
+    
+          if (stnCustomTopic) {
+            stnCustomTopic = JSON.parse(stnCustomTopic);
+            setCustomTopic(stnCustomTopic);
+          }
+        }
+        else {
+          setShowOverviewFlag(false);
+        }    
+    };
 
     // toggle between topics and questions
     const handleOverviewClick = (e) => {
@@ -192,7 +239,7 @@ const Topics = () => {
             {/* Custom Topic Modal */}
             <AddCustomTopicModal addCustomTopic={addCustomTopic} />
 
-            <div className="editor-tc">
+            {showOverviewFlag ? <div className="editor-tc">
                 <div className="editor-tc1">
                     <div className="editor-tc11 px-3 text-center">
                         <p>Current Grade</p>
@@ -359,14 +406,14 @@ const Topics = () => {
                                     );
                                 })}
 
-                                {customTopic.length > 0 ? customTopic.map((e, index) => {
+                                {!isTcExpanded ? customTopic.length > 0 ? customTopic.map((e, index) => {
                                     return (
                                         <div className="p-2" key={index}>
                                             <h5 className="my-0">{e}</h5>
                                             <p>custom topic</p>
                                         </div>
                                     );
-                                }) : null}
+                                }) : null : null}
 
                                 <div onClick={addCustomTopic} className="py-4 px-2 editor-tc16 cursor-pointer" data-bs-toggle="modal" data-bs-target="#customTopicModal">
                                     <em>+ add custom topic</em>
@@ -464,7 +511,7 @@ const Topics = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> : <p>No Data Available</p>}
         </>
     )
 }

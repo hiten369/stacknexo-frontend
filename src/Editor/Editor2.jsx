@@ -64,11 +64,6 @@ const Editor2 = (props) => {
     old: '',
     current: ''
   });
-  const [showOverviewFlag, setShowOverviewFlag] = useState(false);
-  const [topics, setTopics] = useState({});
-  const [ignoredTopics, setIgnoredTopics] = useState([]);
-  const [isTcExpanded, setIsTcExpanded] = useState(false);
-  const [customTopic, setCustomTopic] = useState([]);
   const [modalClickFlag, setModalClickFlag] = useState(true);
 
   // const onEditorStateChange = (text) => {
@@ -144,39 +139,8 @@ const Editor2 = (props) => {
     return false;
   };
 
-  // Handeling Multi-User and overview api data
+  // Handeling Multi-User
   const getMultiData = async () => {
-    let data = null;
-    let stnOverviewApiData = localStorage.getItem('stnOverviewApiData');
-
-    if (stnOverviewApiData) {
-      setShowOverviewFlag(true);
-      // props.setLoad(true);
-      stnOverviewApiData = JSON.parse(stnOverviewApiData);
-      data = stnOverviewApiData;
-      let topicsTemp = data.data.topics;
-      setTopics(topicsTemp);
-      let stnIgnoredTopics = localStorage.getItem('stnIgnoredTopics');
-
-      if (stnIgnoredTopics) {
-        stnIgnoredTopics = JSON.parse(stnIgnoredTopics);
-        for (let i of stnIgnoredTopics) {
-          delete topicsTemp[Object.keys(i)[0]];
-        }
-        setIgnoredTopics(stnIgnoredTopics);
-      }
-
-      let stnCustomTopic = localStorage.getItem('stnCustomTopic');
-
-      if (stnCustomTopic) {
-        stnCustomTopic = JSON.parse(stnCustomTopic);
-        setCustomTopic(stnCustomTopic);
-      }
-    }
-    else {
-      setShowOverviewFlag(false);
-    }
-
     const userIp = await publicIpv4();
     const article = await context.getArticle(articleId, userIp);
     const articleActiveUser = article.data[0].articleActiveUser;
@@ -300,32 +264,6 @@ const Editor2 = (props) => {
     }
   };
 
-  // Handeling Multi-User and overview api data
-  // Setting the goals
-  useEffect(() => {
-    getGoalsData();
-    getMultiData();
-  }, []);
-
-  // Managing date time, article heading, page title and editor js
-  const getEditorData = async () => {
-    if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
-      let ans = await initializeEditor(context, articleId, editorContext);
-      editorContext.setGclient(client1);
-      getVersionHistory(client1);
-      editorG = ans;
-    }
-    else {
-      props.setAlert('danger', 'Not Authorised! Login in to continue');
-      navigate('/login');
-    }
-  };
-
-  // Managing date time, article heading, page title and editor js
-  useEffect(() => {
-    getEditorData();
-  }, [articleId]);
-
   // Managing tooltip and websocket messages (response from backend)
   useEffect(() => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
@@ -386,326 +324,338 @@ const Editor2 = (props) => {
           const dataFromServer = JSON.parse(message.data);
           // console.log(dataFromServer);
 
-          if (dataFromServer.type1 === 'ARTICLE') {
-            // Response when article is updating real-time
-            if (dataFromServer.type === "realTime") {
-              let ans = dataFromServer.data;
-              if (ans.success) {
-                saveAlert(editorContext);
-              }
-              else {
-                props.setAlert('danger', ans.message);
-              }
-            }
-
-            // Response when article is updating every 50 characters
-            else if (dataFromServer.type === "onDemand") {
-              let ans = dataFromServer.data;
-              if (ans.success) {
-                saveAlert(editorContext);
-                getVersionHistory(client1);
-              }
-              else {
-                props.setAlert('danger', ans.message);
-              }
-            }
-
-            // Response of getting article instances
-            else if (dataFromServer.type === "versionHistory") {
-              let ans = dataFromServer.data;
-              setInstances(ans.data.articleData);
-            }
-          }
-          else if (dataFromServer.type1 == 'GRAMMAR') {
-            // if response is for editor block's changes (for making grammar button disable when processing)
-            if (dataFromServer.type === "fetch") {
-
-              // Counting the number of blocks using localStorage (One by one as response recieving)
-              let localBlockCount = localStorage.getItem('localBlockCount');
-
-              if (localBlockCount) {
-                blockNum = JSON.parse(localBlockCount).blockNum + 1;
-                localStorage.setItem('localBlockCount', JSON.stringify({
-                  blockNum: blockNum
-                }));
-              }
-              else {
-                localStorage.setItem('localBlockCount', JSON.stringify({
-                  blockNum: 1,
-                }));
-                blockNum = 1;
-              }
-
-              // Saving the data
-              const savedData = await editorG.save();
-
-              // Total count of blocks (instant)
-              let blockNum1 = savedData.blocks.length;
-              console.log(blockNum, blockNum1);
-
-              // Disable the check grammar, correct text button until all blocks are fetched.
-              if (blockNum === blockNum1) {
-                setGrammarFlag1(false);
-              }
-            }
-
-            // if grammar send something (i.e., not null) - Handling the grammar data
-            if (dataFromServer.data.grammarly) {
-              if (dataFromServer.data.grammarly.str) {
-                console.log(dataFromServer.data.grammarly);
-
-                // Storing the highlighted text's id and text itself
-                // Generating an element in which edited string is stored (String recieved from server)
-                let temp1 = document.createElement('div');
-                temp1.innerHTML = dataFromServer.data.grammarly.str.text;
-
-                // Update the editor with blocks sent by grammarly
-                editorG.blocks.update(dataFromServer.data.grammarly.ids, dataFromServer.data.grammarly.str);
-
-                // Insert html tags here
-                let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-                console.log(tagData);
-
-                tagData.sort((a, b) => a.index - b.index);
-
-                if (tagData.length > 0) {
-                  let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-
-                  for (let i = tagData.length - 1; i >= 0; i--) {
-                    replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
+          if (dataFromServer.type1) {
+            if (dataFromServer.type1 === 'ARTICLE') {
+              if (dataFromServer.type) {
+                // Response when article is updating real-time
+                if (dataFromServer.type === "realTime") {
+                  let ans = dataFromServer.data;
+                  if (ans.success) {
+                    saveAlert(editorContext);
                   }
-
-                  console.log(replacedString);
-                  document.querySelector('.ce-block__content').children[0].innerHTML = replacedString;
+                  else {
+                    props.setAlert('danger', ans.message);
+                  }
                 }
 
-                // Initialy set the block details sent by grammarly which includes block id and text
-                if (blockDetails.length === 0) {
-                  setBlockDetails(blockDetails.concat({
-                    id: dataFromServer.data.grammarly.ids,
-                    text: dataFromServer.data.grammarly.str.text
-                  }));
+                // Response when article is updating every 50 characters
+                else if (dataFromServer.type === "onDemand") {
+                  let ans = dataFromServer.data;
+                  if (ans.success) {
+                    saveAlert(editorContext);
+                    getVersionHistory(client1);
+                  }
+                  else {
+                    props.setAlert('danger', ans.message);
+                  }
                 }
 
-                // Initially set the count of cards in each block
-                intialCardNum += dataFromServer.data.grammarly.data.alerts.length;
-
-                // Initialising the localStorage and handeling data with the help of it.
-                let localMainData = localStorage.getItem('localMainData');
-
-                if (localMainData) {
-                  localMainData = JSON.parse(localMainData);
-
-                  // Setting the cards count
-                  intialCardNum = localMainData.intialCardNum + dataFromServer.data.grammarly.data.alerts.length;
-
-                  for (let i of dataFromServer.data.grammarly.data.alerts) {
-                    // Filtering out the dictionary words
-                    if (dictWords.includes(i.highlightText)) {
-                      intialCardNum--;
-                    }
+                // Response of getting article instances
+                else if (dataFromServer.type === "versionHistory") {
+                  let ans = dataFromServer.data;
+                  setInstances(ans.data.articleData);
+                }
+              }
+            }
+            else if (dataFromServer.type1 == 'GRAMMAR') {
+              if(dataFromServer.type)
+              {
+                // if response is for editor block's changes (for making grammar button disable when processing)
+                if (dataFromServer.type === "fetch") {
+                  // Counting the number of blocks using localStorage (One by one as response recieving)
+                  let localBlockCount = localStorage.getItem('localBlockCount');
+  
+                  if (localBlockCount) {
+                    blockNum = JSON.parse(localBlockCount).blockNum + 1;
+                    localStorage.setItem('localBlockCount', JSON.stringify({
+                      blockNum: blockNum
+                    }));
                   }
-
-                  let tempArr = [];
-                  let tempTextListArr = [];
-                  let tempIdNum1 = 0;
-
-                  for (let i of temp1.children) {
-                    localMainData.idNum[i.id] = tempIdNum1++;
-                    // localMainData.textList.push(i.innerText);
-                    tempTextListArr.push(i.innerText);
-                    tempArr.push(i.id);
-
-                    if (i.children.length !== 0) {
-                      let k = i.children;
-
-                      for (let j of k) {
-                        localMainData.idNum[j.id] = tempIdNum1++;
-                        // localMainData.textList.push(j.innerText);
-                        tempTextListArr.push(j.innerText);
-                        tempArr.push(j.id);
-
-                        if (j.children.length !== 0) {
-                          k = j.children;
+                  else {
+                    localStorage.setItem('localBlockCount', JSON.stringify({
+                      blockNum: 1,
+                    }));
+                    blockNum = 1;
+                  }
+  
+                  // Saving the data
+                  const savedData = await editorG.save();
+  
+                  // Total count of blocks (instant)
+                  let blockNum1 = savedData.blocks.length;
+                  console.log(blockNum, blockNum1);
+  
+                  // Disable the check grammar, correct text button until all blocks are fetched.
+                  if (blockNum === blockNum1) {
+                    setGrammarFlag1(false);
+                  }
+  
+                  // if grammar send something (i.e., not null) - Handling the grammar data
+                  if (dataFromServer.data.grammarly) {
+                    if (dataFromServer.data.grammarly.str) {
+                      console.log(dataFromServer.data.grammarly);
+  
+                      // Storing the highlighted text's id and text itself
+                      // Generating an element in which edited string is stored (String recieved from server)
+                      let temp1 = document.createElement('div');
+                      temp1.innerHTML = dataFromServer.data.grammarly.str.text;
+  
+                      // Update the editor with blocks sent by grammarly
+                      editorG.blocks.update(dataFromServer.data.grammarly.ids, dataFromServer.data.grammarly.str);
+  
+                      // Insert html tags here
+                      let tagData = JSON.parse(localStorage.getItem("stnTagData"));
+                      console.log(tagData);
+  
+                      tagData.sort((a, b) => a.index - b.index);
+  
+                      if (tagData.length > 0) {
+                        let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+  
+                        for (let i = tagData.length - 1; i >= 0; i--) {
+                          replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
                         }
+  
+                        console.log(replacedString);
+                        document.querySelector('.ce-block__content').children[0].innerHTML = replacedString;
                       }
-                    }
-                  }
-
-                  setIdNum(localMainData.idNum);
-                  localMainData.blockIds[blockNum - 1] = tempArr;
-                  localMainData.textList[blockNum - 1] = tempTextListArr;
-                  setBlockIds(localMainData.blockIds);
-                  // setTextList(localMainData.textList);
-                  setTextList(localMainData.textList);
-
-                  // Concating previous localstorage data and Setting block details and main data (alerts) with the help of local storage
-                  setBlockDetails(localMainData.blockDetails.concat({
-                    id: dataFromServer.data.grammarly.ids,
-                    text: dataFromServer.data.grammarly.str.text
-                  }));
-                  setMainData(localMainData.mainData.concat(dataFromServer.data.grammarly.data));
-
-                  // Setting sidebar secions values
-                  let tempSideUtil = {
-                    Correctness: 0,
-                    Clarity: 0,
-                    Engagement: 0,
-                    Tone: 0
-                  };
-
-                  for (let j of localMainData.mainData.concat(dataFromServer.data.grammarly.data)) {
-                    for (let i of j.alerts) {
-                      tempSideUtil = ({ ...tempSideUtil, [i.cardLayout.outcome]: ++tempSideUtil[i.cardLayout.outcome] });
-                    }
-                  }
-
-                  setSideUtils(tempSideUtil);
-
-                  // Concating previous localstorage data with Grammarly alerts and their data and block details in localstorage, blockIds, textLists
-                  localStorage.setItem("localMainData", JSON.stringify({
-                    mainData: localMainData.mainData.concat(dataFromServer.data.grammarly.data), blockDetails: localMainData.blockDetails.concat({
-                      id: dataFromServer.data.grammarly.ids,
-                      text: dataFromServer.data.grammarly.str.text
-                    }),
-                    intialCardNum: intialCardNum, blockIds: localMainData.blockIds, textList: localMainData.textList, idNum: localMainData.idNum, sideUtils: tempSideUtil
-                  }));
-                }
-                else {
-                  // Initially set the count of cards in each block
-                  intialCardNum = dataFromServer.data.grammarly.data.alerts.length;
-
-                  // Storing and setting the highlighted text's id and text
-                  let blockIds1 = [];
-                  let blockIds2 = [];
-                  let tempIdNum = 0;
-                  let tempIdObj = {};
-
-                  for (let i of temp1.children) {
-                    blockIds1.push(i.id);
-                    blockIds2.push(i.innerText);
-                    tempIdObj[i.id] = tempIdNum++;
-
-                    if (i.children.length !== 0) {
-                      let k = i.children;
-
-                      for (let j of k) {
-                        tempIdObj[j.id] = tempIdNum++;
-                        blockIds1.push(j.id);
-                        blockIds2.push(j.innerText);
-
-                        if (j.children.length !== 0) {
-                          k = j.children;
+  
+                      // Initialy set the block details sent by grammarly which includes block id and text
+                      if (blockDetails.length === 0) {
+                        setBlockDetails(blockDetails.concat({
+                          id: dataFromServer.data.grammarly.ids,
+                          text: dataFromServer.data.grammarly.str.text
+                        }));
+                      }
+  
+                      // Initially set the count of cards in each block
+                      intialCardNum += dataFromServer.data.grammarly.data.alerts.length;
+  
+                      // Initialising the localStorage and handeling data with the help of it.
+                      let localMainData = localStorage.getItem('localMainData');
+  
+                      if (localMainData) {
+                        localMainData = JSON.parse(localMainData);
+  
+                        // Setting the cards count
+                        intialCardNum = localMainData.intialCardNum + dataFromServer.data.grammarly.data.alerts.length;
+  
+                        for (let i of dataFromServer.data.grammarly.data.alerts) {
+                          // Filtering out the dictionary words
+                          if (dictWords.includes(i.highlightText)) {
+                            intialCardNum--;
+                          }
                         }
-                      }
-                    }
-                  }
-
-                  setIdNum(tempIdObj);
-                  setBlockIds({ "0": blockIds1 });
-                  // setTextList(blockIds2);
-                  setTextList({ "0": blockIds2 });
-
-                  // Setting sidebar section values (alerts)
-                  let tempSideUtil = {
-                    Correctness: 0,
-                    Clarity: 0,
-                    Engagement: 0,
-                    Tone: 0
-                  };
-
-                  for (let i of dataFromServer.data.grammarly.data.alerts) {
-                    tempSideUtil = { ...tempSideUtil, [i.cardLayout.outcome]: ++tempSideUtil[i.cardLayout.outcome] };
-
-                    // Filtering out the dictionary words
-                    if (dictWords.includes(i.highlightText)) {
-                      intialCardNum--;
-                    }
-                  }
-                  // console.log(intialCardNum);
-                  setSideUtils(tempSideUtil);
-
-                  // Re-setting the main data (alert cards)
-                  setMainData(mainData.concat(dataFromServer.data.grammarly.data));
-
-                  // Re-setting the block details
-                  setBlockDetails(blockDetails.concat({
-                    id: dataFromServer.data.grammarly.ids,
-                    text: dataFromServer.data.grammarly.str.text
-                  }));
-
-                  // Initialising Grammarly alerts and their data and block details in localstorage
-                  localStorage.setItem('localMainData', JSON.stringify({
-                    mainData: [dataFromServer.data.grammarly.data], blockDetails: [{
-                      id: dataFromServer.data.grammarly.ids,
-                      text: dataFromServer.data.grammarly.str.text
-                    }],
-                    intialCardNum: intialCardNum, blockIds: { "0": blockIds1 }, textList: { "0": blockIds2 }, idNum: tempIdObj, sideUtils: tempSideUtil
-                  }));
-                }
-                // console.log(intialCardNum);
-                setTc(intialCardNum);
-
-                // Disabling the check grammar button until unless the data is fetched
-                setGrammarFlag(false);
-
-                if (intialCardNum > 0) {
-                  setFlag3(false);
-                }
-              }
-            }
-            else {
-              setGrammarFlag(false);
-            }
-          }
-          else if (dataFromServer.type1 === 'MESSAGE') {
-            if (dataFromServer.type === "get") {
-              for (let i of dataFromServer.data.data) {
-                if (i.msgFlag) {
-                  // Clear the message interval
-                  clearInterval(int);
-                  settakeOverMsg(<p className="text-success">{i.msgDesc}</p>);
-
-                  // close the modal box.
-                  document.getElementById('takeOverModalBtn').click();
-
-                  const userIp = await publicIpv4();
-                  // Grant access to user to access the article
-                  await context.updateActiveUser(articleId, JSON.parse(localStorage.getItem('stackNUser')).designationName, userIp);
-                }
-                else {
-                  settakeOverMsg(<p className="text-danger">{i.msgDesc}</p>);
-                }
-                setTimeout(() => {
-                  delete_msg(client1);
-                }, 600);
-              }
-            }
-          }
-          else if (dataFromServer.type1 === 'NOTIFICATION') {
-            if (dataFromServer.type === 'get') {
-              let curretUser = JSON.parse(localStorage.getItem('stackNUser')).userId;
-              for (let i of dataFromServer.data.data) {
-                if (i.notiUser === curretUser) {
-                  if (i.notiFlag1) {
-                    props.notify({ id: i._id, title: i.notiTitle, desc: i.notiDesc, type: i.notiType });
-                    if (articleId === i.notiURL) {
-                      if (i.notiFlag2) {
-                        // pop-up a modal
-                        document.getElementById('takeOverModalBtn2').click();
+  
+                        let tempArr = [];
+                        let tempTextListArr = [];
+                        let tempIdNum1 = 0;
+  
+                        for (let i of temp1.children) {
+                          localMainData.idNum[i.id] = tempIdNum1++;
+                          // localMainData.textList.push(i.innerText);
+                          tempTextListArr.push(i.innerText);
+                          tempArr.push(i.id);
+  
+                          if (i.children.length !== 0) {
+                            let k = i.children;
+  
+                            for (let j of k) {
+                              localMainData.idNum[j.id] = tempIdNum1++;
+                              // localMainData.textList.push(j.innerText);
+                              tempTextListArr.push(j.innerText);
+                              tempArr.push(j.id);
+  
+                              if (j.children.length !== 0) {
+                                k = j.children;
+                              }
+                            }
+                          }
+                        }
+  
+                        setIdNum(localMainData.idNum);
+                        localMainData.blockIds[blockNum - 1] = tempArr;
+                        localMainData.textList[blockNum - 1] = tempTextListArr;
+                        setBlockIds(localMainData.blockIds);
+                        // setTextList(localMainData.textList);
+                        setTextList(localMainData.textList);
+  
+                        // Concating previous localstorage data and Setting block details and main data (alerts) with the help of local storage
+                        setBlockDetails(localMainData.blockDetails.concat({
+                          id: dataFromServer.data.grammarly.ids,
+                          text: dataFromServer.data.grammarly.str.text
+                        }));
+                        setMainData(localMainData.mainData.concat(dataFromServer.data.grammarly.data));
+  
+                        // Setting sidebar secions values
+                        let tempSideUtil = {
+                          Correctness: 0,
+                          Clarity: 0,
+                          Engagement: 0,
+                          Tone: 0
+                        };
+  
+                        for (let j of localMainData.mainData.concat(dataFromServer.data.grammarly.data)) {
+                          for (let i of j.alerts) {
+                            tempSideUtil = ({ ...tempSideUtil, [i.cardLayout.outcome]: ++tempSideUtil[i.cardLayout.outcome] });
+                          }
+                        }
+  
+                        setSideUtils(tempSideUtil);
+  
+                        // Concating previous localstorage data with Grammarly alerts and their data and block details in localstorage, blockIds, textLists
+                        localStorage.setItem("localMainData", JSON.stringify({
+                          mainData: localMainData.mainData.concat(dataFromServer.data.grammarly.data), blockDetails: localMainData.blockDetails.concat({
+                            id: dataFromServer.data.grammarly.ids,
+                            text: dataFromServer.data.grammarly.str.text
+                          }),
+                          intialCardNum: intialCardNum, blockIds: localMainData.blockIds, textList: localMainData.textList, idNum: localMainData.idNum, sideUtils: tempSideUtil
+                        }));
                       }
                       else {
-                        setSenderUserId(i.notiSender);
-                        if (modalClickFlag) {
-                          document.getElementById('takeOverModalBtn1').click();
+                        // Initially set the count of cards in each block
+                        intialCardNum = dataFromServer.data.grammarly.data.alerts.length;
+  
+                        // Storing and setting the highlighted text's id and text
+                        let blockIds1 = [];
+                        let blockIds2 = [];
+                        let tempIdNum = 0;
+                        let tempIdObj = {};
+  
+                        for (let i of temp1.children) {
+                          blockIds1.push(i.id);
+                          blockIds2.push(i.innerText);
+                          tempIdObj[i.id] = tempIdNum++;
+  
+                          if (i.children.length !== 0) {
+                            let k = i.children;
+  
+                            for (let j of k) {
+                              tempIdObj[j.id] = tempIdNum++;
+                              blockIds1.push(j.id);
+                              blockIds2.push(j.innerText);
+  
+                              if (j.children.length !== 0) {
+                                k = j.children;
+                              }
+                            }
+                          }
+                        }
+  
+                        setIdNum(tempIdObj);
+                        setBlockIds({ "0": blockIds1 });
+                        // setTextList(blockIds2);
+                        setTextList({ "0": blockIds2 });
+  
+                        // Setting sidebar section values (alerts)
+                        let tempSideUtil = {
+                          Correctness: 0,
+                          Clarity: 0,
+                          Engagement: 0,
+                          Tone: 0
+                        };
+  
+                        for (let i of dataFromServer.data.grammarly.data.alerts) {
+                          tempSideUtil = { ...tempSideUtil, [i.cardLayout.outcome]: ++tempSideUtil[i.cardLayout.outcome] };
+  
+                          // Filtering out the dictionary words
+                          if (dictWords.includes(i.highlightText)) {
+                            intialCardNum--;
+                          }
+                        }
+                        // console.log(intialCardNum);
+                        setSideUtils(tempSideUtil);
+  
+                        // Re-setting the main data (alert cards)
+                        setMainData(mainData.concat(dataFromServer.data.grammarly.data));
+  
+                        // Re-setting the block details
+                        setBlockDetails(blockDetails.concat({
+                          id: dataFromServer.data.grammarly.ids,
+                          text: dataFromServer.data.grammarly.str.text
+                        }));
+  
+                        // Initialising Grammarly alerts and their data and block details in localstorage
+                        localStorage.setItem('localMainData', JSON.stringify({
+                          mainData: [dataFromServer.data.grammarly.data], blockDetails: [{
+                            id: dataFromServer.data.grammarly.ids,
+                            text: dataFromServer.data.grammarly.str.text
+                          }],
+                          intialCardNum: intialCardNum, blockIds: { "0": blockIds1 }, textList: { "0": blockIds2 }, idNum: tempIdObj, sideUtils: tempSideUtil
+                        }));
+                      }
+                      // console.log(intialCardNum);
+                      setTc(intialCardNum);
+  
+                      // Disabling the check grammar button until unless the data is fetched
+                      setGrammarFlag(false);
+  
+                      if (intialCardNum > 0) {
+                        setFlag3(false);
+                      }
+                    }
+                  }
+                  else {
+                    setGrammarFlag(false);
+                  }
+                }
+              }
+            }
+            else if (dataFromServer.type1 === 'MESSAGE') {
+              if(dataFromServer.type)
+              {
+                if (dataFromServer.type === "get") {
+                  for (let i of dataFromServer.data.data) {
+                    if (i.msgFlag) {
+                      // Clear the message interval
+                      clearInterval(int);
+                      settakeOverMsg(<p className="text-success">{i.msgDesc}</p>);
+  
+                      // close the modal box.
+                      document.getElementById('takeOverModalBtn').click();
+  
+                      const userIp = await publicIpv4();
+                      // Grant access to user to access the article
+                      await context.updateActiveUser(articleId, JSON.parse(localStorage.getItem('stackNUser')).designationName, userIp);
+                    }
+                    else {
+                      settakeOverMsg(<p className="text-danger">{i.msgDesc}</p>);
+                    }
+                    setTimeout(() => {
+                      delete_msg(client1);
+                    }, 600);
+                  }
+                }
+              }
+            }
+            else if (dataFromServer.type1 === 'NOTIFICATION') {
+              if(dataFromServer.type)
+              {
+                if (dataFromServer.type === 'get') {
+                  let curretUser = JSON.parse(localStorage.getItem('stackNUser')).userId;
+                  for (let i of dataFromServer.data.data) {
+                    if (i.notiUser === curretUser) {
+                      if (i.notiFlag1) {
+                        props.notify({ id: i._id, title: i.notiTitle, desc: i.notiDesc, type: i.notiType });
+                        if (articleId === i.notiURL) {
+                          if (i.notiFlag2) {
+                            // pop-up a modal
+                            document.getElementById('takeOverModalBtn2').click();
+                          }
+                          else {
+                            setSenderUserId(i.notiSender);
+                            if (modalClickFlag) {
+                              document.getElementById('takeOverModalBtn1').click();
+                            }
+                          }
+  
+                          setTimeout(() => {
+                            update_noti({ notiId: i._id, notiFlag: false, notiFlag1: false, notiFlag2: false }, client1);
+                          }, 1000);
+                          // modalClickFlag = false;
+                          setModalClickFlag(false);
                         }
                       }
-
-                      setTimeout(() => {
-                        update_noti({ notiId: i._id, notiFlag: false, notiFlag1: false, notiFlag2: false }, client1);
-                      }, 1000);
-                      // modalClickFlag = false;
-                      setModalClickFlag(false);
                     }
                   }
                 }
@@ -721,6 +671,33 @@ const Editor2 = (props) => {
     }
   }, [editor_head]);
 
+  // Handeling Multi-User
+  // Setting the goals
+  useEffect(() => {
+    getMultiData();
+    getGoalsData();
+  }, []);
+
+  // Managing date time, article heading, page title and editor js
+  const getEditorData = async () => {
+    if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
+      // console.log(client1);
+      let ans = await initializeEditor(context, articleId, editorContext, client1);
+      editorContext.setGclient(client1);
+      getVersionHistory(client1);
+      editorG = ans;
+    }
+    else {
+      props.setAlert('danger', 'Not Authorised! Login in to continue');
+      navigate('/login');
+    }
+  };
+
+  // Managing date time, article heading, page title and editor js
+  useEffect(() => {
+    getEditorData();
+  }, [articleId]);
+
   // Toggling between highlighted texts and triggering cards by clicking it, edit highlighted text.
   useEffect(() => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
@@ -730,8 +707,6 @@ const Editor2 = (props) => {
       props.setAlert('danger', 'Not Authorised! Login in to continue');
       navigate('/login');
     }
-    // }, [blockDetails]); // fix this
-    // }, [strData]); // fix this
   }, [undoFlag, blockDetails]);
 
   // Toggling side grammar bar when clicked on advanced button (not in use)
@@ -937,7 +912,7 @@ const Editor2 = (props) => {
             </div>
 
             {/* Topics Cards */}
-            <Topics />
+            {/* <Topics /> */}
 
             {/* Grammar cards with side grammar panel */}
             <div className="editor-main12">
@@ -1004,7 +979,7 @@ const Editor2 = (props) => {
               </div>
 
               {/* Side Grammar Panel */}
-              {/* <GrammarPanel /> */}
+              <GrammarPanel />
             </div>
           </div>
         </div>

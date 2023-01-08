@@ -1292,9 +1292,12 @@ p {
 }
 
 .e-header-t1 {
+    position: relative;
     cursor: pointer;
     padding: 10px;
     border-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .e-header12 {
@@ -1307,7 +1310,37 @@ p {
 
 .e-header-active {
     background-color: gainsboro;
-    border-bottom: 2px solid rgb(5, 5, 53);
+    border-bottom: 3px solid rgb(5, 5, 53);
+}
+.e-header-bor{
+    position: absolute;
+    bottom: -3.1px;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+}
+.e-header-bor1{
+    transition:  width 0.18s linear;
+    background: black;
+    width: 0%;
+}
+.e-header-t1:hover .e-header-bor1{
+    /* animation: e-bor-ani 0.2s linear infinite alternate; */
+    width: 100%;
+}
+.e-bor-enter{
+    animation: e-bor-ani 0.2s linear;
+}
+
+@keyframes e-bor-ani {
+    0%{
+        width: 0%;
+    }
+    100%{
+        width: 100%
+    }
 }
 
 .e-share {

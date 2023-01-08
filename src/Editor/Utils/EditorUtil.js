@@ -87,8 +87,8 @@ export const editor_head_change = (e, editorContext) => {
 };
 
 // Intializiong the editor
-export const initializeEditor = async (context, articleId, editorContext) => {
-    const { setEditor_head, setData, setUpdateTime, setPublishTime, setDataMatch, strData, setStrData, setEditorS, onEditorStateChange, onEditorStateChange1, client, getVersionHistory } = editorContext;
+export const initializeEditor = async (context, articleId, editorContext, client) => {
+    const { setEditor_head, setData, setUpdateTime, setPublishTime, setDataMatch, setStrData, setEditorS, onEditorStateChange, onEditorStateChange1 } = editorContext;
     var { editor, setBottomBar } = editorContext;
 
     // Fetching the article details by article id
