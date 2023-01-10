@@ -48,7 +48,7 @@ const Editor2 = (props) => {
   const editorContext = useContext(EditorContext);
 
   const { data, flag1, updateTime, publishTime, editor_head, mainData, setMainData, flag2, flag4, dataMatch, setTextList, mainType, flag3, setFlag3, grammarFlag, setGrammarFlag, grammarFlag1, setGrammarFlag1, alertMsg, blockDetails, setBlockDetails, blockIds, setBlockIds, setIdNum, sideUtils, setSideUtils, dictWords, takeOverMsg, settakeOverMsg, targetUserId, setTargetUserId, tooltip, checkGr, strData, mainDataRefreshFlag, tagData, undoFlag, getVersionHistory, post_noti, get_msg, delete_msg, update_noti } = editorContext;
-  var { intialCardNum, blockNum, tc, setTc } = editorContext;
+  var { intialCardNum, tc, setTc } = editorContext;
 
   const navigate = useNavigate();
   const { articleId } = useParams();
@@ -267,38 +267,6 @@ const Editor2 = (props) => {
   // Managing tooltip and websocket messages (response from backend)
   useEffect(() => {
     if (localStorage.getItem('bnfu498hjdrdmsix3e1mc3nrtnyev8erx4nrerime9ntvcu34n8')) {
-      // let t0 = document.querySelectorAll('.ce-toolbox__button')[0];
-      // let t1 = document.querySelectorAll('.ce-toolbox__button')[1];
-      // let t2 = document.querySelectorAll('.ce-toolbox__button')[2];
-      // let t3 = document.querySelectorAll('.ce-toolbox__button')[3];
-      // let t4 = document.querySelectorAll('.ce-toolbox__button')[4];
-      // let t5 = document.querySelectorAll('.ce-toolbox__button')[5];
-      // let t6 = document.querySelectorAll('.ce-toolbox__button')[6];
-
-      // if (t1) {
-      //   tooltip.onHover(t0, 'Text', {
-      //     placement: 'top'
-      //   });
-      //   tooltip.onHover(t1, 'Heading', {
-      //     placement: 'top'
-      //   });
-      //   tooltip.onHover(t2, 'Table', {
-      //     placement: 'top'
-      //   });
-      //   tooltip.onHover(t3, 'List', {
-      //     placement: 'top'
-      //   });
-      //   tooltip.onHover(t4, 'Image', {
-      //     placement: 'top'
-      //   });
-      //   tooltip.onHover(t5, 'Raw HTML', {
-      //     placement: 'top'
-      //   });
-      //   tooltip.onHover(t6, 'Quote', {
-      //     placement: 'top'
-      //   });
-      // }
-
       if (editorContext.client) {
         client1 = editorContext.client;
 
@@ -319,7 +287,7 @@ const Editor2 = (props) => {
           }
         };
 
-        blockNum = 0;
+        let blockNum = 0;
         client1.onmessage = async (message) => {
           const dataFromServer = JSON.parse(message.data);
           // console.log(dataFromServer);
@@ -358,17 +326,16 @@ const Editor2 = (props) => {
               }
             }
             else if (dataFromServer.type1 == 'GRAMMAR') {
-              if(dataFromServer.type)
-              {
+              if (dataFromServer.type) {
                 // if response is for editor block's changes (for making grammar button disable when processing)
                 if (dataFromServer.type === "fetch") {
                   // Counting the number of blocks using localStorage (One by one as response recieving)
                   let localBlockCount = localStorage.getItem('localBlockCount');
-  
+
                   if (localBlockCount) {
                     blockNum = JSON.parse(localBlockCount).blockNum + 1;
                     localStorage.setItem('localBlockCount', JSON.stringify({
-                      blockNum: blockNum
+                      blockNum
                     }));
                   }
                   else {
@@ -377,49 +344,51 @@ const Editor2 = (props) => {
                     }));
                     blockNum = 1;
                   }
-  
+
                   // Saving the data
                   const savedData = await editorG.save();
-  
+
                   // Total count of blocks (instant)
                   let blockNum1 = savedData.blocks.length;
                   console.log(blockNum, blockNum1);
-  
+
                   // Disable the check grammar, correct text button until all blocks are fetched.
                   if (blockNum === blockNum1) {
                     setGrammarFlag1(false);
                   }
-  
+
                   // if grammar send something (i.e., not null) - Handling the grammar data
                   if (dataFromServer.data.grammarly) {
                     if (dataFromServer.data.grammarly.str) {
                       console.log(dataFromServer.data.grammarly);
-  
+
                       // Storing the highlighted text's id and text itself
                       // Generating an element in which edited string is stored (String recieved from server)
                       let temp1 = document.createElement('div');
                       temp1.innerHTML = dataFromServer.data.grammarly.str.text;
-  
+
                       // Update the editor with blocks sent by grammarly
                       editorG.blocks.update(dataFromServer.data.grammarly.ids, dataFromServer.data.grammarly.str);
-  
+
                       // Insert html tags here
                       let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-                      console.log(tagData);
-  
+                      // console.log(tagData);
+
+                      tagData=tagData[blockNum-1];
+
                       tagData.sort((a, b) => a.index - b.index);
-  
+
                       if (tagData.length > 0) {
-                        let replacedString = document.querySelector('.ce-block__content').children[0].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
-  
+                        let replacedString = document.querySelectorAll('.ce-block__content')[blockNum-1].children[0].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+
                         for (let i = tagData.length - 1; i >= 0; i--) {
                           replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
                         }
-  
-                        console.log(replacedString);
-                        document.querySelector('.ce-block__content').children[0].innerHTML = replacedString;
+
+                        // console.log(replacedString);
+                        document.querySelectorAll('.ce-block__content')[blockNum-1].children[0].innerHTML = replacedString;
                       }
-  
+
                       // Initialy set the block details sent by grammarly which includes block id and text
                       if (blockDetails.length === 0) {
                         setBlockDetails(blockDetails.concat({
@@ -427,66 +396,66 @@ const Editor2 = (props) => {
                           text: dataFromServer.data.grammarly.str.text
                         }));
                       }
-  
+
                       // Initially set the count of cards in each block
                       intialCardNum += dataFromServer.data.grammarly.data.alerts.length;
-  
+
                       // Initialising the localStorage and handeling data with the help of it.
                       let localMainData = localStorage.getItem('localMainData');
-  
+
                       if (localMainData) {
                         localMainData = JSON.parse(localMainData);
-  
+
                         // Setting the cards count
                         intialCardNum = localMainData.intialCardNum + dataFromServer.data.grammarly.data.alerts.length;
-  
+
                         for (let i of dataFromServer.data.grammarly.data.alerts) {
                           // Filtering out the dictionary words
                           if (dictWords.includes(i.highlightText)) {
                             intialCardNum--;
                           }
                         }
-  
+
                         let tempArr = [];
                         let tempTextListArr = [];
                         let tempIdNum1 = 0;
-  
+
                         for (let i of temp1.children) {
                           localMainData.idNum[i.id] = tempIdNum1++;
                           // localMainData.textList.push(i.innerText);
                           tempTextListArr.push(i.innerText);
                           tempArr.push(i.id);
-  
+
                           if (i.children.length !== 0) {
                             let k = i.children;
-  
+
                             for (let j of k) {
                               localMainData.idNum[j.id] = tempIdNum1++;
                               // localMainData.textList.push(j.innerText);
                               tempTextListArr.push(j.innerText);
                               tempArr.push(j.id);
-  
+
                               if (j.children.length !== 0) {
                                 k = j.children;
                               }
                             }
                           }
                         }
-  
+
                         setIdNum(localMainData.idNum);
                         localMainData.blockIds[blockNum - 1] = tempArr;
                         localMainData.textList[blockNum - 1] = tempTextListArr;
                         setBlockIds(localMainData.blockIds);
                         // setTextList(localMainData.textList);
                         setTextList(localMainData.textList);
-  
+
                         // Concating previous localstorage data and Setting block details and main data (alerts) with the help of local storage
                         setBlockDetails(localMainData.blockDetails.concat({
                           id: dataFromServer.data.grammarly.ids,
                           text: dataFromServer.data.grammarly.str.text
                         }));
                         setMainData(localMainData.mainData.concat(dataFromServer.data.grammarly.data));
-  
+
                         // Setting sidebar secions values
                         let tempSideUtil = {
                           Correctness: 0,
@@ -494,15 +463,15 @@ const Editor2 = (props) => {
                           Engagement: 0,
                           Tone: 0
                         };
-  
+
                         for (let j of localMainData.mainData.concat(dataFromServer.data.grammarly.data)) {
                           for (let i of j.alerts) {
                             tempSideUtil = ({ ...tempSideUtil, [i.cardLayout.outcome]: ++tempSideUtil[i.cardLayout.outcome] });
                           }
                         }
-  
+
                         setSideUtils(tempSideUtil);
-  
+
                         // Concating previous localstorage data with Grammarly alerts and their data and block details in localstorage, blockIds, textLists
                         localStorage.setItem("localMainData", JSON.stringify({
                           mainData: localMainData.mainData.concat(dataFromServer.data.grammarly.data), blockDetails: localMainData.blockDetails.concat({
@@ -515,38 +484,38 @@ const Editor2 = (props) => {
                       else {
                         // Initially set the count of cards in each block
                         intialCardNum = dataFromServer.data.grammarly.data.alerts.length;
-  
+
                         // Storing and setting the highlighted text's id and text
                         let blockIds1 = [];
                         let blockIds2 = [];
                         let tempIdNum = 0;
                         let tempIdObj = {};
-  
+
                         for (let i of temp1.children) {
                           blockIds1.push(i.id);
                           blockIds2.push(i.innerText);
                           tempIdObj[i.id] = tempIdNum++;
-  
+
                           if (i.children.length !== 0) {
                             let k = i.children;
-  
+
                             for (let j of k) {
                               tempIdObj[j.id] = tempIdNum++;
                               blockIds1.push(j.id);
                               blockIds2.push(j.innerText);
-  
+
                               if (j.children.length !== 0) {
                                 k = j.children;
                               }
                             }
                           }
                         }
-  
+
                         setIdNum(tempIdObj);
                         setBlockIds({ "0": blockIds1 });
                         // setTextList(blockIds2);
                         setTextList({ "0": blockIds2 });
-  
+
                         // Setting sidebar section values (alerts)
                         let tempSideUtil = {
                           Correctness: 0,
@@ -554,10 +523,10 @@ const Editor2 = (props) => {
                           Engagement: 0,
                           Tone: 0
                         };
-  
+
                         for (let i of dataFromServer.data.grammarly.data.alerts) {
                           tempSideUtil = { ...tempSideUtil, [i.cardLayout.outcome]: ++tempSideUtil[i.cardLayout.outcome] };
-  
+
                           // Filtering out the dictionary words
                           if (dictWords.includes(i.highlightText)) {
                             intialCardNum--;
@@ -565,16 +534,16 @@ const Editor2 = (props) => {
                         }
                         // console.log(intialCardNum);
                         setSideUtils(tempSideUtil);
-  
+
                         // Re-setting the main data (alert cards)
                         setMainData(mainData.concat(dataFromServer.data.grammarly.data));
-  
+
                         // Re-setting the block details
                         setBlockDetails(blockDetails.concat({
                           id: dataFromServer.data.grammarly.ids,
                           text: dataFromServer.data.grammarly.str.text
                         }));
-  
+
                         // Initialising Grammarly alerts and their data and block details in localstorage
                         localStorage.setItem('localMainData', JSON.stringify({
                           mainData: [dataFromServer.data.grammarly.data], blockDetails: [{
@@ -586,10 +555,10 @@ const Editor2 = (props) => {
                       }
                       // console.log(intialCardNum);
                       setTc(intialCardNum);
-  
+
                       // Disabling the check grammar button until unless the data is fetched
                       setGrammarFlag(false);
-  
+
                       if (intialCardNum > 0) {
                         setFlag3(false);
                       }
@@ -602,18 +571,17 @@ const Editor2 = (props) => {
               }
             }
             else if (dataFromServer.type1 === 'MESSAGE') {
-              if(dataFromServer.type)
-              {
+              if (dataFromServer.type) {
                 if (dataFromServer.type === "get") {
                   for (let i of dataFromServer.data.data) {
                     if (i.msgFlag) {
                       // Clear the message interval
                       clearInterval(int);
                       settakeOverMsg(<p className="text-success">{i.msgDesc}</p>);
-  
+
                       // close the modal box.
                       document.getElementById('takeOverModalBtn').click();
-  
+
                       const userIp = await publicIpv4();
                       // Grant access to user to access the article
                       await context.updateActiveUser(articleId, JSON.parse(localStorage.getItem('stackNUser')).designationName, userIp);
@@ -629,8 +597,7 @@ const Editor2 = (props) => {
               }
             }
             else if (dataFromServer.type1 === 'NOTIFICATION') {
-              if(dataFromServer.type)
-              {
+              if (dataFromServer.type) {
                 if (dataFromServer.type === 'get') {
                   let curretUser = JSON.parse(localStorage.getItem('stackNUser')).userId;
                   for (let i of dataFromServer.data.data) {
@@ -648,7 +615,7 @@ const Editor2 = (props) => {
                               document.getElementById('takeOverModalBtn1').click();
                             }
                           }
-  
+
                           setTimeout(() => {
                             update_noti({ notiId: i._id, notiFlag: false, notiFlag1: false, notiFlag2: false }, client1);
                           }, 1000);
@@ -834,156 +801,155 @@ const Editor2 = (props) => {
 
   return (
     <>
-      {client1 ? <>
-        {/* Testing */}
-        <button style={{ position: "absolute", top: "4rem", left: "3rem", zIndex: "99999" }} onClick={rand}>Test</button>
+      {/* Testing */}
+      <button style={{ position: "absolute", top: "4rem", left: "3rem", zIndex: "99999" }} onClick={rand}>Test</button>
 
-        {/* Heartbeat api handler */}
-        {/* <HeartBeatHandler notify={props.notify} setAlert={props.setAlert} encrypt={props.encrypt} /> */}
+      {/* Heartbeat api handler */}
+      {/* <HeartBeatHandler notify={props.notify} setAlert={props.setAlert} encrypt={props.encrypt} /> */}
 
-        {/* Side Bar */}
-        <Sidebar key={articleId} articleId={articleId} />
+      {/* Side Bar */}
+      <Sidebar key={articleId} articleId={articleId} />
 
-        {/* Take Over Modal for take over request */}
-        <TakeOverModal takeOverFlag={takeOverFlag} takeOver={takeOver} takeOverMsg={takeOverMsg} editorContext={editorContext} func1={func1} />
-        <button id="takeOverModalBtn" data-bs-toggle="modal" data-bs-target="#takeOverModal"></button>
+      {/* Take Over Modal for take over request */}
+      <TakeOverModal takeOverFlag={takeOverFlag} takeOver={takeOver} takeOverMsg={takeOverMsg} editorContext={editorContext} func1={func1} />
+      <button id="takeOverModalBtn" data-bs-toggle="modal" data-bs-target="#takeOverModal"></button>
 
-        {/* Asking permission to take over current article */}
-        <TakeOverModal1 setModalClickFlag={setModalClickFlag} />
-        <button id="takeOverModalBtn1" data-bs-toggle="modal" data-bs-target="#takeOverModal1"></button>
+      {/* Asking permission to take over current article */}
+      <TakeOverModal1 setModalClickFlag={setModalClickFlag} />
+      <button id="takeOverModalBtn1" data-bs-toggle="modal" data-bs-target="#takeOverModal1"></button>
 
-        {/* Admin/Editor take over the article, asking to retakeover request or go back */}
-        <TakeOverModal2 />
-        <button id="takeOverModalBtn2" data-bs-toggle="modal" data-bs-target="#takeOverModal2"></button>
+      {/* Admin/Editor take over the article, asking to retakeover request or go back */}
+      <TakeOverModal2 />
+      <button id="takeOverModalBtn2" data-bs-toggle="modal" data-bs-target="#takeOverModal2"></button>
 
-        {/* Dictionary Modal */}
-        <DictionaryModal editorContext={editorContext} updateDictModal={updateDictModal} dictWords={dictWords} />
+      {/* Dictionary Modal */}
+      <DictionaryModal editorContext={editorContext} updateDictModal={updateDictModal} dictWords={dictWords} />
 
-        {/* Performance Modal */}
-        <SetPerformanceModal mainData={mainData} />
+      {/* Performance Modal */}
+      <SetPerformanceModal mainData={mainData} />
 
-        {/* Set Goals Modal */}
-        <SetGoalModal />
+      {/* Set Goals Modal */}
+      <SetGoalModal />
 
-        {/* Header */}
-        <Header articleId={articleId} />
+      {/* Header */}
+      <Header articleId={articleId} />
 
-        {/* Revision confirmation popup */}
-        {revisionFlag ? <RevisionPopup setRevisionStats={setRevisionStats} revisionStats={revisionStats} editorG={editorG} currentData={currentData} setRevisionFlag={setRevisionFlag} /> : null}
+      {/* Revision confirmation popup */}
+      {revisionFlag ? <RevisionPopup client={client1} setRevisionStats={setRevisionStats} revisionStats={revisionStats} editorG={editorG} currentData={currentData} setRevisionFlag={setRevisionFlag} /> : null}
 
-        {/* Grammar box with Editor */}
-        <div className="editor-main">
-          {flag2 ? <Alert2 message={alertMsg} closeAlert={() => {
-            closeAlert(editorContext);
-          }} alertUndo={() => {
-            alertUndo(editorContext);
-          }} /> : null}
+      {/* Grammar box with Editor */}
+      <div className="editor-main">
+        {flag2 ? <Alert2 message={alertMsg} closeAlert={() => {
+          closeAlert(editorContext);
+        }} alertUndo={() => {
+          alertUndo(editorContext);
+        }} /> : null}
 
-          <div className="editor-main1">
+        <div className="editor-main1">
 
-            {/* Editor with Words-Bar, Revision-Bar */}
-            <div className="editor-main11">
-              {props.load ? <>
-                <div className="row1">
-                  <input className="me-3" id="editor_head" name="editor_title" onChange={(e) => {
-                    editor_head_change(e, editorContext);
-                  }} onBlur={() => {
-                    editor_head_save(context, articleId, editorContext);
-                  }} value={editor_head} data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="right" title="Rename" type="text" placeholder="Untitled Document" />
-                  {flag1 ? <Alert1 /> : null}
-                </div>
-                <div className="articleStatus">{data.data ? data.data.articleStatus : null}</div>
-                <div className="updateTs">
-                  <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Updated: ${updateTime}`}><img src="/assets/media/editor/updated.png" alt="Last Updated" /><p>{updateTime === 'Invalid Date' ? 'Loading ..' : updateTime}</p></div>
-                  <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Published: ${publishTime}`} ><img src="/assets/media/editor/publish.png" alt="Last Published" /><p>{publishTime}</p></div>
-                </div>
-                <WordsBar />
-                <RevisionBar revisionStats={revisionStats} setRevisionStats={setRevisionStats} setCurrentData={setCurrentData} setRevisionFlag={setRevisionFlag} instances={instances} setInstances={setInstances} editorG={editorG} client={client1} articleId={articleId} />
-              </> : <h4 className="mt-5 mx-5">Loading...</h4>}
-              <div id="editorjs"></div>
-              <div className="editor-menu">
-                <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Read only mode." onClick={() => {
-                  func1(false, editorContext);
-                }} src="/assets/media/editor/readOnly.svg" alt="Read only" />
-                <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Save article." onClick={() => {
-                  func(context, articleId, editorContext);
-                }} src="/assets/media/editor/save.svg" alt="Save" />
+          {/* Editor with Words-Bar, Revision-Bar */}
+          <div className="editor-main11">
+            {props.load ? <>
+              <div className="row1">
+                <input className="me-3" id="editor_head" name="editor_title" onChange={(e) => {
+                  editor_head_change(e, editorContext);
+                }} onBlur={() => {
+                  editor_head_save(context, articleId, editorContext);
+                }} value={editor_head} data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="right" title="Rename" type="text" placeholder="Untitled Document" />
+                {flag1 ? <Alert1 /> : null}
               </div>
-            </div>
-
-            {/* Topics Cards */}
-            {/* <Topics /> */}
-
-            {/* Grammar cards with side grammar panel */}
-            <div className="editor-main12">
-
-              {/* Grammar Cards */}
-              <div className="editor-main121">
-                <div className="em0">
-                  {mainData.length !== 0 ?
-                    <>
-                      <span className={`badge me-3 badge-circle badge-${mainType === 'all' ? 'secondary' : mainType === 'Correctness' ? 'danger' : mainType === 'Clarity' ? 'info' : mainType === 'Engagement' ? 'primary' : mainType === 'Tone' ? 'success' : 'dark'}`}>{tc}</span>
-                      <b>{mainType === 'all' ? 'All Suggestions' : mainType}</b>
-                    </> :
-                    null}
-                </div>
-                {mainType !== 'all' ? <div onClick={(e) => {
-                  trigger_active(e, editorContext);
-                }} className="editor-main1210">
-                  <p>Back to all suggestions X</p>
-                </div> : null}
-                {flag3 ? <div className="em1">
-                  <img src="/assets/media/editor/i1.svg" alt="Nothing" />
-                  <h5 className="my-2">Nothing to check yet</h5>
-                  <p>Start writing or upload a document to see feedback</p>
-                </div> : null}
-
-                {/* Grammar cards */}
-                {mainData.length !== 0 ? <div className="em2">
-                  {mainData.map((g, ind) => {
-                    if (blockDetails[ind]) {
-                      if (mainType === 'all') {
-                        return g.alerts.map((e, index) => {
-
-                          if (localStorage.getItem('localMainData')) {
-                            if (dictWords.includes(e.highlightText)) {
-                              dltCard(blockIds[ind][index], ind, index, '', false, '', true, editorContext);
-                            }
-                          }
-
-                          return (
-                            <CorrectionCard key={index} ind={ind} index={index} e={e} />
-                          );
-
-                        });
-                      }
-                      else {
-                        return g.alerts.map((e, index1) => {
-
-                          if (localStorage.getItem('localMainData')) {
-                            if (dictWords.includes(e.highlightText)) {
-                              dltCard(blockIds[ind][index1], ind, index1, '', false, '', true, editorContext);
-                            }
-                          }
-
-                          if (mainType === e.cardLayout.outcome) {
-                            return (
-                              <CorrectionCard key={index1} ind={ind} index={index1} e={e} />
-                            )
-                          }
-                        });
-                      }
-                    }
-                  })}
-                </div> : null}
+              <div className="articleStatus">{data.data ? data.data.articleStatus : null}</div>
+              <div className="updateTs">
+                <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Updated: ${updateTime}`}><img src="/assets/media/editor/updated.png" alt="Last Updated" /><p>{updateTime === 'Invalid Date' ? 'Loading ..' : updateTime}</p></div>
+                <div className="me-3 updateTs1" data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title={`Last Published: ${publishTime}`} ><img src="/assets/media/editor/publish.png" alt="Last Published" /><p>{publishTime}</p></div>
               </div>
-
-              {/* Side Grammar Panel */}
-              <GrammarPanel />
+              <WordsBar />
+              <RevisionBar revisionStats={revisionStats} setRevisionStats={setRevisionStats} setCurrentData={setCurrentData} setRevisionFlag={setRevisionFlag} instances={instances} setInstances={setInstances} editorG={editorG} client={client1} articleId={articleId} />
+            </> : <h4 className="mt-5 mx-5">Loading...</h4>}
+            <div id="editorjs"></div>
+            <div className="editor-menu">
+              <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Read only mode." onClick={() => {
+                func1(false, editorContext);
+              }} src="/assets/media/editor/readOnly.svg" alt="Read only" />
+              <img data-bs-toggle="tooltip" data-bs-custom-class="tooltip-dark" data-bs-placement="top" title="Save article." onClick={() => {
+                func(context, articleId, editorContext, client1);
+              }} src="/assets/media/editor/save.svg" alt="Save" />
             </div>
           </div>
+
+          {/* Topics Cards */}
+          {/* <Topics /> */}
+
+          {/* Grammar cards with side grammar panel */}
+          <div className="editor-main12">
+
+            {/* Grammar Cards */}
+            <div className="editor-main121">
+              <div className="em0">
+                {mainData.length !== 0 ?
+                  <>
+                    <span className={`badge me-3 badge-circle badge-${mainType === 'all' ? 'secondary' : mainType === 'Correctness' ? 'danger' : mainType === 'Clarity' ? 'info' : mainType === 'Engagement' ? 'primary' : mainType === 'Tone' ? 'success' : 'dark'}`}>{tc}</span>
+                    <b>{mainType === 'all' ? 'All Suggestions' : mainType}</b>
+                  </> :
+                  null}
+              </div>
+              {mainType !== 'all' ? <div onClick={(e) => {
+                trigger_active(e, editorContext);
+              }} className="editor-main1210">
+                <p>Back to all suggestions X</p>
+              </div> : null}
+              {flag3 ? <div className="em1">
+                <img src="/assets/media/editor/i1.svg" alt="Nothing" />
+                <h5 className="my-2">Nothing to check yet</h5>
+                <p>Start writing or upload a document to see feedback</p>
+              </div> : null}
+
+              {/* Grammar cards */}
+              {mainData.length !== 0 ? <div className="em2">
+                {mainData.map((g, ind) => {
+                  if (blockDetails[ind]) {
+                    if (mainType === 'all') {
+                      return g.alerts.map((e, index) => {
+
+                        if (localStorage.getItem('localMainData')) {
+                          if (dictWords.includes(e.highlightText)) {
+                            dltCard(blockIds[ind][index], ind, index, '', false, '', true, editorContext);
+                          }
+                        }
+
+                        return (
+                          <CorrectionCard key={index} ind={ind} index={index} e={e} />
+                        );
+
+                      });
+                    }
+                    else {
+                      return g.alerts.map((e, index1) => {
+
+                        if (localStorage.getItem('localMainData')) {
+                          if (dictWords.includes(e.highlightText)) {
+                            dltCard(blockIds[ind][index1], ind, index1, '', false, '', true, editorContext);
+                          }
+                        }
+
+                        if (mainType === e.cardLayout.outcome) {
+                          return (
+                            <CorrectionCard key={index1} ind={ind} index={index1} e={e} />
+                          )
+                        }
+                      });
+                    }
+                  }
+                })}
+              </div> : null}
+            </div>
+
+            {/* Side Grammar Panel */}
+            <GrammarPanel />
+          </div>
         </div>
-      </> : <>{"Loading ..."}</>}
+      </div>
+
     </>
   );
 };

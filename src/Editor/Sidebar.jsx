@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import DataTable from 'react-data-table-component';
 import ReactTooltip from 'react-tooltip'
 import { publicIpv4 } from 'public-ip';
+import useScript from '../CustomScripts/UseScript';
 
 const tConvert = (time) => {
     // Check correct time format and split into components
@@ -191,7 +192,7 @@ const DrawerChat = (props) => {
             {
                 id: 'articleUpdateDate',
                 name: 'Last Modified',
-                selector: row => <><p>{`${new Date(Number(row.articleUpdateDate.date)).toLocaleDateString()} at ${tConvert(new Date(Number(row.articleUpdateDate.date)).toLocaleTimeString())}`}</p> by <NavLink className="text-dark" to={`/users/${row.articleUpdateDate.user.id}`}><b>{row.articleUpdateDate.user.name}</b></NavLink></>,
+                selector: row => <><p>{`${new Date(Number(row?.articleUpdateDate?.date))?.toLocaleDateString()} at ${tConvert(new Date(Number(row?.articleUpdateDate?.date))?.toLocaleTimeString())}`}</p> by <NavLink className="text-dark" to={`/users/${row?.articleUpdateDate?.user?.id}`}><b>{row?.articleUpdateDate?.user?.name}</b></NavLink></>,
                 sortable: true,
                 sortField: 'articleUpdateDate',
                 wrap: true,
@@ -603,6 +604,6 @@ const DrawerChat = (props) => {
             </div>
         </>
     )
-}
+};
 
 export default DrawerChat;

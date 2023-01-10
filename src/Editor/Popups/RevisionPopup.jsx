@@ -3,7 +3,7 @@ import EditorContext from '../../context/EditorContext';
 
 const RevisionPopup = (props) => {
     const editorContext = useContext(EditorContext);
-    const { onEditorStateChange, client } = editorContext;
+    const { onEditorStateChange } = editorContext;
 
     const approve = () => {
         let newId = props.revisionStats.new;
@@ -38,7 +38,7 @@ const RevisionPopup = (props) => {
         });
 
         // Saving the current text
-        onEditorStateChange(props.currentData, client);
+        onEditorStateChange(props.currentData, props.client);
         props.setRevisionFlag(false);
     };
 

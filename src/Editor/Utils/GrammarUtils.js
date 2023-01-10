@@ -1781,7 +1781,8 @@ const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUti
 };
 
 // Inserting the ids to tags for uniquification
-const insertIdToTags = (x, tagIndex) => {
+const insertIdToTags = (x) => {
+    let tagIndex = 0;
     for (let i = 0; i < x.length; i++) {
         if ((x[i].tagName !== 'SPAN' && x[i].tagName !== 'BR') && (x[i].parentNode?.tagName === 'SPAN' || x[i].parentNode?.tagName === 'DIV')) {
             x[i].setAttribute("id", `uuid${tagIndex++}`);
@@ -1819,7 +1820,7 @@ const replaceTags = (tagData, ind) => {
         // console.log(replacedString);
         document.querySelectorAll('.ce-block__content')[ind].children[0].innerHTML = replacedString;
     }
-}
+};
 
 // Correcting the text mistake on click
 export const textChange = async (id, text, replacement_text, isNum, ind, ind1, startInd, endInd, matchText, overFlowText, beginFlag, beginInc, editorContext, highlightBegin, highlightEnd) => {
@@ -1885,6 +1886,15 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
     }
     // console.log(idNum[id]);
 
+    // Insert html tags here
+    let tagData = JSON.parse(localStorage.getItem("stnTagData"))[ind];
+    let tagData1 = JSON.parse(localStorage.getItem("stnTagData"))[ind];
+
+    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+
+    // Inserting the ids to tags for uniquification
+    insertIdToTags(x);
+
     // Dealing with cards whose highlight index are changed in order to prevent inter collision (overlap)
     // if the card is manipulated in backend to prevent collision, then handle that card here
     if (document.getElementById(id).classList[1].slice(5, 6) === '1') {
@@ -1893,16 +1903,6 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         let ind2 = Number(idNum[id]);
         // var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind1 + 1)) + (7 * ind2), endInd + (77 * (ind1 + 1)) + (7 * ind2));
         var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2), endInd + (77 * (Number(idNum[id]) + 1)) + (7 * ind2));
-
-        // Insert html tags here
-        let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-        let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
-
-        let tagIndex = 0;
-        const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
-
-        // Inserting the ids to tags for uniquification
-        insertIdToTags(x, tagIndex);
 
         let card01;
 
@@ -1914,6 +1914,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             card01 = document.getElementById(id).nextElementSibling.getElementsByTagName("*");
         }
 
+        /* Insert html tags here */
         console.log(card01);
         console.log(document.getElementById(id));
 
@@ -1936,9 +1937,9 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
         // Saving the data
-        localStorage.setItem("stnTagData", JSON.stringify(tagData));
+        localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
 
-        console.log("======= ========= ======== ====== ========");
+        // console.log("======= ========= ======== ====== ========");
         // console.log(startInd + (77 * (ind1 + 1)) + (7 * ind2), endInd + (77 * (ind1 + 1)) + (7 * ind2));
         // console.log(changeStr1);
         if (changeStr1 !== matchText) {
@@ -2100,15 +2101,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             let shift = (replacement_text.length) - (matchText.length);
             console.log(shift);
 
-            // Insert html tags here
-            let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-            let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
-
-            let tagIndex = 0;
-            const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
-
-            // Inserting the ids to tags for uniquification
-            insertIdToTags(x, tagIndex);
+            /* Insert html tags here */
 
             let card01 = document.getElementById(id).getElementsByTagName("*");
 
@@ -2131,7 +2124,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
             // Saving the data
-            localStorage.setItem("stnTagData", JSON.stringify(tagData));
+            localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
             // console.log(tagData);
 
             undoObj = {
@@ -2175,15 +2168,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     let shift = replacement_text.length + strSpace.length;
 
-                    // Insert html tags here
-                    let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-                    let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
-
-                    let tagIndex = 0;
-                    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
-
-                    // Inserting the ids to tags for uniquification
-                    insertIdToTags(x, tagIndex);
+                    /* Insert html tags here */
 
                     let card01 = document.getElementById(id).getElementsByTagName("*");
 
@@ -2199,7 +2184,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     tagData = tagUtil1(card01, document.getElementById(id).textContent, tagData1, tagData, replacement_text + strSpace + document.getElementById(id).textContent, false, false, 0);
 
                     // Saving the data
-                    localStorage.setItem("stnTagData", JSON.stringify(tagData));
+                    localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
                     // console.log(tagData);
 
                     undoObj = {
@@ -2255,23 +2240,16 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
 
                     // console.log(startInd + (77 * (ind3 + 1)) + (7 * ind2), endInd + (77 * (ind3 + 1)) + (7 * ind2));
                     // console.log(changeStr1);
+
                     let changeStr = blockDetails[ind].text.slice(0, startInd + (77 * (ind3 + 1)) + (7 * ind2)) + replacement_text + blockDetails[ind].text.slice(endInd + (77 * (ind3 + 1)) + (7 * ind2),);
 
-                    console.log(blockDetails[ind].text.slice(0, startInd + (77 * (ind3 + 1)) + (7 * ind2)));
-                    console.log(replacement_text);
-                    console.log(blockDetails[ind].text.slice(endInd + (77 * (ind3 + 1)) + (7 * ind2),));
+                    // console.log(blockDetails[ind].text.slice(0, startInd + (77 * (ind3 + 1)) + (7 * ind2)));
+                    // console.log(replacement_text);
+                    // console.log(blockDetails[ind].text.slice(endInd + (77 * (ind3 + 1)) + (7 * ind2),));
 
                     let shift = (replacement_text.length) - (matchText.length);
 
-                    // Insert html tags here
-                    let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-                    let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
-
-                    let tagIndex = 0;
-                    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
-
-                    // Inserting the ids to tags for uniquification
-                    insertIdToTags(x, tagIndex);
+                    /* Insert html tags here */
 
                     let card01 = document.getElementById(id).getElementsByTagName("*");
 
@@ -2293,7 +2271,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
                     // Saving the data
-                    localStorage.setItem("stnTagData", JSON.stringify(tagData));
+                    localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
                     // console.log(tagData);
 
                     undoObj = {
@@ -2326,16 +2304,8 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 var ind4 = Number(idNum[id]); // card index
                 var ind5 = Number(idNum[id]); // card index
 
-                // Insert html tags here
-                let tagData = JSON.parse(localStorage.getItem("stnTagData"));
-                let tagData1 = JSON.parse(localStorage.getItem("stnTagData"));
-
-                let tagIndex = 0;
-                let x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
-
-                // Inserting the ids to tags for uniquification
-                insertIdToTags(x, tagIndex);
-
+                /* Insert html tags here */
+                
                 let card01 = document.getElementById(id).getElementsByTagName("*");
                 // console.log(card01);
 
@@ -2357,12 +2327,12 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
                 // Saving the data
-                localStorage.setItem("stnTagData", JSON.stringify(tagData));
+                localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
                 // console.log(tagData);
 
                 // console.log(mainData[ind].alerts.length);
 
-                console.log(blockDetails[ind].text);
+                // console.log(blockDetails[ind].text);
 
                 // checking correction card's correction index, increasing card's checking index count if not found
                 // For the nested spans
@@ -2703,7 +2673,7 @@ export const alertUndo = (editorContext) => {
         }
 
         console.log(alertUndoMsg.prevTagData);
-        localStorage.setItem("stnTagData", JSON.stringify(alertUndoMsg.prevTagData));
+        localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [alertUndoMsg.ind]:alertUndoMsg.prevTagData}));
     }
 
     // If undo a deleted card

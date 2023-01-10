@@ -37,11 +37,10 @@ export const func1 = async (flag = false, editorContext) => {
 };
 
 // Save the article when click on save button
-export const func = async (context, articleId, editorContext) => {
-    const { setAlert, bottomBar, editorS, onEditorStateChange1, client } = editorContext;
+export const func = async (context, articleId, editorContext, client) => {
+    const { setAlert, bottomBar, editorS, onEditorStateChange1 } = editorContext;
 
     let userIp = await publicIpv4();
-    console.log(bottomBar);
     let words = bottomBar.words;
     let savedData = await editorS.save();
     onEditorStateChange1(savedData.blocks, { words, grade: 'A-' }, client);
