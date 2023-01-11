@@ -2339,16 +2339,19 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 let tagIndexLength = tagIndexLengthUtil(blockDetails[ind].text);
                 console.log(tagIndexLength);
 
+                // console.log(blockDetails[ind].text);
+
                 for (let h = ind1; h < (mainData[ind].alerts.length); h++) {
                     var changeStr1 = blockDetails[ind].text.slice(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
                     console.log(startInd + (77 * (ind5 + 1)) + (7 * ind2), endInd + (77 * (ind5 + 1)) + (7 * ind2));
-                    // console.log(blockDetails[ind].text);
                     // console.log(ind5, ind2);
+                    // console.log(blockDetails[ind].text[endInd + (77 * (ind5 + 1)) + (7 * ind2)]);
+                    // console.log(blockDetails[ind].text.slice(endInd + (77 * (ind5 + 1)) + (7 * ind2), ));
                     console.log(`'${changeStr1}'`);
                     console.log(`'${matchText}'`);
 
                     let isInTags1 = isInTags(startInd + (77 * (ind5 + 1)) + (7 * ind2), tagIndexLength);
-                    let isInTags2 = isInTags(endInd + (77 * (ind5 + 1)) + (7 * ind2), tagIndexLength);
+                    let isInTags2 = isInTags(endInd + (77 * (ind5 + 1)) + (7 * ind2)-1, tagIndexLength);
                     console.log(isInTags1, isInTags2);
 
                     if (changeStr1 === matchText && (isInTags1 === 0 && isInTags2 === 0)) {

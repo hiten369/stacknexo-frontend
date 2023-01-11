@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import EditorContext from './EditorContext';
 import Tooltip1 from 'codex-tooltip';
 import { publicIpv4 } from 'public-ip';
+import { useLocation, useParams } from 'react-router-dom';
 
 const EditorState = (props) => {
+    const location = useLocation();
     const [data, setData] = useState({});
     const [flag1, setFlag1] = useState(false);
     const [updateTime, setUpdateTime] = useState('');
@@ -84,7 +86,7 @@ const EditorState = (props) => {
             type: "realTime",
             content: text,
             type1: "ARTICLE",
-            articleId: localStorage.getItem('stnArticleId')
+            articleId: location.pathname.split('/')[2]
         }));
     };
 
@@ -95,7 +97,7 @@ const EditorState = (props) => {
             content: text,
             data,
             type1: "ARTICLE",
-            articleId: localStorage.getItem('stnArticleId')
+            articleId: location.pathname.split('/')[2]
         }));
     };
 
@@ -106,7 +108,7 @@ const EditorState = (props) => {
             type: "fetch",
             content: text,
             type1: "GRAMMAR",
-            articleId: localStorage.getItem('stnArticleId'),
+            articleId: location.pathname.split('/')[2],
             text: str,
             flag,
             goalsObj
@@ -119,7 +121,7 @@ const EditorState = (props) => {
         client2.send(JSON.stringify({
             type: "update",
             type1: "GOALS",
-            articleId: localStorage.getItem('stnArticleId'),
+            articleId: location.pathname.split('/')[2],
             goalsObj
         }));
     };
@@ -131,7 +133,7 @@ const EditorState = (props) => {
             type1: "GOALSUSER",
             name: name,
             flag: flag,
-            articleId: localStorage.getItem('stnArticleId'),
+            articleId: location.pathname.split('/')[2],
             goalsObj
         }));
     };
@@ -142,7 +144,7 @@ const EditorState = (props) => {
         client2.send(JSON.stringify({
             type: "update",
             type1: "USERDICT",
-            articleId: localStorage.getItem('stnArticleId'),
+            articleId: location.pathname.split('/')[2],
             dictWord,
             userIp
         }));
@@ -155,7 +157,7 @@ const EditorState = (props) => {
         client2.send(JSON.stringify({
             type: "versionHistory",
             type1: "ARTICLE",
-            articleId: localStorage.getItem('stnArticleId'),
+            articleId: location.pathname.split('/')[2],
         }));
     };
 

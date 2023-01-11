@@ -340,7 +340,7 @@ const EditorMain = (props) => {
             {
                 id: 'articleUpdateDate',
                 name: 'Last Modified',
-                selector: row => <><p>{row.articleUpdateDate.date ? `${new Date(Number(row.articleUpdateDate.date)).toLocaleDateString()} at ${tConvert(new Date(Number(row.articleUpdateDate.date)).toLocaleTimeString())}` : 'Few moments ago'}</p> by <NavLink className="text-dark" to={row.articleUpdateDate.user.id ? `/users/${row.articleUpdateDate.user.id}` : ''}><b>{row.articleUpdateDate.user.name}</b></NavLink></>,
+                selector: row => <><p>{row?.articleUpdateDate?.date ? `${new Date(Number(row?.articleUpdateDate?.date)).toLocaleDateString()} at ${tConvert(new Date(Number(row?.articleUpdateDate?.date))?.toLocaleTimeString())}` : 'Few moments ago'}</p> by <NavLink className="text-dark" to={row?.articleUpdateDate?.user?.id ? `/users/${row?.articleUpdateDate?.user?.id}` : ''}><b>{row?.articleUpdateDate?.user?.name}</b></NavLink></>,
                 sortable: true,
                 sortField: 'articleUpdateDate',
                 wrap: true,

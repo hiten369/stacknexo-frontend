@@ -53,8 +53,6 @@ const Editor2 = (props) => {
   const navigate = useNavigate();
   const { articleId } = useParams();
 
-  useMemo(() => localStorage.setItem('stnArticleId', articleId), [articleId]);
-
   const [senderUserId, setSenderUserId] = useState('');
   const [takeOverFlag, setTakeOverFlag] = useState(false);
   const [instances, setInstances] = useState([]);
