@@ -1,9 +1,9 @@
 import { dltCard } from "./GrammarUtils";
 
 // Add/Remove to dictionary
-export const updateDict = (cardId, ind, dictWord, editorContext) => {
+export const updateDict = (cardId, ind, dictWord, editorContext, index) => {
     const { dictWords, setDictWords, onEditorStateChange5, client } = editorContext;
-    dltCard(cardId, ind, `"${dictWord}" has been added to dictionary`, true, dictWord, false, editorContext);
+    dltCard(cardId, ind, index, `"${dictWord}" has been added to dictionary`, true, dictWord, false, editorContext);
     onEditorStateChange5(dictWord, client);
     setDictWords(dictWords.concat(dictWord));
 };

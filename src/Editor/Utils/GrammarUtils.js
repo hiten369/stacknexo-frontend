@@ -1644,7 +1644,7 @@ const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUti
             break;
         }
 
-        // console.log(i);
+        console.log(i);
         if (i?.tagName !== 'SPAN' && (i.parentNode?.tagName === 'SPAN' || i.parentNode?.tagName === 'DIV')) {
             // console.log(i.innerText);
             // console.log(matchText);
@@ -1667,16 +1667,17 @@ const tagUtil1 = (card01, matchText, tagData1, tagData, replacement_text, tagUti
 
             // if correction text containing HTML tags
             if (tagInnerText === correctionText || tagUtilFlag) {
-                // console.log(i.id.slice(4,));
+                console.log(i.id.slice(4,));
                 // console.log(tagData1);
 
                 if (correctionText !== ' ') {
                     // To find index of the tag word to be manupilated
                     let tagArrIndex = tagData1.findIndex(x => x.index === Number(i.id.slice(4,)));
-                    // console.log(tagArrIndex);
+                    console.log(tagArrIndex);
 
                     if (tagData.length > 0 && tagArrIndex !== -1) {
 
+                        console.log(tagData1);
                         console.log(tagData);
                         console.log(`'${correctionText}'`);
                         console.log(`'${replacement_text}'`);
@@ -1890,7 +1891,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
     let tagData = JSON.parse(localStorage.getItem("stnTagData"))[ind];
     let tagData1 = JSON.parse(localStorage.getItem("stnTagData"))[ind];
 
-    const x = document.querySelector('.ce-block__content').children[0].getElementsByTagName("*");
+    const x = document.querySelectorAll('.ce-block__content')[ind].children[0].getElementsByTagName("*");
 
     // Inserting the ids to tags for uniquification
     insertIdToTags(x);

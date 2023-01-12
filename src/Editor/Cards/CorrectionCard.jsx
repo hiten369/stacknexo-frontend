@@ -154,7 +154,7 @@ const CorrectionCard = ({ ind, index, index2, e }) => {
                                 e.category === 'Unknown' ?
                                     <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
                                         <b>Unknown word: </b>
-                                        <i className="text-danger fw-bolder">{e.text}</i>
+                                        <em className="text-danger fw-bolder">{e.text}</em>
                                     </p> :
 
                                     <p style={flag4 || grammarFlag || grammarFlag1 ? { 'pointerEvents': 'none', 'cursor': 'wait' } : {}} className='cpar'>
@@ -223,7 +223,7 @@ const CorrectionCard = ({ ind, index, index2, e }) => {
                         <div className="em2-box13 mb-3">
                             <div className="em2-box131">
                                 <p onClick={() => {
-                                    updateDict(blockIds[ind][index], ind, e.highlightText, editorContext);
+                                    updateDict(blockIds[ind][index], ind, e.highlightText, editorContext, index);
                                 }} className="text-gray learnMore dictionary">Add to dictionary</p>
                             </div>
                             <div onClick={() => {
