@@ -1938,7 +1938,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
         tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
         // Saving the data
-        localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
+        localStorage.setItem("stnTagData", JSON.stringify({ ...JSON.parse(localStorage.getItem('stnTagData')), [ind]: tagData }));
 
         // console.log("======= ========= ======== ====== ========");
         // console.log(startInd + (77 * (ind1 + 1)) + (7 * ind2), endInd + (77 * (ind1 + 1)) + (7 * ind2));
@@ -2125,7 +2125,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
             tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
             // Saving the data
-            localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
+            localStorage.setItem("stnTagData", JSON.stringify({ ...JSON.parse(localStorage.getItem('stnTagData')), [ind]: tagData }));
             // console.log(tagData);
 
             undoObj = {
@@ -2185,7 +2185,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     tagData = tagUtil1(card01, document.getElementById(id).textContent, tagData1, tagData, replacement_text + strSpace + document.getElementById(id).textContent, false, false, 0);
 
                     // Saving the data
-                    localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
+                    localStorage.setItem("stnTagData", JSON.stringify({ ...JSON.parse(localStorage.getItem('stnTagData')), [ind]: tagData }));
                     // console.log(tagData);
 
                     undoObj = {
@@ -2272,7 +2272,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
                     // Saving the data
-                    localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
+                    localStorage.setItem("stnTagData", JSON.stringify({ ...JSON.parse(localStorage.getItem('stnTagData')), [ind]: tagData }));
                     // console.log(tagData);
 
                     undoObj = {
@@ -2306,7 +2306,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 var ind5 = Number(idNum[id]); // card index
 
                 /* Insert html tags here */
-                
+
                 let card01 = document.getElementById(id).getElementsByTagName("*");
                 // console.log(card01);
 
@@ -2328,7 +2328,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                 tagData = tagUtil1(card01, matchText, tagData1, tagData, replacement_text, tagUtilFlag, blankTextFlag, insertPosition);
 
                 // Saving the data
-                localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [ind]:tagData}));
+                localStorage.setItem("stnTagData", JSON.stringify({ ...JSON.parse(localStorage.getItem('stnTagData')), [ind]: tagData }));
                 // console.log(tagData);
 
                 // console.log(mainData[ind].alerts.length);
@@ -2352,7 +2352,7 @@ export const textChange = async (id, text, replacement_text, isNum, ind, ind1, s
                     console.log(`'${matchText}'`);
 
                     let isInTags1 = isInTags(startInd + (77 * (ind5 + 1)) + (7 * ind2), tagIndexLength);
-                    let isInTags2 = isInTags(endInd + (77 * (ind5 + 1)) + (7 * ind2)-1, tagIndexLength);
+                    let isInTags2 = isInTags(endInd + (77 * (ind5 + 1)) + (7 * ind2) - 1, tagIndexLength);
                     console.log(isInTags1, isInTags2);
 
                     if (changeStr1 === matchText && (isInTags1 === 0 && isInTags2 === 0)) {
@@ -2677,7 +2677,7 @@ export const alertUndo = (editorContext) => {
         }
 
         console.log(alertUndoMsg.prevTagData);
-        localStorage.setItem("stnTagData", JSON.stringify({...JSON.parse(localStorage.getItem('stnTagData')), [alertUndoMsg.ind]:alertUndoMsg.prevTagData}));
+        localStorage.setItem("stnTagData", JSON.stringify({ ...JSON.parse(localStorage.getItem('stnTagData')), [alertUndoMsg.ind]: alertUndoMsg.prevTagData }));
     }
 
     // If undo a deleted card

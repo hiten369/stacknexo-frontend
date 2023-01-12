@@ -372,19 +372,19 @@ const Editor2 = (props) => {
                       let tagData = JSON.parse(localStorage.getItem("stnTagData"));
                       // console.log(tagData);
 
-                      tagData=tagData[blockNum-1];
+                      tagData = tagData[blockNum - 1];
 
                       tagData.sort((a, b) => a.index - b.index);
 
                       if (tagData.length > 0) {
-                        let replacedString = document.querySelectorAll('.ce-block__content')[blockNum-1].children[0].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
+                        let replacedString = document.querySelectorAll('.ce-block__content')[blockNum - 1].children[0].innerHTML.replaceAll('&nbsp;', ' ').replace(/\u00A0/g, " ");
 
                         for (let i = tagData.length - 1; i >= 0; i--) {
                           replacedString = replace_nth(replacedString, tagData[i].text, tagData[i].replacement, tagData[i].occurrance);
                         }
 
                         // console.log(replacedString);
-                        document.querySelectorAll('.ce-block__content')[blockNum-1].children[0].innerHTML = replacedString;
+                        document.querySelectorAll('.ce-block__content')[blockNum - 1].children[0].innerHTML = replacedString;
                       }
 
                       // Initialy set the block details sent by grammarly which includes block id and text
